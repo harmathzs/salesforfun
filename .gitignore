@@ -46,3 +46,12 @@ $RECYCLE.BIN/
 **/__pycache__/
 **/.venv/
 **/venv/
+
+# My exclusions
+.husky
+.vscode
+.idea
+package.json
+*.iml
+config
+.proxyai
