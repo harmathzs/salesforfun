@@ -64,6 +64,7 @@
         <members>ShipmentItem</members>
         <members>Task</members>
         <members>User</members>
+        <members>Value__mdt</members>
         <name>CustomObject</name>
     </types>
     <types>
@@ -74,6 +75,13 @@
     </types>
     <types>
         <name>WebLink</name>
+    </types>
+    <types>
+        <members>Value.Org_Id</members>
+        <name>CustomMetadata</name>
+    </types>
+    <types>
+        <name>FieldSet</name>
     </types>
     <version>66.0</version>
 </Package>
