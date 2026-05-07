@@ -97,5 +97,14 @@
     <types>
         <name>ValidationRule</name>
     </types>
+    <types>
+        <members>Mass_Lead_Evolution_App</members>
+        <name>CustomApplication</name>
+    </types>
+    <types>
+        <members>Mass_Lead_Evolution_Home</members>
+        <members>Mass_Lead_Evolution_UtilityBar</members>
+        <name>FlexiPage</name>
+    </types>
     <version>66.0</version>
 </Package>
