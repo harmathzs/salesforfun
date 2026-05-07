@@ -44,6 +44,11 @@ Implement an end-to-end Salesforce sales process from Lead to Renewal with clear
 
 ### Phase 1: Foundation (High Priority)
 
+✅ **COMPLETED: Lead capture and qualification**
+   - Web-to-Lead implementation with React site
+   - Lead insert trigger with Metillium framework
+   - Product Interest field mapping from web form
+
 1. Lead conversion baseline and field mappings
 2. Opportunity defaults
    - Auto-set Price Book
@@ -114,6 +119,12 @@ Use Apex for:
 
 ## 7) Backlog (Refined From Current Notes)
 
+✅ **COMPLETED: Web-to-Lead Implementation**
+   - React site with Lead capture form (https://react-for-fun.vercel.app/)
+   - Web-to-Lead integration with Salesforce
+   - Lead insert trigger using Metillium framework
+   - Product Interest field mapping (Description → Product Interest)
+
 1. Mass convert Leads
    - Auto-set Price Book on Opportunity
    - Set OpportunityLineItems by product interest
@@ -130,6 +141,12 @@ Use Apex for:
 8. Renewal, Amendment, Termination options
 
 ## 8) Milestones and Acceptance
+
+✅ **Milestone 0: Web-to-Lead Implementation Complete**
+   - React site with Lead capture form deployed
+   - Web-to-Lead integration working
+   - Lead insert trigger implemented with Metillium framework
+   - Product Interest field mapping functional
 
 - Milestone A: Lead-to-Opportunity automation complete and tested
 - Milestone B: Quote-to-Order with line items complete and tested
