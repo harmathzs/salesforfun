@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Mass Lead Converter</masterLabel>
+    <description>Component for mass converting leads to accounts, contacts, and opportunities</description>
+    <targets>
+        <target>lightning__QuickAction</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__QuickAction">
+            <actionType>ScreenAction</actionType>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

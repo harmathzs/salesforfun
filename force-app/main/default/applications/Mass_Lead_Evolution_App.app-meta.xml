@@ -20,6 +20,14 @@
     <isOmniPinnedViewEnabled>false</isOmniPinnedViewEnabled>
     <label>Mass Lead Evolution</label>
     <navType>Standard</navType>
+    <actionOverrides>
+        <actionName>ListView</actionName>
+        <content>MassConvertLeads</content>
+        <formFactor>Large</formFactor>
+        <skipRecordTypeSelect>false</skipRecordTypeSelect>
+        <type>QuickAction</type>
+        <pageOrSobjectType>Lead</pageOrSobjectType>
+    </actionOverrides>
     <profileActionOverrides>
         <actionName>Tab</actionName>
         <content>Mass_Lead_Evolution_Home</content>
