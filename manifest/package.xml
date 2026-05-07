@@ -65,9 +65,18 @@
         <members>Task</members>
         <members>User</members>
         <members>Value__mdt</members>
+        <members>mtf__Trigger_Action__mdt</members>
+        <members>mtf__sObject_Trigger_Setting__mdt</members>
         <name>CustomObject</name>
     </types>
     <types>
+        <members>mtf__Trigger_Action__mdt.mtf__Active__c</members>
+        <members>mtf__Trigger_Action__mdt.mtf__Apex_Class_Name__c</members>
+        <members>mtf__Trigger_Action__mdt.mtf__Description__c</members>
+        <members>mtf__Trigger_Action__mdt.mtf__Order__c</members>
+        <members>mtf__Trigger_Action__mdt.mtf__sObject_Trigger_Setting__c</members>
+        <members>mtf__sObject_Trigger_Setting__mdt.mtf__Active__c</members>
+        <members>mtf__sObject_Trigger_Setting__mdt.mtf__Object_API_Name__c</members>
         <name>CustomField</name>
     </types>
     <types>
@@ -78,10 +87,15 @@
     </types>
     <types>
         <members>Value.Org_Id</members>
+        <members>Value.Admin_Password</members>
+        <members>Value.Admin_User_Email</members>
         <name>CustomMetadata</name>
     </types>
     <types>
         <name>FieldSet</name>
+    </types>
+    <types>
+        <name>ValidationRule</name>
     </types>
     <version>66.0</version>
 </Package>
