@@ -1,11 +1,8 @@
 /** Metillium Trigger Framework from https://github.com/lfreeland/Saleforce-Trigger-Framework */
 global with sharing class LeadTriggerAction extends mtf.TriggerAction {
   public override void beforeInsert(List<SObject> newRecords) {
-    Lead[] newLeads = newRecords;
-
-    for (Lead newLead : newLeads) {
-
-    }
+    // copy Web-to-Lead Description to Product Interest
+    LeadTriggerService.copyDescriptionToProductInterestBI(newRecords);
   }
 
   public override void beforeUpdate(Map<Id, SObject> oldRecordsMap, Map<Id, SObject> newRecordsMap) {}

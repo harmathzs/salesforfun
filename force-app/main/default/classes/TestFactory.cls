@@ -7,7 +7,8 @@ public with sharing class TestFactory {
         LastName='Doe '+i,
         Company='Test Corp',
         LeadSource='Web',
-        Email='test'+i+'@lead.com'
+        Email='test'+i+'@lead.com',
+        Description='I am interested in the Perfect Product PP-2000 series.'
       ));
     }
     return testLeads;
