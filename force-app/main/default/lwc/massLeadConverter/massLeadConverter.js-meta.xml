@@ -5,11 +5,15 @@
     <masterLabel>Mass Lead Converter</masterLabel>
     <description>Component for mass converting leads to accounts, contacts, and opportunities</description>
     <targets>
-        <target>lightning__QuickAction</target>
+        <target>lightning__FlowScreen</target>
+        <target>lightning__AppPage</target>
+        <target>lightning__RecordPage</target>
+        <target>lightning__RecordAction</target>
+        <target>lightning__HomePage</target>
     </targets>
     <targetConfigs>
-        <targetConfig targets="lightning__QuickAction">
-            <actionType>ScreenAction</actionType>
+        <targetConfig targets="lightning__FlowScreen,lightning__AppPage,lightning__HomePage">
+            <property name="ids" type="String" />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

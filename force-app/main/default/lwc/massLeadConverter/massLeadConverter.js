@@ -2,10 +2,11 @@ import { LightningElement, api } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class MassLeadConverter extends LightningElement {
-    @api recordIds;
+    @api ids;
+    recordIdsLength = 'TODO';
     
     connectedCallback() {
-        console.log('Mass Lead Converter initialized with records:', this.recordIds);
+        console.log('Mass Lead Converter initialized with records:', this.ids);
         this.showToast('Info', 'Mass Convert Leads action ready', 'info');
     }
     
