@@ -1,22 +1,27 @@
 <template>
-    <lightning-card title="Mass Lead Conversion" icon-name="standard:lead">
-        <div class="slds-p-around_medium">
-            <p>ids: {ids}</p>
-            <p>Selected {recordIdsLength} leads for conversion</p>
-            <p>This action will convert the selected leads to Accounts, Contacts, and Opportunities.</p>
+  <lightning-card title="Mass Lead Conversion" icon-name="standard:lead">
+    <div class="slds-p-around_medium">
+      <p>ids: {ids}</p>
+      <p>Selected {recordIdsLength} leads for conversion</p>
+      <p>
+        This action will convert the selected leads to Accounts, Contacts, and
+        Opportunities.
+      </p>
 
-            <lightning-button
-                label="Convert Leads"
-                variant="brand"
-                onclick={handleConvert}
-                class="slds-m-top_small">
-            </lightning-button>
+      <lightning-button
+        label="Convert Leads"
+        variant="brand"
+        onclick={handleConvert}
+        class="slds-m-top_small"
+      >
+      </lightning-button>
 
-            <lightning-button
-                label="Cancel"
-                onclick={handleCancel}
-                class="slds-m-left_small">
-            </lightning-button>
-        </div>
-    </lightning-card>
+      <lightning-button
+        label="Cancel"
+        onclick={handleCancel}
+        class="slds-m-left_small"
+      >
+      </lightning-button>
+    </div>
+  </lightning-card>
 </template>

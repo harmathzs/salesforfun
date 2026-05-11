@@ -2,16 +2,31 @@
   "trailingComma": "none",
   "plugins": [
     "prettier-plugin-apex",
-    "@prettier/plugin-xml"
+    "@prettier/plugin-xml",
+    "prettier-plugin-lwc"
   ],
   "overrides": [
     {
       "files": "**/lwc/**/*.html",
-      "options": { "parser": "lwc" }
+      "options": {
+        "parser": "lwc",
+        "singleQuote": true,
+        "bracketSpacing": true,
+        "tabWidth": 2,
+        "printWidth": 100,
+        "htmlWhitespaceSensitivity": "ignore"
+      }
     },
     {
       "files": "*.{cmp,page,component}",
-      "options": { "parser": "html" }
+      "options": {
+        "parser": "html",
+        "singleQuote": true,
+        "bracketSpacing": true,
+        "tabWidth": 2,
+        "printWidth": 100,
+        "htmlWhitespaceSensitivity": "ignore"
+      }
     }
   ]
 }
