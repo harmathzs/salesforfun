@@ -22,7 +22,11 @@ public with sharing class LeadMassConvertInvocable {
    */
   @InvocableMethod(label='Mass Convert Leads' description='Converts multiple leads to Accounts, Contacts, and Opportunities')
   public static List<String> massConvert(List<List<Lead>> leads) {
-    System.debug('LeadMassConvertInvocable.massConvert; leads: '+leads);
+    System.debug('LeadMassConvertInvocable.massConvert started');
+    System.debug('LeadMassConvertInvocable.massConvert; input leads count: ' + (leads != null ? leads.size() : 0));
+    if (leads != null && !leads.isEmpty() && !leads[0].isEmpty()) {
+      System.debug('LeadMassConvertInvocable.massConvert; leads to process: ' + leads[0].size());
+    }
 
     Map<String, List<Map<String, String>>> results = new Map<String, List<Map<String, String>>>{
       'error' => new List<Map<String, String>>(),
@@ -51,9 +55,11 @@ public with sharing class LeadMassConvertInvocable {
 
     for (Integer i = 0; i < convertibleLeads.size(); i++) {
       Lead lead = convertibleLeads[i];
+      System.debug('LeadMassConvertInvocable.massConvert; processing lead ' + (i+1) + '/' + convertibleLeads.size() + ' - Id: ' + lead.Id + ', Status: ' + lead.Status);
 
       // Validate lead status
       if (lead.Status != 'Qualified') {
+        System.debug('LeadMassConvertInvocable.massConvert; lead not qualified - Id: ' + lead.Id + ', Status: ' + lead.Status);
         Map<String, String> errorResult = new Map<String, String>{
           'OpportunityId' => null,
           'AccountId' => null,
@@ -72,17 +78,21 @@ public with sharing class LeadMassConvertInvocable {
 
       leadConversions.add(leadConvert);
       leadIndexMap.put(lead.Id, i);
+      System.debug('LeadMassConvertInvocable.massConvert; prepared conversion for lead Id: ' + lead.Id);
     }
 
     // Bulk convert leads - DML outside the loop
     if (!leadConversions.isEmpty()) {
+      System.debug('LeadMassConvertInvocable.massConvert; executing bulk conversion for ' + leadConversions.size() + ' leads');
       List<Database.LeadConvertResult> convertResults = Database.convertLead(leadConversions);
+      System.debug('LeadMassConvertInvocable.massConvert; conversion completed, processing ' + convertResults.size() + ' results');
 
       // Process results
       for (Integer i = 0; i < convertResults.size(); i++) {
         Database.LeadConvertResult convertResult = convertResults[i];
 
         if (convertResult.isSuccess()) {
+          System.debug('LeadMassConvertInvocable.massConvert; successful conversion - OpportunityId: ' + convertResult.getOpportunityId() + ', AccountId: ' + convertResult.getAccountId() + ', ContactId: ' + convertResult.getContactId());
           Map<String, String> result = new Map<String, String>{
             'OpportunityId' => convertResult.getOpportunityId(),
             'AccountId' => convertResult.getAccountId(),
@@ -91,6 +101,7 @@ public with sharing class LeadMassConvertInvocable {
           };
           results.get('results').add(result);
         } else {
+          System.debug('LeadMassConvertInvocable.massConvert; failed conversion - Error: ' + convertResult.getErrors()[0].getMessage());
           Map<String, String> errorResult = new Map<String, String>{
             'OpportunityId' => null,
             'AccountId' => null,
