@@ -3,30 +3,14 @@ private class LeadMassConvertInvocableTest {
 
   @TestSetup
   static void setupTestData() {
-    // Create test leads with different statuses
+    // Create test leads with different statuses using TestFactory
     List<Lead> testLeads = new List<Lead>();
 
     // Create 3 qualified leads
-    for (Integer i = 0; i < 3; i++) {
-      testLeads.add(new Lead(
-        FirstName = 'Test' + i,
-        LastName = 'Lead' + i,
-        Company = 'Test Company ' + i,
-        Status = 'Qualified',
-        Email = 'test' + i + '@example.com'
-      ));
-    }
+    testLeads.addAll(TestFactory.getQualifiedTestLeads(3));
 
     // Create 2 unqualified leads
-    for (Integer i = 3; i < 5; i++) {
-      testLeads.add(new Lead(
-        FirstName = 'Test' + i,
-        LastName = 'Lead' + i,
-        Company = 'Test Company ' + i,
-        Status = 'Open - Not Contacted',
-        Email = 'test' + i + '@example.com'
-      ));
-    }
+    testLeads.addAll(TestFactory.getUnqualifiedTestLeads(2));
 
     insert testLeads;
   }
