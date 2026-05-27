@@ -1,5 +1,26 @@
+/**
+ * Mass Lead Conversion Service
+ *
+ * @author Zsolt Harmath
+ * @description Provides bulk lead conversion functionality for converting multiple leads to Accounts, Contacts, and Opportunities.
+ *              Implements efficient bulk processing patterns and comprehensive error handling.
+ */
 public with sharing class LeadMassConvertInvocable {
-  @InvocableMethod
+  /**
+   * Converts multiple leads to Accounts, Contacts, and Opportunities in a single transaction.
+   *
+   * @param leads List of List of Lead records to convert. The outer list contains one inner list of leads.
+   * @return List<String> JSON string containing conversion results with OpportunityId, AccountId, ContactId, and Error for each lead.
+   *
+   * @example
+   * // Basic usage
+   * List<Lead> leadsToConvert = [SELECT Id FROM Lead WHERE Status = 'Qualified'];
+   * List<String> results = LeadMassConvertInvocable.massConvert(new List<List<Lead>>{leadsToConvert});
+   *
+   * @note Only leads with 'Qualified' status will be converted. Unqualified leads will receive error messages.
+   * @note This method follows bulk processing best practices - no DML in loops, proper error handling.
+   */
+  @InvocableMethod(label='Mass Convert Leads' description='Converts multiple leads to Accounts, Contacts, and Opportunities')
   public static List<String> massConvert(List<List<Lead>> leads) {
     System.debug('LeadMassConvertInvocable.massConvert; leads: '+leads);
 

@@ -1,6 +1,25 @@
+/**
+ * LeadMassConvertInvocable Test Class
+ *
+ * @author Zsolt Harmath
+ * @description Comprehensive test coverage for LeadMassConvertInvocable class.
+ *              Tests bulk lead conversion functionality including happy paths, edge cases, and error conditions.
+ *
+ * @group TestClasses
+ * @see LeadMassConvertInvocable
+ */
 @IsTest
 private class LeadMassConvertInvocableTest {
 
+  /**
+   * Sets up test data for all test methods in this class.
+   *
+   * @description Creates 3 qualified leads and 2 unqualified leads using TestFactory.
+   *              These records are inserted and available for all test methods via SOQL queries.
+   *
+   * @see TestFactory.getQualifiedTestLeads()
+   * @see TestFactory.getUnqualifiedTestLeads()
+   */
   @TestSetup
   static void setupTestData() {
     // Create test leads with different statuses using TestFactory
@@ -15,6 +34,15 @@ private class LeadMassConvertInvocableTest {
     insert testLeads;
   }
 
+  /**
+   * Tests successful conversion of qualified leads.
+   *
+   * @description Verifies that leads with 'Qualified' status are successfully converted
+   *              to Accounts, Contacts, and Opportunities with proper result structure.
+   *
+   * @testSetup setupTestData()
+   * @isTest true
+   */
   @IsTest
   static void testMassConvertWithQualifiedLeads() {
     // Get qualified leads
@@ -52,6 +80,15 @@ private class LeadMassConvertInvocableTest {
     }
   }
 
+  /**
+   * Tests proper handling of unqualified leads.
+   *
+   * @description Verifies that leads without 'Qualified' status return error messages
+   *              instead of being converted, with proper error structure.
+   *
+   * @testSetup setupTestData()
+   * @isTest true
+   */
   @IsTest
   static void testMassConvertWithUnqualifiedLeads() {
     // Get unqualified leads
@@ -84,6 +121,15 @@ private class LeadMassConvertInvocableTest {
     }
   }
 
+  /**
+   * Tests input validation for empty lead lists.
+   *
+   * @description Verifies that empty lead lists return appropriate error messages
+   *              in the error section of the result structure.
+   *
+   * @testSetup None required
+   * @isTest true
+   */
   @IsTest
   static void testMassConvertWithEmptyList() {
     Test.startTest();
@@ -106,6 +152,15 @@ private class LeadMassConvertInvocableTest {
     System.assertEquals('Leads list is empty!', error.get('Error'), 'Error should indicate empty list');
   }
 
+  /**
+   * Tests handling of mixed qualified and unqualified leads.
+   *
+   * @description Verifies that a mixed dataset properly converts qualified leads
+   *              and returns errors for unqualified leads in a single operation.
+   *
+   * @testSetup setupTestData()
+   * @isTest true
+   */
   @IsTest
   static void testMassConvertWithMixedLeads() {
     // Get all leads (both qualified and unqualified)
@@ -146,6 +201,15 @@ private class LeadMassConvertInvocableTest {
     System.assertEquals(2, failedCount, 'Should have 2 failed conversions');
   }
 
+  /**
+   * Tests input validation for null parameters.
+   *
+   * @description Verifies that null input is handled gracefully and returns
+   *              appropriate error messages in the error section.
+   *
+   * @testSetup None required
+   * @isTest true
+   */
   @IsTest
   static void testMassConvertWithNullInput() {
     Test.startTest();
