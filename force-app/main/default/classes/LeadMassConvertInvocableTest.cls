@@ -117,7 +117,7 @@ private class LeadMassConvertInvocableTest {
       System.assertEquals(null, result.get('AccountId'), 'Should have no AccountId');
       System.assertEquals(null, result.get('ContactId'), 'Should have no ContactId');
       System.assert(result.get('Error') != null, 'Should have error');
-      System.assert(((String)result.get('Error')).contains('Qualified'), 'Error should mention Qualified status');
+      System.assert(((String)result.get('Error')).contains('not eligible for conversion'), 'Error should mention eligibility status');
     }
   }
 
@@ -193,7 +193,7 @@ private class LeadMassConvertInvocableTest {
         System.assert(result.get('OpportunityId') != null, 'Successful result should have OpportunityId');
       } else {
         failedCount++;
-        System.assert(((String)result.get('Error')).contains('Qualified'), 'Failed result should mention Qualified status');
+        System.assert(((String)result.get('Error')).contains('not eligible for conversion'), 'Failed result should mention eligibility status');
       }
     }
 

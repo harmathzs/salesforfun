@@ -17,7 +17,7 @@ public with sharing class LeadMassConvertInvocable {
    * List<Lead> leadsToConvert = [SELECT Id FROM Lead WHERE Status = 'Qualified'];
    * List<String> results = LeadMassConvertInvocable.massConvert(new List<List<Lead>>{leadsToConvert});
    *
-   * @note Only leads with 'Qualified' status will be converted. Unqualified leads will receive error messages.
+   * @note Only leads with convertible statuses (Qualified, Working - Contacted, Nurturing, Closed - Not Converted) will be converted. Ineligible leads will receive error messages.
    * @note This method follows bulk processing best practices - no DML in loops, proper error handling.
    */
   @InvocableMethod(label='Mass Convert Leads' description='Converts multiple leads to Accounts, Contacts, and Opportunities')
@@ -57,14 +57,15 @@ public with sharing class LeadMassConvertInvocable {
       Lead lead = convertibleLeads[i];
       System.debug('LeadMassConvertInvocable.massConvert; processing lead ' + (i+1) + '/' + convertibleLeads.size() + ' - Id: ' + lead.Id + ', Status: ' + lead.Status);
 
-      // Validate lead status
-      if (lead.Status != 'Qualified') {
+      // Validate lead status - allow common convertible statuses
+      Set<String> convertibleStatuses = new Set<String>{'Qualified', 'Working - Contacted', 'Nurturing', 'Closed - Not Converted'};
+      if (!convertibleStatuses.contains(lead.Status)) {
         System.debug('LeadMassConvertInvocable.massConvert; lead not qualified - Id: ' + lead.Id + ', Status: ' + lead.Status);
         Map<String, String> errorResult = new Map<String, String>{
           'OpportunityId' => null,
           'AccountId' => null,
           'ContactId' => null,
-          'Error' => 'Lead must be Qualified to convert: ' + lead.Status
+          'Error' => 'Lead status not eligible for conversion: ' + lead.Status
         };
         results.get('results').add(errorResult);
         continue;
