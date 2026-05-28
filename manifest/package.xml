@@ -80,6 +80,7 @@
         <name>CustomField</name>
     </types>
     <types>
+        <members>default.Leads_Ready_For_Conversion</members>
         <name>ListView</name>
     </types>
     <types>
@@ -96,6 +97,27 @@
     </types>
     <types>
         <name>ValidationRule</name>
+    </types>
+    <types>
+        <members>Mass_Lead_Evolution_App</members>
+        <name>CustomApplication</name>
+    </types>
+    <types>
+        <members>Mass_Lead_Evolution_Home</members>
+        <members>Mass_Lead_Evolution_UtilityBar</members>
+        <name>FlexiPage</name>
+    </types>
+    <types>
+        <members>MassConvertLeads</members>
+        <name>QuickAction</name>
+    </types>
+    <types>
+        <members>Mass_Lead_Conversion_Screen_Flow</members>
+        <name>Flow</name>
+    </types>
+    <types>
+        <members>Mass_Lead_Conversion_Screen_Flow</members>
+        <name>FlowDefinition</name>
     </types>
     <version>66.0</version>
 </Package>
