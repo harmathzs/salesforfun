@@ -105,6 +105,7 @@
     <types>
         <members>Mass_Lead_Evolution_Home</members>
         <members>Mass_Lead_Evolution_UtilityBar</members>
+        <members>My_Custom_Salesforce_Home_Page</members>
         <name>FlexiPage</name>
     </types>
     <types>
@@ -118,6 +119,25 @@
     <types>
         <members>Mass_Lead_Conversion_Screen_Flow</members>
         <name>FlowDefinition</name>
+    </types>
+    <types>
+        <members>Sales4fun_Store</members>
+        <name>CustomSite</name>
+    </types>
+    <types>
+        <members>Sales4fun_Store1</members>
+        <name>DigitalExperienceConfig</name>
+    </types>
+    <types>
+        <members>force__Commerce_Shopper</members>
+        <members>Sales4fun_Commerce_Shopper</members>
+        <name>PermissionSetGroup</name>
+    </types>
+    <types>
+        <members>Customer Community Plus User</members>
+        <members>Sales4fun Store Profile</members>
+        <members>Sales4fun Store Shopper Profile</members>
+        <name>Profile</name>
     </types>
     <version>66.0</version>
 </Package>
