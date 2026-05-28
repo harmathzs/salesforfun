@@ -111,5 +111,13 @@
         <members>MassConvertLeads</members>
         <name>QuickAction</name>
     </types>
+    <types>
+        <members>Mass_Lead_Conversion_Screen_Flow</members>
+        <name>Flow</name>
+    </types>
+    <types>
+        <members>Mass_Lead_Conversion_Screen_Flow</members>
+        <name>FlowDefinition</name>
+    </types>
     <version>66.0</version>
 </Package>
