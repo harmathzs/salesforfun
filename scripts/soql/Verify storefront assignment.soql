@@ -1,0 +1,3 @@
+/* Verify storefront assignment */
+SELECT Id
+FROM StoreIntegratedService
