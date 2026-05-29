@@ -1,0 +1,2 @@
+/* Commerce Products */
+SELECT Id FROM Product2

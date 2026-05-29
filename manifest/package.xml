@@ -67,6 +67,25 @@
         <members>Value__mdt</members>
         <members>mtf__Trigger_Action__mdt</members>
         <members>mtf__sObject_Trigger_Setting__mdt</members>
+        <members>AccountContactRole</members>
+        <members>BuyerAccount</members>
+        <members>BuyerGroup</members>
+        <members>BuyerGroupMember</members>
+        <members>BuyerGroupPricebook</members>
+        <members>BuyerGroupRelatedObject</members>
+        <members>Customer</members>
+        <members>Image</members>
+        <members>LocationGroup</members>
+        <members>LocationGroupAssignment</members>
+        <members>ProductCatalog</members>
+        <members>ProductCategory</members>
+        <members>ProductCategoryProduct</members>
+        <members>ProductSellingModel</members>
+        <members>SalesStore</members>
+        <members>SalesStoreCatalog</members>
+        <members>Seller</members>
+        <members>Site</members>
+        <members>WebCart</members>
         <name>CustomObject</name>
     </types>
     <types>
