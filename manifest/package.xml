@@ -86,6 +86,8 @@
         <members>Seller</members>
         <members>Site</members>
         <members>WebCart</members>
+        <members>Webshop_Session__c</members>
+        <members>Webshop_User__c</members>
         <name>CustomObject</name>
     </types>
     <types>
