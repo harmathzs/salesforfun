@@ -1,0 +1,26 @@
+/* Webshop Sessions */
+SELECT Id
+    ,Active__c
+    ,Expires_At__c
+    ,Issued_At__c
+    ,Last_Seen_At__c
+    ,Revoked_At__c
+    ,Session_Id__c
+    ,Webshop_User__c
+    ,Webshop_User__r.Contact__c
+    ,Webshop_User__r.Contact__r.Name
+    ,Webshop_User__r.Failed_Login_Count__c
+    ,Webshop_User__r.Email__c
+    ,Webshop_User__r.Status__c
+    ,Webshop_User__r.Username__c
+    ,Webshop_User__r.Email_Verified__c
+    ,Webshop_User__r.First_Name__c
+    ,Webshop_User__r.Last_Name__c
+    ,Webshop_User__r.Email_Verified_At__c
+    ,Webshop_User__r.Password_Hash__c
+    ,Webshop_User__r.Password_Changed_At__c
+    ,Webshop_User__r.Salesforce_User__c
+    ,Webshop_User__r.Salesforce_User__r.Name
+    ,Webshop_User__r.Last_Login_At__c
+FROM Webshop_Session__c
+LIMIT 200
