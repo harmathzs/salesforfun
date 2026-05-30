@@ -1,2 +1,13 @@
 /* Commerce Products */
-SELECT Id FROM Product2
+SELECT Id
+        ,Name
+        ,(SELECT Id
+            ,Name
+            ,Catalog.Name
+            ,IsPrimaryCategory
+            ,ProductCategory.Name
+        FROM ProductCategoryProducts
+        LIMIT 3
+        )
+    ,StockKeepingUnit
+FROM Product2 LIMIT 20
