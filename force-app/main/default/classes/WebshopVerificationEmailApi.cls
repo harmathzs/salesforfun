@@ -1,6 +1,33 @@
+/**
+ * REST API for sending verification emails to leads during webshop registration.
+ *
+ * This API provides email verification functionality for the React 4 fun webshop.
+ * It allows the frontend application to request verification emails be sent to leads
+ * with custom verification codes that expire after a configurable time period.
+ *
+ * @author Salesforce Developer
+ * @version 1.0
+ * @since 2024
+ *
+ * @description REST endpoint for lead email verification process
+ * @restResource true
+ * @urlMapping /webshop/verification-email
+ */
 @RestResource(UrlMapping='/webshop/verification-email')
 global with sharing class WebshopVerificationEmailApi {
 
+  /**
+   * Request structure for verification email API.
+   *
+   * Contains all parameters needed to send a verification email to a lead.
+   * Either leadId or email must be provided to identify the lead.
+   *
+   * @property leadId Optional lead ID to identify the target lead
+   * @property email Optional lead email to identify the target lead
+   * @property firstName Optional custom first name for email greeting
+   * @property code Required verification code (minimum 4 characters)
+   * @property expiryMinutes Optional code expiry time in minutes (default: 15)
+   */
   global class VerifyEmailRequest {
     public String leadId;
     public String email;
@@ -9,12 +36,56 @@ global with sharing class WebshopVerificationEmailApi {
     public Integer expiryMinutes;
   }
 
+  /**
+   * Response structure for verification email API.
+   *
+   * Contains the result of the verification email sending operation.
+   *
+   * @property ok Boolean indicating success (true) or failure (false)
+   * @property message Human-readable status message
+   * @property requestId Unique identifier for this API request
+   */
   global class VerifyEmailResponse {
     public Boolean ok;
     public String message;
     public String requestId;
   }
 
+  /**
+   * Sends a verification email to a lead with a custom verification code.
+   *
+   * This method handles POST requests to the verification email endpoint.
+   * It validates the request, looks up the lead, generates a verification email,
+   * and sends it using Salesforce email messaging.
+   *
+   * @return VerifyEmailResponse containing success status, message, and request ID
+   *
+   * @httpMethod POST
+   * @restEndpoint /webshop/verification-email
+   *
+   * @example
+   * Request: {
+   *   "leadId": "00Q1t00000ABC123",
+   *   "code": "123456",
+   *   "expiryMinutes": 15
+   * }
+   *
+   * Response (Success): {
+   *   "ok": true,
+   *   "message": "Verification email sent",
+   *   "requestId": "vf_123456789"
+   * }
+   *
+   * Response (Error): {
+   *   "ok": false,
+   *   "message": "Lead not found",
+   *   "requestId": "vf_123456789"
+   * }
+   *
+   * @throws AuraHandledException for validation errors and processing failures
+   * @httpStatus 200 on success
+   * @httpStatus 400 on client errors
+   */
   @HttpPost
   global static VerifyEmailResponse sendVerificationEmail() {
     VerifyEmailResponse out = new VerifyEmailResponse();
