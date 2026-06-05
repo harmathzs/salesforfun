@@ -2,20 +2,53 @@
 private class WebshopVerificationTest {
 
   /**
-   * Test setup method to create test data
-   * @return Lead test record
+   * Creates and inserts a test lead using TestFactory.
+   * Uses the first lead from getTestLeads() method.
+   *
+   * @return Lead inserted test lead record
    */
   private static Lead createTestLead() {
-    Lead testLead = new Lead(
-      FirstName = 'Test',
-      LastName = 'User',
-      Email = 'test@example.com',
-      Company = 'Test Company',
-      Status = 'Open - Not Contacted',
-      Email_Verified__c = false
-    );
-    insert testLead;
-    return testLead;
+    // Get test leads from factory and insert the first one
+    Lead[] testLeads = TestFactory.getTestLeads();
+    insert testLeads[0];
+    return testLeads[0];
+  }
+
+  /**
+   * Creates and inserts a qualified test lead using TestFactory.
+   *
+   * @return Lead inserted qualified test lead record
+   */
+  private static Lead createQualifiedTestLead() {
+    // Get qualified test leads from factory and insert the first one
+    Lead[] qualifiedLeads = TestFactory.getQualifiedTestLeads(1);
+    insert qualifiedLeads[0];
+    return qualifiedLeads[0];
+  }
+
+  /**
+   * Creates and inserts an unqualified test lead using TestFactory.
+   *
+   * @return Lead inserted unqualified test lead record
+   */
+  private static Lead createUnqualifiedTestLead() {
+    // Get unqualified test leads from factory and insert the first one
+    Lead[] unqualifiedLeads = TestFactory.getUnqualifiedTestLeads(1);
+    insert unqualifiedLeads[0];
+    return unqualifiedLeads[0];
+  }
+
+  /**
+   * Creates and inserts a verified test lead using TestFactory.
+   *
+   * @return Lead inserted verified test lead record
+   */
+  private static Lead createVerifiedTestLead() {
+    // Get test lead from factory, mark as verified, and insert
+    Lead[] testLeads = TestFactory.getTestLeads();
+    testLeads[0].Email_Verified__c = true;
+    insert testLeads[0];
+    return testLeads[0];
   }
 
   /**
@@ -216,16 +249,8 @@ private class WebshopVerificationTest {
    */
   @IsTest
   static void testAlreadyVerifiedLead() {
-    // Create verified lead
-    Lead testLead = new Lead(
-      FirstName = 'Verified',
-      LastName = 'User',
-      Email = 'verified@example.com',
-      Company = 'Test Company',
-      Status = 'Open - Not Contacted',
-      Email_Verified__c = true  // Already verified
-    );
-    insert testLead;
+    // Create verified lead using factory
+    Lead testLead = createVerifiedTestLead();
 
     // Create request
     String requestJson = JSON.serialize(new Map<String, Object>{
