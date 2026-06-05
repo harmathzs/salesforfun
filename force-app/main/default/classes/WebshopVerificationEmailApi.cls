@@ -164,6 +164,7 @@ global with sharing class WebshopVerificationEmailApi {
       // msg.setOrgWideEmailAddressId('0D2xxxxxxxxxxxx');
 
       Messaging.SendEmailResult[] results = Messaging.sendEmail(new Messaging.SingleEmailMessage[] { msg });
+      System.debug('sendVerificationEmail results: '+results);
 
       if (results == null || results.isEmpty() || !results[0].isSuccess()) {
         String err = 'Unknown send failure';
