@@ -162,6 +162,15 @@ global with sharing class WebshopVerificationEmailApi {
 
       // Optional: enforce org-wide sender
       // msg.setOrgWideEmailAddressId('0D2xxxxxxxxxxxx');
+      OrgWideEmailAddress oweaHZs = [SELECT Id, Address, DisplayName, IsVerified FROM OrgWideEmailAddress
+        WHERE Address = 'harmathzs@gmail.com' AND IsVerified=TRUE LIMIT 1];
+      System.debug('oweaHZs: '+oweaHZs);
+      Id oweaHZsId = oweaHZs.Id;
+      msg.setOrgWideEmailAddressId(oweaHZsId);
+
+      //msg.setSenderDisplayName('Zsolt Harmath');
+
+      System.debug('msg: '+msg);
 
       Messaging.SendEmailResult[] results = Messaging.sendEmail(new Messaging.SingleEmailMessage[] { msg });
       System.debug('sendVerificationEmail results: '+results);
