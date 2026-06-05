@@ -164,6 +164,7 @@ Use Apex for:
    - Web-to-Lead integration with Salesforce
    - Lead insert trigger using Metillium framework
    - Product Interest field mapping (Description → Product Interest)
+   - Email verification API endpoint: `POST /webshop/verification-email`
 
 ✅ **COMPLETED: Mass Lead Conversion Implementation**
    - LeadMassConvertInvocable Apex class with bulk processing
@@ -222,6 +223,66 @@ Use Apex for:
 
 ## 8) Current Technical Implementation
 
+### Webshop Verification Email API
+
+**Class:** `WebshopVerificationEmailApi.cls`
+
+**Endpoint:** `POST /webshop/verification-email`
+
+**Purpose:** REST API for sending verification emails to leads during the webshop registration process
+
+**Key Features:**
+- REST Resource with URL mapping `/webshop/verification-email`
+- Handles POST requests for email verification
+- Supports both leadId and email-based lead lookup
+- Generates and sends verification codes via email
+- Validates input parameters and lead status
+- Returns structured JSON responses with success/failure status
+
+**Request Structure:**
+```json
+{
+  "leadId": "string",           // Optional: Lead ID
+  "email": "string",             // Optional: Lead email (alternative to leadId)
+  "firstName": "string",         // Optional: Custom greeting name
+  "code": "string",               // Required: Verification code (min 4 chars)
+  "expiryMinutes": integer        // Optional: Code expiry time (default: 15)
+}
+```
+
+**Response Structure:**
+```json
+{
+  "ok": boolean,                  // Success status
+  "message": "string",           // Status message
+  "requestId": "string"           // Unique request identifier
+}
+```
+
+**Validation Rules:**
+- Requires either leadId or email parameter
+- Verification code must be at least 4 characters
+- Lead must exist and have a valid email
+- Lead email must not already be verified
+- Default expiry time: 15 minutes
+
+**Email Template:**
+- Subject: "Verify your React 4 fun account"
+- Personalized greeting using firstName or lead data
+- Includes verification code and expiry information
+- Plain text format for maximum compatibility
+
+**Error Handling:**
+- Returns HTTP 400 for client errors
+- Detailed error messages in response
+- Handles email sending failures gracefully
+- Validates all input parameters
+
+**Integration Points:**
+- Lead object (Email, Email_Verified__c, Verification_Channel__c)
+- Salesforce Email Messaging API
+- React webshop frontend for verification flow
+
 ### Mass Lead Conversion Architecture
 
 **Components Implemented:**
@@ -256,6 +317,7 @@ Use Apex for:
    - Web-to-Lead integration working
    - Lead insert trigger implemented with Metillium framework
    - Product Interest field mapping functional
+   - Email verification API endpoint implemented: `POST /webshop/verification-email`
 
 ✅ **Milestone 1: Mass Lead Conversion Complete**
    - LeadMassConvertInvocable Apex class deployed and tested
@@ -292,7 +354,45 @@ Use Apex for:
 7. Voice interface and advanced AI functions
 8. Lifecycle automation (renewal, amendment, termination)
 
-## 11) Agentforce Implementation Approach
+## 11) API Endpoints Reference
+
+### Current REST API Endpoints
+
+**Webshop Integration:**
+- `POST /webshop/verification-email` - Send verification email to leads
+
+**Lead Management:**
+- Mass lead conversion via Screen Flow (Apex Invocable Method)
+
+### Planned API Endpoints
+
+**Opportunity Automation:**
+- `POST /api/opportunity/pricebook` - Auto-set price book based on criteria
+- `POST /api/opportunity/contact-role` - Auto-create primary contact role
+
+**Quote and Order Processing:**
+- `POST /api/quote-to-order` - Convert quote to order with validation
+- `POST /api/quote/line-items` - Sync quote line items
+
+**Contract Management:**
+- `POST /api/contract/generate` - Generate contract from closed-won opportunity
+- `GET /api/contract/pdf/{contractId}` - Get contract PDF
+
+**ERP Integration:**
+- `POST /api/erp/invoice-sync` - Sync invoice data from ERP
+- `POST /api/erp/payment-sync` - Sync payment data from ERP
+- `POST /api/erp/shipment-sync` - Sync shipment data from ERP
+
+**Asset Management:**
+- `POST /api/order-to-assets` - Convert order products to assets
+
+**Agentforce AI Endpoints:**
+- `POST /api/ai/prompt-template` - Generate content from prompt templates
+- `POST /api/ai/email-generate` - Generate sales emails using AI
+- `POST /api/ai/field-suggestions` - Get AI field suggestions
+- `POST /api/ai/voice-process` - Process voice commands
+
+## 12) Agentforce Implementation Approach
 
 ### Zero-Cost Implementation Strategy
 
