@@ -10,4 +10,9 @@ SELECT Id
         LIMIT 3
         )
     ,StockKeepingUnit
-FROM Product2 LIMIT 20
+    ,(SELECT Id, CreatedDate
+        ,UnitPrice
+    FROM PricebookEntries
+    ORDER BY CreatedDate DESC
+    LIMIT 3)
+FROM Product2 LIMIT 500
