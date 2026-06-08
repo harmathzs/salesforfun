@@ -50,9 +50,30 @@ global with sharing class WebshopCheckout {
       }
 
       System.debug('Body to parse: <'+body+'>');
-      CheckoutRequest r = (CheckoutRequest) JSON.deserialize(body, CheckoutRequest.class);
 
-      // basic validation
+      // Parse the request using untyped deserialization first for validation
+      Object parsedObj = JSON.deserializeUntyped(body);
+
+      // Check if we got null (completely invalid JSON)
+      if (parsedObj == null) {
+        out.message = 'Invalid JSON payload';
+        res.statusCode = 400;
+        res.responseBody = Blob.valueOf(JSON.serialize(out));
+        return;
+      }
+
+      // Try to deserialize as CheckoutRequest
+      CheckoutRequest r;
+      try {
+        r = (CheckoutRequest) JSON.deserialize(body, CheckoutRequest.class);
+      } catch (Exception e) {
+        out.message = 'Invalid request structure: ' + e.getMessage();
+        res.statusCode = 400;
+        res.responseBody = Blob.valueOf(JSON.serialize(out));
+        return;
+      }
+
+      // basic validation - check if deserialization resulted in null
       if (r == null) {
         out.message = 'Invalid JSON payload';
         res.statusCode = 400;
