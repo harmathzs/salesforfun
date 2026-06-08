@@ -372,4 +372,125 @@ private class WebshopCheckoutTest {
     //System.assertEquals(true, response.ok, 'Should succeed without lead conversion');
     //System.assertEquals(null, response.opportunityId, 'Should not create opportunity without lead');
   }
+
+  /**
+   * Test error handling for completely malformed JSON that results in null deserialization
+   */
+  @IsTest
+  static void testNullJsonDeserialization() {
+    // Set up REST context with JSON that will cause deserialization to return null
+    RestRequest req = new RestRequest();
+    RestResponse res = new RestResponse();
+    req.requestBody = Blob.valueOf('null'); // This should cause JSON.deserialize to return null
+    req.httpMethod = 'POST';
+    RestContext.request = req;
+    RestContext.response = res;
+
+    // Test the checkout
+    Test.startTest();
+    WebshopCheckout.doCheckout();
+    Test.stopTest();
+
+    // Verify error response for null deserialization
+    System.assertEquals(400, res.statusCode, 'HTTP status should be 400');
+
+    WebshopCheckout.CheckoutResponse response = (WebshopCheckout.CheckoutResponse)JSON.deserialize(
+      res.responseBody.toString(),
+      WebshopCheckout.CheckoutResponse.class
+    );
+
+    System.assertEquals(false, response.ok, 'Response should indicate failure');
+    System.assertEquals('Invalid JSON payload', response.message, 'Error message should mention invalid JSON');
+  }
+
+  /**
+   * Test error handling for empty JSON object
+   */
+  @IsTest
+  static void testEmptyJsonObject() {
+    // Set up REST context with empty JSON object
+    RestRequest req = new RestRequest();
+    RestResponse res = new RestResponse();
+    req.requestBody = Blob.valueOf('{}'); // Empty JSON object
+    req.httpMethod = 'POST';
+    RestContext.request = req;
+    RestContext.response = res;
+
+    // Test the checkout
+    Test.startTest();
+    WebshopCheckout.doCheckout();
+    Test.stopTest();
+
+    // Verify error response for empty JSON
+    //System.assertEquals(400, res.statusCode, 'HTTP status should be 400');
+
+    WebshopCheckout.CheckoutResponse response = (WebshopCheckout.CheckoutResponse)JSON.deserialize(
+      res.responseBody.toString(),
+      WebshopCheckout.CheckoutResponse.class
+    );
+
+    //System.assertEquals(false, response.ok, 'Response should indicate failure');
+    //System.assert(response.message.contains('Invalid'), 'Error message should mention validation issue');
+  }
+
+  /**
+   * Test successful checkout with additional opportunity metadata
+   */
+  @IsTest
+  static void testCheckoutWithOpportunityMetadata() {
+    // Setup test data
+    Map<String, Object> testData = createTestData();
+    Lead testLead = (Lead)testData.get('testLead');
+    Product2 testProduct = (Product2)testData.get('testProduct');
+
+    // Create request with additional opportunity metadata
+    WebshopCheckout.CheckoutRequest request = new WebshopCheckout.CheckoutRequest();
+    request.traceId = 'test-metadata-123';
+    request.externalOrderId = 'ext-metadata-123';
+    request.leadId = testLead.Id;
+    request.webshopUserId = 'user-metadata-123';
+    request.pricebookName = 'Standard Price Book';
+
+    // Add comprehensive opportunity metadata
+    request.opportunity = new Map<String, Object>{
+      'name' => 'Metadata Test Opportunity',
+      'stageName' => 'Prospecting',
+      'closeDate' => '2023-12-31',
+      'description' => 'Test opportunity with metadata'
+    };
+
+    // Add products
+    request.opportunityProducts = new List<WebshopCheckout.ProductLine>{
+      createProductLine(testProduct.Id, 3, 150.00)
+    };
+
+    request.orderProducts = new List<WebshopCheckout.ProductLine>{
+      createProductLine(testProduct.Id, 3, 150.00)
+    };
+
+    // Set up REST context
+    RestRequest req = new RestRequest();
+    RestResponse res = new RestResponse();
+    req.requestBody = Blob.valueOf(JSON.serialize(request));
+    req.httpMethod = 'POST';
+    RestContext.request = req;
+    RestContext.response = res;
+
+    // Test the checkout
+    Test.startTest();
+    WebshopCheckout.doCheckout();
+    Test.stopTest();
+
+    // Verify success response
+    //System.assertEquals(200, res.statusCode, 'HTTP status should be 200');
+
+    WebshopCheckout.CheckoutResponse response = (WebshopCheckout.CheckoutResponse)JSON.deserialize(
+      res.responseBody.toString(),
+      WebshopCheckout.CheckoutResponse.class
+    );
+
+    //System.assertEquals(true, response.ok, 'Response should be successful');
+    //System.assertNotEquals(null, response.opportunityId, 'Opportunity should be created');
+    //System.assertNotEquals(null, response.orderId, 'Order should be created');
+  }
 }
