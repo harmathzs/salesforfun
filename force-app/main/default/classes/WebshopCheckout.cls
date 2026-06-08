@@ -49,6 +49,7 @@ global with sharing class WebshopCheckout {
         return;
       }
 
+      System.debug('Body to parse: <'+body+'>');
       CheckoutRequest r = (CheckoutRequest) JSON.deserialize(body, CheckoutRequest.class);
 
       // basic validation
