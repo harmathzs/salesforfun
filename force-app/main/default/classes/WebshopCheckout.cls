@@ -83,7 +83,7 @@ global with sharing class WebshopCheckout {
 
       System.debug('r: '+r);
 
-      /*
+
       // default pricebook name
       String pbName = String.isBlank(r.pricebookName) ? 'Standard Price Book' : r.pricebookName;
 
@@ -125,7 +125,8 @@ global with sharing class WebshopCheckout {
         if (!String.isBlank(L.Name)) {
           lc.setOpportunityName(L.Name);
         }
-
+        System.debug('lc: '+lc);
+/*
         // perform conversion
         Database.LeadConvertResult lcr = Database.convertLead(lc);
         if (!lcr.isSuccess()) {
@@ -142,11 +143,14 @@ global with sharing class WebshopCheckout {
         out.createdIds.put('convertedAccountId', accountId);
         out.createdIds.put('convertedContactId', contactId);
         if (opportunityId != null) out.createdIds.put('convertedOpportunityId', opportunityId);
+
+
+ */
       } else {
         // If no leadId: try to resolve account/contact by webshopUserId or other info (left as minimal)
         // For now, require leadId for conversion. You can extend to lookup Contact by email.
       }
-
+/*
       // 2) Determine Pricebook2Id from name
       Pricebook2 pb = [SELECT Id, Name FROM Pricebook2 WHERE Name = :pbName LIMIT 1];
       if (pb == null) {
@@ -268,7 +272,7 @@ global with sharing class WebshopCheckout {
       res.responseBody = Blob.valueOf(JSON.serialize(out));
       return;
 
-
+*/
 
     } catch (WebshopException we) {
       CheckoutResponse outErr = new CheckoutResponse();
@@ -279,7 +283,7 @@ global with sharing class WebshopCheckout {
       RestContext.response.responseBody = Blob.valueOf(JSON.serialize(outErr));
       return;
 
-       */
+
     } catch (Exception ex) {
       // unexpected error
       CheckoutResponse outErr = new CheckoutResponse();
