@@ -70,6 +70,13 @@ global with sharing class WebshopCheckout {
           out.message = 'Order already processed (idempotent)';
           out.orderId = existing[0].Id;
           out.accountId = existing[0].AccountId;
+
+          // Ensure createdIds is properly initialized for idempotent response
+          out.createdIds = new Map<String, String>{
+            'orderId' => String.valueOf(existing[0].Id),
+            'accountId' => String.valueOf(existing[0].AccountId)
+          };
+
           res.statusCode = 200;
           res.responseBody = Blob.valueOf(JSON.serialize(out));
           return;
@@ -219,6 +226,19 @@ global with sharing class WebshopCheckout {
       out.contactId = contactId;
       out.opportunityId = opportunityId;
       out.orderId = ord.Id;
+
+      // Ensure createdIds contains only serializable types (convert Ids to Strings)
+      Map<String, String> safeCreatedIds = new Map<String, String>();
+      for (String key : out.createdIds.keySet()) {
+        Object value = out.createdIds.get(key);
+        if (value instanceof Id) {
+          safeCreatedIds.put(key, String.valueOf(value));
+        } else if (value != null) {
+          safeCreatedIds.put(key, String.valueOf(value));
+        }
+      }
+      out.createdIds = safeCreatedIds;
+
       res.statusCode = 200;
       res.responseBody = Blob.valueOf(JSON.serialize(out));
       return;
@@ -227,6 +247,7 @@ global with sharing class WebshopCheckout {
       CheckoutResponse outErr = new CheckoutResponse();
       outErr.ok = false;
       outErr.message = 'Business error: ' + we.getMessage();
+      outErr.createdIds = new Map<String, String>(); // Ensure empty but properly typed map
       RestContext.response.statusCode = 400;
       RestContext.response.responseBody = Blob.valueOf(JSON.serialize(outErr));
       return;
@@ -234,7 +255,8 @@ global with sharing class WebshopCheckout {
       // unexpected error
       CheckoutResponse outErr = new CheckoutResponse();
       outErr.ok = false;
-      outErr.message = 'Unexpected error: ' + ex.getMessage();
+      outErr.message = 'Unexpected error: ' + String.valueOf(ex.getMessage()); // Ensure string conversion
+      outErr.createdIds = new Map<String, String>(); // Ensure empty but properly typed map
       RestContext.response.statusCode = 500;
       RestContext.response.responseBody = Blob.valueOf(JSON.serialize(outErr));
       return;

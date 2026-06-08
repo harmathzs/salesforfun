@@ -43,37 +43,53 @@ private class WebshopCheckoutTest {
   }
 
   /**
-   * Creates a valid checkout request JSON
+   * Creates a valid checkout request JSON using proper CheckoutRequest structure
    * @param leadId The lead ID to use in the request
    * @param externalOrderId Optional external order ID for idempotency
+   * @param productId The product ID to use in product lines
    * @return String JSON request body
    */
-  private static String createValidRequest(String leadId, String externalOrderId) {
-    Map<String, Object> request = new Map<String, Object>{
-      'traceId' => 'test-trace-123',
-      'externalOrderId' => externalOrderId,
-      'leadId' => leadId,
-      'webshopUserId' => 'user-123',
-      'pricebookName' => 'Standard Price Book',
-      'opportunity' => new Map<String, Object>{
-        'name' => 'Test Opportunity'
-      },
-      'opportunityProducts' => new List<Map<String, Object>>{
-        new Map<String, Object>{
-          'productId' => 'PRODUCT_ID_PLACEHOLDER',
-          'quantity' => 2,
-          'unitPrice' => 100.00
-        }
-      },
-      'orderProducts' => new List<Map<String, Object>>{
-        new Map<String, Object>{
-          'productId' => 'PRODUCT_ID_PLACEHOLDER',
-          'quantity' => 2,
-          'unitPrice' => 100.00
-        }
-      }
+  private static String createValidRequest(String leadId, String externalOrderId, String productId) {
+    // Create proper CheckoutRequest instance
+    WebshopCheckout.CheckoutRequest request = new WebshopCheckout.CheckoutRequest();
+
+    request.traceId = 'test-trace-123';
+    request.externalOrderId = externalOrderId;
+    request.leadId = leadId;
+    request.webshopUserId = 'user-123';
+    request.pricebookName = 'Standard Price Book';
+
+    // Create opportunity metadata
+    request.opportunity = new Map<String, Object>{
+      'name' => 'Test Opportunity'
     };
+
+    // Create opportunity products
+    request.opportunityProducts = new List<WebshopCheckout.ProductLine>{
+      createProductLine(productId, 2, 100.00)
+    };
+
+    // Create order products
+    request.orderProducts = new List<WebshopCheckout.ProductLine>{
+      createProductLine(productId, 2, 100.00)
+    };
+
     return JSON.serialize(request);
+  }
+
+  /**
+   * Helper method to create ProductLine instances
+   * @param productId The product ID
+   * @param quantity The quantity
+   * @param unitPrice The unit price
+   * @return WebshopCheckout.ProductLine instance
+   */
+  private static WebshopCheckout.ProductLine createProductLine(String productId, Decimal quantity, Decimal unitPrice) {
+    WebshopCheckout.ProductLine pl = new WebshopCheckout.ProductLine();
+    pl.productId = productId;
+    pl.quantity = quantity;
+    pl.unitPrice = unitPrice;
+    return pl;
   }
 
   /**
@@ -86,9 +102,8 @@ private class WebshopCheckoutTest {
     Lead testLead = (Lead)testData.get('testLead');
     Product2 testProduct = (Product2)testData.get('testProduct');
 
-    // Create valid request
-    String requestJson = createValidRequest(testLead.Id, 'ext-order-123');
-    requestJson = requestJson.replace('PRODUCT_ID_PLACEHOLDER', testProduct.Id);
+    // Create valid request with proper product ID
+    String requestJson = createValidRequest(testLead.Id, 'ext-order-123', testProduct.Id);
 
     // Set up REST context
     RestRequest req = new RestRequest();
@@ -145,7 +160,7 @@ private class WebshopCheckoutTest {
 
     // Create valid request
     String externalOrderId = 'idempotent-test-123';
-    String requestJson = createValidRequest(testLead.Id, externalOrderId);
+    String requestJson = createValidRequest(testLead.Id, externalOrderId, null);
     requestJson = requestJson.replace('PRODUCT_ID_PLACEHOLDER', testProduct.Id);
 
     // First checkout - should succeed
@@ -256,9 +271,8 @@ private class WebshopCheckoutTest {
     Lead testLead = (Lead)testData.get('testLead');
 
     // Create request with non-existent pricebook
-    String requestJson = createValidRequest(testLead.Id, 'ext-order-456');
+    String requestJson = createValidRequest(testLead.Id, 'ext-order-456', 'PRODUCT-001'); // Fake product ID
     requestJson = requestJson.replace('Standard Price Book', 'Non-Existent Pricebook');
-    requestJson = requestJson.replace('PRODUCT_ID_PLACEHOLDER', 'PRODUCT-001'); // Fake product ID
 
     // Set up REST context
     RestRequest req = new RestRequest();
@@ -295,8 +309,7 @@ private class WebshopCheckoutTest {
     Lead testLead = (Lead)testData.get('testLead');
 
     // Create request with fake product ID that has no pricebook entry
-    String requestJson = createValidRequest(testLead.Id, 'ext-order-789');
-    requestJson = requestJson.replace('PRODUCT_ID_PLACEHOLDER', '01t000000000001AAA'); // Fake product ID
+    String requestJson = createValidRequest(testLead.Id, 'ext-order-789', '01t000000000001AAA'); // Fake product ID
 
     // Set up REST context
     RestRequest req = new RestRequest();
@@ -333,8 +346,7 @@ private class WebshopCheckoutTest {
     Product2 testProduct = (Product2)testData.get('testProduct');
 
     // Create request without leadId
-    String requestJson = createValidRequest('', 'ext-order-no-lead');
-    requestJson = requestJson.replace('PRODUCT_ID_PLACEHOLDER', testProduct.Id);
+    String requestJson = createValidRequest('', 'ext-order-no-lead', testProduct.Id);
 
     // Set up REST context
     RestRequest req = new RestRequest();
