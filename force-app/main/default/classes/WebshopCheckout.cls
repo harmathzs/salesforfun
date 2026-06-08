@@ -81,6 +81,9 @@ global with sharing class WebshopCheckout {
         return;
       }
 
+      System.debug('r: '+r);
+
+      /*
       // default pricebook name
       String pbName = String.isBlank(r.pricebookName) ? 'Standard Price Book' : r.pricebookName;
 
@@ -265,6 +268,8 @@ global with sharing class WebshopCheckout {
       res.responseBody = Blob.valueOf(JSON.serialize(out));
       return;
 
+
+
     } catch (WebshopException we) {
       CheckoutResponse outErr = new CheckoutResponse();
       outErr.ok = false;
@@ -273,6 +278,8 @@ global with sharing class WebshopCheckout {
       RestContext.response.statusCode = 400;
       RestContext.response.responseBody = Blob.valueOf(JSON.serialize(outErr));
       return;
+
+       */
     } catch (Exception ex) {
       // unexpected error
       CheckoutResponse outErr = new CheckoutResponse();
