@@ -13,12 +13,9 @@ private class WebshopCheckoutTest {
     insert testLeads[0];
     testData.put('testLead', testLeads[0]);
 
-    // Create a standard price book (should exist in org, but create if needed)
+    // Get the existing standard price book (should always exist in org)
     Pricebook2 standardPB = [SELECT Id FROM Pricebook2 WHERE IsStandard = TRUE LIMIT 1];
-    if (standardPB == null) {
-      standardPB = new Pricebook2(Name = 'Standard Price Book');
-      insert standardPB;
-    }
+    System.assertNotEquals(null, standardPB, 'Standard Pricebook should exist in the org');
     testData.put('standardPricebook', standardPB);
 
     // Create a test product
