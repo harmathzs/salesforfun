@@ -48,7 +48,7 @@ global with sharing class WebshopConvert {
      * }
      */
     @HttpPost
-    global static Map<String, Object> post() {
+    global static String post() {
         Map<String, Object> response = new Map<String, Object>{
             'success' => false,
             'error' => null,
@@ -60,7 +60,7 @@ global with sharing class WebshopConvert {
 
             if (req == null || String.isBlank(req.requestBody.toString())) {
                 response.put('error', 'missing request body');
-                return response;
+                return JSON.serialize(response);
             }
 
             Map<String, Object> payload = (Map<String, Object>) JSON.deserializeUntyped(req.requestBody.toString());
@@ -70,7 +70,7 @@ global with sharing class WebshopConvert {
 
             if (leadId == null) {
                 response.put('error', 'leadId is required');
-                return response;
+              return JSON.serialize(response);
             }
 
             Lead leadRecord = [
@@ -88,7 +88,7 @@ global with sharing class WebshopConvert {
                 };
                 response.put('result', result);
                 response.put('success', true);
-                return response;
+              return JSON.serialize(response);
             }
 
             Database.LeadConvert leadConvert = new Database.LeadConvert();
@@ -120,7 +120,7 @@ global with sharing class WebshopConvert {
 
             response.put('result', result);
             response.put('success', true);
-            return response;
+          return JSON.serialize(response);
 
         } catch (Exception ex) {
             Map<String, Object> error = new Map<String, Object>{
@@ -129,7 +129,7 @@ global with sharing class WebshopConvert {
             };
             response.put('error', error);
             response.put('success', false);
-            return response;
+          return JSON.serialize(response);
         }
     }
 }
