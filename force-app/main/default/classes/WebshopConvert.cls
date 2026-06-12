@@ -13,11 +13,13 @@ global with sharing class WebshopConvert {
 
     /**
      * Converts a lead into an account, contact, and optionally an opportunity.
+     * When createOpportunity is true, Salesforce will create the opportunity during lead conversion.
+     * When createOpportunity is false, no opportunity will be created.
      *
      * @param None This method processes the request body which should contain:
      *             - leadId: The ID of the lead to convert (required)
      *             - createOpportunity: Boolean flag to create an opportunity (default: true)
-     *             - opportunityName: Custom name for the opportunity (optional)
+     *             - opportunityName: Custom name for the opportunity (optional, used only if createOpportunity=true)
      *
      * @return Map<String, Object> A response map containing:
      *         - success: Boolean indicating if the operation was successful
@@ -93,29 +95,22 @@ global with sharing class WebshopConvert {
             leadConvert.setLeadId(leadRecord.Id);
             String convertedStatus = 'Closed - Converted';
             leadConvert.setConvertedStatus(convertedStatus);
-            leadConvert.setDoNotCreateOpportunity(true);
+
+            // Let Salesforce create the opportunity if createOpportunity is true
+            leadConvert.setDoNotCreateOpportunity(!createOpportunity);
+
+            // Set opportunity name if provided and creating opportunity
+            if (createOpportunity) {
+                String nameToUse = (oppName != null && oppName.trim().length() > 0) ? oppName :
+                    (leadRecord.Company != null ? (leadRecord.Company + ' Webshop Opportunity') : 'Webshop Opportunity');
+                leadConvert.setOpportunityName(nameToUse);
+            }
 
             Database.LeadConvertResult convertResult = Database.convertLead(leadConvert, true);
 
             Id accountId = convertResult.getAccountId();
             Id contactId = convertResult.getContactId();
-            Id oppId;
-
-            if (createOpportunity && accountId != null) {
-                String nameToUse = (oppName != null && oppName.trim().length() > 0) ? oppName :
-                    (leadRecord.Company != null ? (leadRecord.Company + ' Webshop Opportunity') : 'Webshop Opportunity');
-
-                Opportunity opportunity = new Opportunity(
-                    Name = nameToUse,
-                    AccountId = accountId,
-                    CloseDate = Date.today().addDays(30),
-                    StageName = 'Prospecting'
-                );
-                insert opportunity;
-                oppId = opportunity.Id;
-            } else {
-                oppId = convertResult.getOpportunityId();
-            }
+            Id oppId = convertResult.getOpportunityId();
 
             Map<String, Object> result = new Map<String, Object>{
                 'accountId' => accountId,
