@@ -16,6 +16,12 @@
 @RestResource(UrlMapping='/webshop/verification-email')
 global with sharing class WebshopVerificationEmailApi {
 
+    /**
+     * Custom exception class for Webshop API errors.
+     * This is used instead of AuraHandledException since this is a REST API endpoint.
+     */
+    public class WebshopApiException extends Exception {}
+
   /**
    * Request structure for verification email API.
    *
@@ -97,15 +103,13 @@ global with sharing class WebshopVerificationEmailApi {
         : RestContext.request.requestBody.toString();
 
       if (String.isBlank(raw)) {
-        // throw new WebshopApiException('Empty request body');
-        System.debug('Webshop Verification Email Api error: '+'Empty request body');
+        throw new WebshopApiException('Empty request body');
       }
 
       VerifyEmailRequest req = (VerifyEmailRequest) JSON.deserialize(raw, VerifyEmailRequest.class);
 
       if (String.isBlank(req.code) || req.code.length() < 4) {
-        //throw new WebshopApiException('Invalid verification code');
-        System.debug('Webshop Verification Email Api error: '+'Invalid verification code');
+        throw new WebshopApiException('Invalid verification code');
       }
       if (req.expiryMinutes == null || req.expiryMinutes <= 0) {
         req.expiryMinutes = 15;
@@ -131,16 +135,13 @@ global with sharing class WebshopVerificationEmailApi {
       }
 
       if (leadRecord == null) {
-        //throw new WebshopApiException('Lead not found');
-        System.debug('Webshop Verification Email Api error: '+'Lead not found');
+        throw new WebshopApiException('Lead not found');
       }
       if (String.isBlank(leadRecord.Email)) {
-        //throw new WebshopApiException('Lead has no email');
-        System.debug('Webshop Verification Email Api error: '+'Lead has no email');
+        throw new WebshopApiException('Lead has no email');
       }
       if (leadRecord.Email_Verified__c == true) {
-        //throw new WebshopApiException('Lead already verified');
-        System.debug('Webshop Verification Email Api warning: '+'Lead already verified');
+        throw new WebshopApiException('Lead already verified');
       }
 
       String greetName = !String.isBlank(req.firstName)
@@ -185,8 +186,7 @@ global with sharing class WebshopVerificationEmailApi {
         if (results != null && !results.isEmpty() && results[0].getErrors() != null && !results[0].getErrors().isEmpty()) {
           err = results[0].getErrors()[0].getMessage();
         }
-        //throw new WebshopApiException('Email send failed: ' + err);
-        System.debug('Webshop Verification Email Api error: '+'Email send failed: ' + err);
+        throw new WebshopApiException('Email send failed: ' + err);
       }
 
       // Optional reporting only (you kept these fields)
