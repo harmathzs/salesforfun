@@ -140,9 +140,8 @@ global with sharing class WebshopVerificationEmailApi {
       if (String.isBlank(leadRecord.Email)) {
         throw new WebshopApiException('Lead has no email');
       }
-      if (leadRecord.Email_Verified__c == true) {
-        throw new WebshopApiException('Lead already verified');
-      }
+      // Allow re-verification for leads who were previously verified
+      // This handles the case where a user deletes their account and re-registers
 
       String greetName = !String.isBlank(req.firstName)
         ? req.firstName
