@@ -126,7 +126,7 @@ global with sharing class WebshopCheckout {
           lc.setOpportunityName(L.Name);
         }
         System.debug('lc: '+lc);
-/*
+
         // perform conversion
         Database.LeadConvertResult lcr = Database.convertLead(lc);
         if (!lcr.isSuccess()) {
@@ -144,13 +144,15 @@ global with sharing class WebshopCheckout {
         out.createdIds.put('convertedContactId', contactId);
         if (opportunityId != null) out.createdIds.put('convertedOpportunityId', opportunityId);
 
-
- */
       } else {
         // If no leadId: try to resolve account/contact by webshopUserId or other info (left as minimal)
         // For now, require leadId for conversion. You can extend to lookup Contact by email.
+        out.message = 'leadId is required for checkout';
+        res.statusCode = 400;
+        res.responseBody = Blob.valueOf(JSON.serialize(out));
+        return;
       }
-/*
+
       // 2) Determine Pricebook2Id from name
       Pricebook2 pb = [SELECT Id, Name FROM Pricebook2 WHERE Name = :pbName LIMIT 1];
       if (pb == null) {
@@ -271,8 +273,6 @@ global with sharing class WebshopCheckout {
       res.statusCode = 200;
       res.responseBody = Blob.valueOf(JSON.serialize(out));
       return;
-
-*/
 
     } catch (WebshopException we) {
       CheckoutResponse outErr = new CheckoutResponse();
