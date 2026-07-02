@@ -1,0 +1,4 @@
+/* Find a converted lead */
+SELECT Id, Email, FirstName, LastName, IsConverted, ConvertedAccountId
+FROM Lead
+WHERE Email = 'kolomparozseb537@gmail.com'
