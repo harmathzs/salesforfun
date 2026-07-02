@@ -2,44 +2,36 @@
 private class WebshopCheckoutTest {
 
   /**
-   * Test setup method to create required test data
+   * Test setup method to create required test data using extended TestFactory
    * @return Map<String, Object> containing test records
    */
   private static Map<String, Object> createTestData() {
-    Map<String, Object> testData = new Map<String, Object>();
+    // Use the comprehensive webshop test setup from TestFactory
+    Map<String, Object> testData = TestFactory.createWebshopTestSetup(1, 1);
 
-    // Create a test lead using TestFactory
-    Lead[] testLeads = TestFactory.getTestLeads();
-    insert testLeads[0];
-    testData.put('testLead', testLeads[0]);
+    // Extract the first lead and product for convenience
+    Lead[] leads = (Lead[])testData.get('leads');
+    Product2[] products = (Product2[])testData.get('products');
 
-    // Use test standard pricebook id
-    Id standardPBid = Test.getStandardPricebookId();
-
-    System.assertNotEquals(null, standardPBid, 'Standard Pricebook Id should exist');
-    testData.put('standardPricebookId', standardPBid);
-
-    // Create a test product
-    Product2 testProduct = new Product2(
-      Name = 'Test Product',
-      Description = 'Test Product for Webshop',
-      ProductCode = 'TEST-PROD-001',
-      IsActive = true
-    );
-    insert testProduct;
-    testData.put('testProduct', testProduct);
-
-    // Create pricebook entry
-    PricebookEntry pbe = new PricebookEntry(
-      Pricebook2Id = standardPBid,
-      Product2Id = testProduct.Id,
-      UnitPrice = 100.00,
-      IsActive = true
-    );
-    insert pbe;
-    testData.put('pricebookEntry', pbe);
+    testData.put('testLead', leads[0]);
+    testData.put('testProduct', products[0]);
 
     return testData;
+  }
+
+  /**
+   * Helper method to create ProductLine instances
+   * @param productId The product ID
+   * @param quantity The quantity
+   * @param unitPrice The unit price
+   * @return WebshopCheckout.ProductLine instance
+   */
+  private static WebshopCheckout.ProductLine createProductLine(Id productId, Decimal quantity, Decimal unitPrice) {
+    WebshopCheckout.ProductLine pl = new WebshopCheckout.ProductLine();
+    pl.productId = productId;
+    pl.quantity = quantity;
+    pl.unitPrice = unitPrice;
+    return pl;
   }
 
   /**
@@ -50,47 +42,18 @@ private class WebshopCheckoutTest {
    * @return String JSON request body
    */
   private static String createValidRequest(String leadId, String externalOrderId, String productId) {
-    // Create proper CheckoutRequest instance
-    WebshopCheckout.CheckoutRequest request = new WebshopCheckout.CheckoutRequest();
-
-    request.traceId = 'test-trace-123';
-    request.externalOrderId = externalOrderId;
-    request.leadId = leadId;
-    request.webshopUserId = 'user-123';
-    request.pricebookName = 'Standard Price Book';
-
-    // Create opportunity metadata
-    request.opportunity = new Map<String, Object>{
-      'name' => 'Test Opportunity'
-    };
-
-    // Create opportunity products
-    request.opportunityProducts = new List<WebshopCheckout.ProductLine>{
-      createProductLine(productId, 2, 100.00)
-    };
-
-    // Create order products
-    request.orderProducts = new List<WebshopCheckout.ProductLine>{
-      createProductLine(productId, 2, 100.00)
-    };
+    // Use TestFactory to create the checkout request
+    WebshopCheckout.CheckoutRequest request = TestFactory.createCheckoutRequest(
+      leadId,
+      productId,
+      externalOrderId,
+      'Test Opportunity'
+    );
 
     return JSON.serialize(request);
   }
 
-  /**
-   * Helper method to create ProductLine instances
-   * @param productId The product ID
-   * @param quantity The quantity
-   * @param unitPrice The unit price
-   * @return WebshopCheckout.ProductLine instance
-   */
-  private static WebshopCheckout.ProductLine createProductLine(String productId, Decimal quantity, Decimal unitPrice) {
-    WebshopCheckout.ProductLine pl = new WebshopCheckout.ProductLine();
-    pl.productId = productId;
-    pl.quantity = quantity;
-    pl.unitPrice = unitPrice;
-    return pl;
-  }
+
 
   /**
    * Test successful checkout with lead conversion
@@ -119,7 +82,7 @@ private class WebshopCheckoutTest {
     Test.stopTest();
 
     // Verify response
-    //System.assertEquals(200, res.statusCode, 'HTTP status should be 200');
+    System.assertEquals(200, res.statusCode, 'HTTP status should be 200');
 
     // Parse and verify response
     WebshopCheckout.CheckoutResponse response = (WebshopCheckout.CheckoutResponse)JSON.deserialize(
@@ -127,25 +90,29 @@ private class WebshopCheckoutTest {
       WebshopCheckout.CheckoutResponse.class
     );
 
-    //System.assertEquals(true, response.ok, 'Response should be successful');
-    //System.assertEquals('Checkout processed', response.message, 'Message should indicate success');
-    //System.assertNotEquals(null, response.accountId, 'Account ID should be set');
-    //System.assertNotEquals(null, response.contactId, 'Contact ID should be set');
-    //System.assertNotEquals(null, response.opportunityId, 'Opportunity ID should be set');
-    //System.assertNotEquals(null, response.orderId, 'Order ID should be set');
+    System.assertEquals(true, response.ok, 'Response should be successful');
+    System.assertEquals('Checkout processed', response.message, 'Message should indicate success');
+    System.assertNotEquals(null, response.accountId, 'Account ID should be set');
+    System.assertNotEquals(null, response.contactId, 'Contact ID should be set');
+    System.assertNotEquals(null, response.opportunityId, 'Opportunity ID should be set');
+    System.assertNotEquals(null, response.orderId, 'Order ID should be set');
 
     // Verify created records
-    //Account createdAccount = [SELECT Id FROM Account WHERE Id = :response.accountId LIMIT 1];
-    //System.assertNotEquals(null, createdAccount, 'Account should exist');
+    Account createdAccount = [SELECT Id FROM Account WHERE Id = :response.accountId LIMIT 1];
+    System.assertNotEquals(null, createdAccount, 'Account should exist');
 
-    //Contact createdContact = [SELECT Id FROM Contact WHERE Id = :response.contactId LIMIT 1];
-    //System.assertNotEquals(null, createdContact, 'Contact should exist');
+    Contact createdContact = [SELECT Id FROM Contact WHERE Id = :response.contactId LIMIT 1];
+    System.assertNotEquals(null, createdContact, 'Contact should exist');
 
-    //Opportunity createdOpportunity = [SELECT Id FROM Opportunity WHERE Id = :response.opportunityId LIMIT 1];
-    //System.assertNotEquals(null, createdOpportunity, 'Opportunity should exist');
+    Opportunity createdOpportunity = [SELECT Id FROM Opportunity WHERE Id = :response.opportunityId LIMIT 1];
+    System.assertNotEquals(null, createdOpportunity, 'Opportunity should exist');
 
-    //Order createdOrder = [SELECT Id FROM Order WHERE Id = :response.orderId LIMIT 1];
-    //System.assertNotEquals(null, createdOrder, 'Order should exist');
+    Order createdOrder = [SELECT Id FROM Order WHERE Id = :response.orderId LIMIT 1];
+    System.assertNotEquals(null, createdOrder, 'Order should exist');
+
+    // Verify lead was converted
+    Lead convertedLead = [SELECT IsConverted FROM Lead WHERE Id = :testLead.Id];
+    System.assertEquals(true, convertedLead.IsConverted, 'Lead should be converted');
   }
 
   /**
@@ -220,15 +187,15 @@ private class WebshopCheckoutTest {
     Test.stopTest();
 
     // Verify error response
-    //System.assertEquals(400, res.statusCode, 'HTTP status should be 400');
+    System.assertEquals(400, res.statusCode, 'HTTP status should be 400');
 
     WebshopCheckout.CheckoutResponse response = (WebshopCheckout.CheckoutResponse)JSON.deserialize(
       res.responseBody.toString(),
       WebshopCheckout.CheckoutResponse.class
     );
 
-    //System.assertEquals(false, response.ok, 'Response should indicate failure');
-    //System.assertEquals('Empty request body', response.message, 'Error message should mention empty body');
+    System.assertEquals(false, response.ok, 'Response should indicate failure');
+    System.assertEquals('Empty request body', response.message, 'Error message should mention empty body');
   }
 
   /**
@@ -250,15 +217,15 @@ private class WebshopCheckoutTest {
     Test.stopTest();
 
     // Verify error response
-    //System.assertEquals(400, res.statusCode, 'HTTP status should be 400');
+    System.assertEquals(400, res.statusCode, 'HTTP status should be 400');
 
     WebshopCheckout.CheckoutResponse response = (WebshopCheckout.CheckoutResponse)JSON.deserialize(
       res.responseBody.toString(),
       WebshopCheckout.CheckoutResponse.class
     );
 
-    //System.assertEquals(false, response.ok, 'Response should indicate failure');
-    //System.assertEquals('Invalid JSON payload', response.message, 'Error message should mention invalid JSON');
+    System.assertEquals(false, response.ok, 'Response should indicate failure');
+    System.assertEquals('Invalid JSON payload', response.message, 'Error message should mention invalid JSON');
   }
 
   /**
@@ -288,15 +255,15 @@ private class WebshopCheckoutTest {
     Test.stopTest();
 
     // Verify error response
-    //System.assertEquals(400, res.statusCode, 'HTTP status should be 400');
+    System.assertEquals(400, res.statusCode, 'HTTP status should be 400');
 
     WebshopCheckout.CheckoutResponse response = (WebshopCheckout.CheckoutResponse)JSON.deserialize(
       res.responseBody.toString(),
       WebshopCheckout.CheckoutResponse.class
     );
 
-    //System.assertEquals(false, response.ok, 'Response should indicate failure');
-    //System.assert(response.message.contains('Pricebook not found'), 'Error message should mention pricebook not found');
+    System.assertEquals(false, response.ok, 'Response should indicate failure');
+    System.assert(response.message.contains('Pricebook not found'), 'Error message should mention pricebook not found');
   }
 
   /**
@@ -325,15 +292,15 @@ private class WebshopCheckoutTest {
     Test.stopTest();
 
     // Verify error response
-    //System.assertEquals(400, res.statusCode, 'HTTP status should be 400');
+    System.assertEquals(400, res.statusCode, 'HTTP status should be 400');
 
     WebshopCheckout.CheckoutResponse response = (WebshopCheckout.CheckoutResponse)JSON.deserialize(
       res.responseBody.toString(),
       WebshopCheckout.CheckoutResponse.class
     );
 
-    //System.assertEquals(false, response.ok, 'Response should indicate failure');
-    //System.assert(response.message.contains('PricebookEntry'), 'Error message should mention PricebookEntry');
+    System.assertEquals(false, response.ok, 'Response should indicate failure');
+    System.assert(response.message.contains('PricebookEntry'), 'Error message should mention PricebookEntry');
   }
 
   /**
@@ -362,15 +329,129 @@ private class WebshopCheckoutTest {
     Test.stopTest();
 
     // Verify error response (currently the API requires leadId)
-    //System.assertEquals(200, res.statusCode, 'Should succeed but not create opportunity');
+    System.assertEquals(400, res.statusCode, 'Should fail without leadId');
 
     WebshopCheckout.CheckoutResponse response = (WebshopCheckout.CheckoutResponse)JSON.deserialize(
       res.responseBody.toString(),
       WebshopCheckout.CheckoutResponse.class
     );
 
-    //System.assertEquals(true, response.ok, 'Should succeed without lead conversion');
-    //System.assertEquals(null, response.opportunityId, 'Should not create opportunity without lead');
+    System.assertEquals(false, response.ok, 'Should fail without leadId');
+    System.assertEquals('leadId is required for checkout', response.message, 'Should indicate leadId is required');
+  }
+
+  /**
+   * Test lead conversion with opportunity name from lead
+   */
+  @IsTest
+  static void testLeadConversionWithOpportunityName() {
+    // Setup test data
+    Map<String, Object> testData = createTestData();
+    Lead testLead = (Lead)testData.get('testLead');
+    Product2 testProduct = (Product2)testData.get('testProduct');
+
+    // Create a new lead with company name (which will be used for opportunity name)
+    Lead namedLead = new Lead(
+      FirstName = 'Test',
+      LastName = 'Lead',
+      Company = 'Test Company Webshop Lead',
+      Status = 'Open - Not Contacted',
+      Email = 'test-named@example.com'
+    );
+    insert namedLead;
+
+    // Create valid request with the named lead
+    WebshopCheckout.CheckoutRequest request = new WebshopCheckout.CheckoutRequest();
+    request.leadId = namedLead.Id;
+    request.pricebookName = 'Standard Price Book';
+    request.opportunityProducts = new List<WebshopCheckout.ProductLine>{
+      createProductLine(testProduct.Id, 1.0, 100.00)
+    };
+    request.orderProducts = new List<WebshopCheckout.ProductLine>{
+      createProductLine(testProduct.Id, 1.0, 100.00)
+    };
+
+    // Set up REST context
+    RestRequest req = new RestRequest();
+    RestResponse res = new RestResponse();
+    req.requestBody = Blob.valueOf(JSON.serialize(request));
+    req.httpMethod = 'POST';
+    RestContext.request = req;
+    RestContext.response = res;
+
+    // Test the checkout
+    Test.startTest();
+    WebshopCheckout.doCheckout();
+    Test.stopTest();
+
+    // Verify response
+    System.assertEquals(200, res.statusCode, 'HTTP status should be 200');
+
+    WebshopCheckout.CheckoutResponse response = (WebshopCheckout.CheckoutResponse)JSON.deserialize(
+      res.responseBody.toString(),
+      WebshopCheckout.CheckoutResponse.class
+    );
+
+    System.assertEquals(true, response.ok, 'Response should be successful');
+    System.assertNotEquals(null, response.opportunityId, 'Opportunity ID should be set');
+
+    // Verify opportunity was created with lead company name
+    Opportunity createdOpportunity = [SELECT Name FROM Opportunity WHERE Id = :response.opportunityId LIMIT 1];
+    System.assertEquals('Test Company Webshop Lead', createdOpportunity.Name, 'Opportunity should use lead company name');
+  }
+
+  /**
+   * Test lead conversion failure handling
+   */
+  @IsTest
+  static void testLeadConversionFailure() {
+    // Create a lead that will fail conversion (e.g., missing required fields)
+    Lead badLead = new Lead(
+      FirstName = 'Bad',
+      LastName = 'Lead',
+      Company = 'Bad Company'
+      // Missing required fields that might cause conversion to fail
+    );
+    insert badLead;
+
+    // Setup test data for product
+    Map<String, Object> testData = createTestData();
+    Product2 testProduct = (Product2)testData.get('testProduct');
+
+    // Create request with bad lead
+    WebshopCheckout.CheckoutRequest request = new WebshopCheckout.CheckoutRequest();
+    request.leadId = badLead.Id;
+    request.pricebookName = 'Standard Price Book';
+    request.opportunityProducts = new List<WebshopCheckout.ProductLine>{
+      createProductLine(testProduct.Id, 1.0, 100.00)
+    };
+    request.orderProducts = new List<WebshopCheckout.ProductLine>{
+      createProductLine(testProduct.Id, 1.0, 100.00)
+    };
+
+    // Set up REST context
+    RestRequest req = new RestRequest();
+    RestResponse res = new RestResponse();
+    req.requestBody = Blob.valueOf(JSON.serialize(request));
+    req.httpMethod = 'POST';
+    RestContext.request = req;
+    RestContext.response = res;
+
+    // Test the checkout
+    Test.startTest();
+    WebshopCheckout.doCheckout();
+    Test.stopTest();
+
+    // Verify error response
+    System.assertEquals(400, res.statusCode, 'Should fail with bad lead');
+
+    WebshopCheckout.CheckoutResponse response = (WebshopCheckout.CheckoutResponse)JSON.deserialize(
+      res.responseBody.toString(),
+      WebshopCheckout.CheckoutResponse.class
+    );
+
+    System.assertEquals(false, response.ok, 'Should fail with bad lead');
+    System.assert(response.message.contains('Lead conversion failed'), 'Should indicate conversion failure');
   }
 
   /**
@@ -404,6 +485,140 @@ private class WebshopCheckoutTest {
   }
 
   /**
+   * Test order creation with order line items
+   */
+  @IsTest
+  static void testOrderWithLineItems() {
+    // Setup test data
+    Map<String, Object> testData = createTestData();
+    Lead testLead = (Lead)testData.get('testLead');
+    Product2 testProduct = (Product2)testData.get('testProduct');
+
+    // Create request with order products
+    WebshopCheckout.CheckoutRequest request = new WebshopCheckout.CheckoutRequest();
+    request.leadId = testLead.Id;
+    request.pricebookName = 'Standard Price Book';
+    request.externalOrderId = 'ext-order-items-123';
+
+    // Add multiple order products with different quantities and prices
+    request.orderProducts = new List<WebshopCheckout.ProductLine>{
+      createProductLine(testProduct.Id, 3.0, 100.00),
+      createProductLine(testProduct.Id, 2.0, 50.00)
+    };
+
+    // Set up REST context
+    RestRequest req = new RestRequest();
+    RestResponse res = new RestResponse();
+    req.requestBody = Blob.valueOf(JSON.serialize(request));
+    req.httpMethod = 'POST';
+    RestContext.request = req;
+    RestContext.response = res;
+
+    // Test the checkout
+    Test.startTest();
+    WebshopCheckout.doCheckout();
+    Test.stopTest();
+
+    // Verify success response
+    System.assertEquals(200, res.statusCode, 'HTTP status should be 200');
+
+    WebshopCheckout.CheckoutResponse response = (WebshopCheckout.CheckoutResponse)JSON.deserialize(
+      res.responseBody.toString(),
+      WebshopCheckout.CheckoutResponse.class
+    );
+
+    System.assertEquals(true, response.ok, 'Response should be successful');
+    System.assertNotEquals(null, response.orderId, 'Order ID should be set');
+
+    // Verify order was created with correct external ID
+    Order createdOrder = [
+      SELECT Id, External_Id__c, AccountId, Pricebook2Id, EffectiveDate, Status
+      FROM Order
+      WHERE Id = :response.orderId
+      LIMIT 1
+    ];
+    System.assertEquals('ext-order-items-123', createdOrder.External_Id__c, 'Order should have correct external ID');
+    System.assertEquals('Draft', createdOrder.Status, 'Order should be in Draft status');
+    System.assertEquals(Date.today(), createdOrder.EffectiveDate, 'Order should have today as effective date');
+
+    // Verify order line items were created
+    List<OrderItem> orderLineItems = [
+      SELECT Id, OrderId, PricebookEntryId, Quantity, UnitPrice
+      FROM OrderItem
+      WHERE OrderId = :response.orderId
+    ];
+    System.assertEquals(2, orderLineItems.size(), 'Should create 2 order line items');
+    System.assertEquals(3.0, orderLineItems[0].Quantity, 'First line item should have quantity 3');
+    System.assertEquals(2.0, orderLineItems[1].Quantity, 'Second line item should have quantity 2');
+    System.assertEquals(100.00, orderLineItems[0].UnitPrice, 'First line item should have correct price');
+    System.assertEquals(50.00, orderLineItems[1].UnitPrice, 'Second line item should have correct price');
+  }
+
+  /**
+   * Test idempotent order creation
+   */
+  @IsTest
+  static void testIdempotentOrderCreation() {
+    // Setup test data
+    Map<String, Object> testData = createTestData();
+    Lead testLead = (Lead)testData.get('testLead');
+    Product2 testProduct = (Product2)testData.get('testProduct');
+
+    // Create request with external order ID
+    String externalOrderId = 'idempotent-test-' + String.valueOf(System.now().getTime());
+    String requestJson = createValidRequest(testLead.Id, externalOrderId, testProduct.Id);
+
+    // First checkout - should succeed
+    RestRequest req1 = new RestRequest();
+    RestResponse res1 = new RestResponse();
+    req1.requestBody = Blob.valueOf(requestJson);
+    req1.httpMethod = 'POST';
+    RestContext.request = req1;
+    RestContext.response = res1;
+
+    Test.startTest();
+    WebshopCheckout.doCheckout();
+    Test.stopTest();
+
+    System.assertEquals(200, res1.statusCode, 'First request should succeed');
+
+    // Parse first response
+    WebshopCheckout.CheckoutResponse firstResponse = (WebshopCheckout.CheckoutResponse)JSON.deserialize(
+      res1.responseBody.toString(),
+      WebshopCheckout.CheckoutResponse.class
+    );
+
+    // Second checkout with same externalOrderId - should be idempotent
+    RestRequest req2 = new RestRequest();
+    RestResponse res2 = new RestResponse();
+    req2.requestBody = Blob.valueOf(requestJson);
+    req2.httpMethod = 'POST';
+    RestContext.request = req2;
+    RestContext.response = res2;
+
+    Test.startTest();
+    WebshopCheckout.doCheckout();
+    Test.stopTest();
+
+    System.assertEquals(200, res2.statusCode, 'Second request should also succeed (idempotent)');
+
+    // Parse and verify idempotent response
+    WebshopCheckout.CheckoutResponse secondResponse = (WebshopCheckout.CheckoutResponse)JSON.deserialize(
+      res2.responseBody.toString(),
+      WebshopCheckout.CheckoutResponse.class
+    );
+
+    System.assertEquals(true, secondResponse.ok, 'Idempotent response should be successful');
+    System.assert(secondResponse.message.contains('idempotent'), 'Message should indicate idempotent processing');
+    System.assertNotEquals(null, secondResponse.orderId, 'Order ID should be returned');
+    System.assertEquals(firstResponse.orderId, secondResponse.orderId, 'Should return same order ID');
+
+    // Verify only one order was created
+    List<Order> orders = [SELECT Id FROM Order WHERE External_Id__c = :externalOrderId];
+    System.assertEquals(1, orders.size(), 'Should only create one order (idempotent)');
+  }
+
+  /**
    * Test error handling for empty JSON object
    */
   @IsTest
@@ -422,17 +637,15 @@ private class WebshopCheckoutTest {
     Test.stopTest();
 
     // Verify error response for empty JSON
-    //System.assertEquals(400, res.statusCode, 'HTTP status should be 400');
-/*
+    System.assertEquals(400, res.statusCode, 'HTTP status should be 400');
+
     WebshopCheckout.CheckoutResponse response = (WebshopCheckout.CheckoutResponse)JSON.deserialize(
       res.responseBody.toString(),
       WebshopCheckout.CheckoutResponse.class
     );
 
-
- */
-    //System.assertEquals(false, response.ok, 'Response should indicate failure');
-    //System.assert(response.message.contains('Invalid'), 'Error message should mention validation issue');
+    System.assertEquals(false, response.ok, 'Response should indicate failure');
+    System.assert(response.message.contains('Invalid'), 'Error message should mention validation issue');
   }
 
   /**
@@ -537,11 +750,11 @@ private class WebshopCheckoutTest {
 
     // Add products
     request.opportunityProducts = new List<WebshopCheckout.ProductLine>{
-      createProductLine(testProduct.Id, 3, 150.00)
+      createProductLine(testProduct.Id, 3.0, 150.00)
     };
 
     request.orderProducts = new List<WebshopCheckout.ProductLine>{
-      createProductLine(testProduct.Id, 3, 150.00)
+      createProductLine(testProduct.Id, 3.0, 150.00)
     };
 
     // Set up REST context
@@ -558,16 +771,135 @@ private class WebshopCheckoutTest {
     Test.stopTest();
 
     // Verify success response
-    //System.assertEquals(200, res.statusCode, 'HTTP status should be 200');
+    System.assertEquals(200, res.statusCode, 'HTTP status should be 200');
 
     WebshopCheckout.CheckoutResponse response = (WebshopCheckout.CheckoutResponse)JSON.deserialize(
       res.responseBody.toString(),
       WebshopCheckout.CheckoutResponse.class
     );
 
-    //System.assertEquals(true, response.ok, 'Response should be successful');
-    //System.assertNotEquals(null, response.opportunityId, 'Opportunity should be created');
-    //System.assertNotEquals(null, response.orderId, 'Order should be created');
+    System.assertEquals(true, response.ok, 'Response should be successful');
+    System.assertNotEquals(null, response.opportunityId, 'Opportunity should be created');
+    System.assertNotEquals(null, response.orderId, 'Order should be created');
+
+    // Verify opportunity was created with metadata name
+    Opportunity createdOpportunity = [SELECT Name FROM Opportunity WHERE Id = :response.opportunityId LIMIT 1];
+    System.assertEquals('Metadata Test Opportunity', createdOpportunity.Name, 'Should use metadata opportunity name');
+  }
+
+  /**
+   * Test opportunity creation with opportunity line items
+   */
+  @IsTest
+  static void testOpportunityWithLineItems() {
+    // Setup test data
+    Map<String, Object> testData = createTestData();
+    Lead testLead = (Lead)testData.get('testLead');
+    Product2 testProduct = (Product2)testData.get('testProduct');
+
+    // Create request with opportunity products
+    WebshopCheckout.CheckoutRequest request = new WebshopCheckout.CheckoutRequest();
+    request.leadId = testLead.Id;
+    request.pricebookName = 'Standard Price Book';
+
+    // Add multiple opportunity products
+    request.opportunityProducts = new List<WebshopCheckout.ProductLine>{
+      createProductLine(testProduct.Id, 2.0, 100.00),
+      createProductLine(testProduct.Id, 1.0, 50.00)
+    };
+
+    request.orderProducts = new List<WebshopCheckout.ProductLine>{
+      createProductLine(testProduct.Id, 2.0, 100.00)
+    };
+
+    // Set up REST context
+    RestRequest req = new RestRequest();
+    RestResponse res = new RestResponse();
+    req.requestBody = Blob.valueOf(JSON.serialize(request));
+    req.httpMethod = 'POST';
+    RestContext.request = req;
+    RestContext.response = res;
+
+    // Test the checkout
+    Test.startTest();
+    WebshopCheckout.doCheckout();
+    Test.stopTest();
+
+    // Verify success response
+    System.assertEquals(200, res.statusCode, 'HTTP status should be 200');
+
+    WebshopCheckout.CheckoutResponse response = (WebshopCheckout.CheckoutResponse)JSON.deserialize(
+      res.responseBody.toString(),
+      WebshopCheckout.CheckoutResponse.class
+    );
+
+    System.assertEquals(true, response.ok, 'Response should be successful');
+    System.assertNotEquals(null, response.opportunityId, 'Opportunity should be created');
+
+    // Verify opportunity line items were created
+    List<OpportunityLineItem> opportunityLineItems = [
+      SELECT Id, OpportunityId, PricebookEntryId, Quantity, UnitPrice
+      FROM OpportunityLineItem
+      WHERE OpportunityId = :response.opportunityId
+    ];
+    System.assertEquals(2, opportunityLineItems.size(), 'Should create 2 opportunity line items');
+    System.assertEquals(2.0, opportunityLineItems[0].Quantity, 'First line item should have quantity 2');
+    System.assertEquals(1.0, opportunityLineItems[1].Quantity, 'Second line item should have quantity 1');
+  }
+
+  /**
+   * Test opportunity creation when lead conversion doesn't create opportunity
+   */
+  @IsTest
+  static void testOpportunityCreationWhenLeadConversionFails() {
+    // Setup test data
+    Map<String, Object> testData = createTestData();
+    Product2 testProduct = (Product2)testData.get('testProduct');
+
+    // Create a lead that will be converted but modify the conversion to not create opportunity
+    Lead testLead = (Lead)testData.get('testLead');
+
+    // Create request
+    WebshopCheckout.CheckoutRequest request = new WebshopCheckout.CheckoutRequest();
+    request.leadId = testLead.Id;
+    request.pricebookName = 'Standard Price Book';
+    request.opportunity = new Map<String, Object>{
+      'name' => 'Fallback Opportunity'
+    };
+    request.opportunityProducts = new List<WebshopCheckout.ProductLine>{
+      createProductLine(testProduct.Id, 1, 100.00)
+    };
+    request.orderProducts = new List<WebshopCheckout.ProductLine>{
+      createProductLine(testProduct.Id, 1, 100.00)
+    };
+
+    // Set up REST context
+    RestRequest req = new RestRequest();
+    RestResponse res = new RestResponse();
+    req.requestBody = Blob.valueOf(JSON.serialize(request));
+    req.httpMethod = 'POST';
+    RestContext.request = req;
+    RestContext.response = res;
+
+    // Test the checkout
+    Test.startTest();
+    WebshopCheckout.doCheckout();
+    Test.stopTest();
+
+    // Verify success response
+    System.assertEquals(200, res.statusCode, 'HTTP status should be 200');
+
+    WebshopCheckout.CheckoutResponse response = (WebshopCheckout.CheckoutResponse)JSON.deserialize(
+      res.responseBody.toString(),
+      WebshopCheckout.CheckoutResponse.class
+    );
+
+    System.assertEquals(true, response.ok, 'Response should be successful');
+    System.assertNotEquals(null, response.opportunityId, 'Opportunity should be created as fallback');
+
+    // Verify opportunity was created with fallback name
+    Opportunity createdOpportunity = [SELECT Name FROM Opportunity WHERE Id = :response.opportunityId LIMIT 1];
+    System.assertEquals('Fallback Opportunity', createdOpportunity.Name, 'Should use fallback opportunity name');
   }
 
   /**
