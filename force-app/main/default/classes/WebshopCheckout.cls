@@ -134,61 +134,87 @@ global with sharing class WebshopCheckout {
 
       if (!String.isBlank(r.leadId)) {
         System.debug('Lead ID provided: ' + r.leadId);
-        // Fetch lead to set opportunity name (use Lead.Name if available)
-        Lead L = [SELECT Id, FirstName, LastName, Name, Company FROM Lead WHERE Id = :r.leadId LIMIT 1];
+
+        // First, check if this lead is already converted
+        Lead L = [SELECT Id, FirstName, LastName, Name, Company, IsConverted, ConvertedAccountId, ConvertedContactId
+                  FROM Lead WHERE Id = :r.leadId LIMIT 1];
         System.debug('Fetched lead: ' + L.FirstName + ' ' + L.LastName + ' (Company: ' + (String.isBlank(L.Company) ? 'N/A' : L.Company) + ')');
+        System.debug('Lead conversion status: IsConverted=' + L.IsConverted);
 
-        Database.LeadConvert lc = new Database.LeadConvert();
-        lc.setLeadId(r.leadId);
-        lc.setDoNotCreateOpportunity(false); // create opportunity by default
-        lc.setConvertedStatus('Closed - Converted'); // ensure this status exists in your org
+        if (L.IsConverted) {
+          // Lead is already converted - use existing Account and Contact
+          System.debug('Lead is already converted - using existing Account and Contact');
+          accountId = L.ConvertedAccountId;
+          contactId = L.ConvertedContactId;
 
-        // set opportunity name to lead name (if present)
-        if (!String.isBlank(L.Name)) {
-          lc.setOpportunityName(L.Name);
-          System.debug('Setting opportunity name to lead name: ' + L.Name);
-        } else if (!String.isBlank(L.Company)) {
-          lc.setOpportunityName(L.Company + ' Webshop Opportunity');
-          System.debug('Setting opportunity name to company name: ' + L.Company + ' Webshop Opportunity');
+          // Look up the converted contact to get opportunity information
+          Contact convertedContact = [SELECT Id, AccountId FROM Contact WHERE Id = :contactId LIMIT 1];
+
+          System.debug('Using existing converted records:');
+          System.debug('  AccountId: ' + accountId);
+          System.debug('  ContactId: ' + contactId);
+
+          out.createdIds.put('convertedAccountId', accountId);
+          out.createdIds.put('convertedContactId', contactId);
+
+          // For repeat orders, we'll create a new opportunity later in the process
+          opportunityId = null;
+          System.debug('=== Lead Conversion Process Completed (using existing converted records) ===');
         } else {
-          System.debug('No lead name or company available, opportunity will use default naming');
+          // Lead is not converted - perform standard conversion
+          System.debug('Lead is not converted - performing standard conversion');
+
+          Database.LeadConvert lc = new Database.LeadConvert();
+          lc.setLeadId(r.leadId);
+          lc.setDoNotCreateOpportunity(false); // create opportunity by default
+          lc.setConvertedStatus('Closed - Converted'); // ensure this status exists in your org
+
+          // set opportunity name to lead name (if present)
+          if (!String.isBlank(L.Name)) {
+            lc.setOpportunityName(L.Name);
+            System.debug('Setting opportunity name to lead name: ' + L.Name);
+          } else if (!String.isBlank(L.Company)) {
+            lc.setOpportunityName(L.Company + ' Webshop Opportunity');
+            System.debug('Setting opportunity name to company name: ' + L.Company + ' Webshop Opportunity');
+          } else {
+            System.debug('No lead name or company available, opportunity will use default naming');
+          }
+
+          System.debug('LeadConvert configuration:');
+          System.debug('  LeadId: ' + lc.getLeadId());
+          System.debug('  ConvertedStatus: ' + lc.getConvertedStatus());
+          System.debug('  OpportunityName: ' + lc.getOpportunityName());
+
+          // perform conversion
+          System.debug('Performing lead conversion...');
+          Database.LeadConvertResult lcr = Database.convertLead(lc);
+
+          if (!lcr.isSuccess()) {
+            // return convert errors
+            String errorMsg = (lcr.getErrors() != null && lcr.getErrors().size() > 0) ? lcr.getErrors()[0].getMessage() : 'unknown';
+            System.debug('Error: Lead conversion failed - ' + errorMsg);
+            out.message = 'Lead conversion failed: ' + errorMsg;
+            res.statusCode = 400;
+            res.responseBody = Blob.valueOf(JSON.serialize(out));
+            return;
+          }
+
+          System.debug('Lead conversion successful');
+          accountId = lcr.getAccountId();
+          contactId = lcr.getContactId();
+          opportunityId = lcr.getOpportunityId(); // may be null if conversion did not create opportunity
+
+          System.debug('Conversion results:');
+          System.debug('  AccountId: ' + accountId);
+          System.debug('  ContactId: ' + contactId);
+          System.debug('  OpportunityId: ' + opportunityId);
+
+          out.createdIds.put('convertedAccountId', accountId);
+          out.createdIds.put('convertedContactId', contactId);
+          if (opportunityId != null) out.createdIds.put('convertedOpportunityId', opportunityId);
+
+          System.debug('=== Lead Conversion Process Completed ===');
         }
-
-        System.debug('LeadConvert configuration:');
-        System.debug('  LeadId: ' + lc.getLeadId());
-        System.debug('  ConvertedStatus: ' + lc.getConvertedStatus());
-        //System.debug('  DoNotCreateOpportunity: ' + lc.getDoNotCreateOpportunity()); // There is no getDoNotCreateOpportunity() method!
-        System.debug('  OpportunityName: ' + lc.getOpportunityName());
-
-        // perform conversion
-        System.debug('Performing lead conversion...');
-        Database.LeadConvertResult lcr = Database.convertLead(lc);
-
-        if (!lcr.isSuccess()) {
-          // return convert errors
-          String errorMsg = (lcr.getErrors() != null && lcr.getErrors().size() > 0) ? lcr.getErrors()[0].getMessage() : 'unknown';
-          System.debug('Error: Lead conversion failed - ' + errorMsg);
-          out.message = 'Lead conversion failed: ' + errorMsg;
-          res.statusCode = 400;
-          res.responseBody = Blob.valueOf(JSON.serialize(out));
-          return;
-        }
-
-        System.debug('Lead conversion successful');
-        accountId = lcr.getAccountId();
-        contactId = lcr.getContactId();
-        opportunityId = lcr.getOpportunityId(); // may be null if conversion did not create opportunity
-
-        System.debug('Conversion results:');
-        System.debug('  AccountId: ' + accountId);
-        System.debug('  ContactId: ' + contactId);
-        System.debug('  OpportunityId: ' + opportunityId);
-
-        out.createdIds.put('convertedAccountId', accountId);
-        out.createdIds.put('convertedContactId', contactId);
-        if (opportunityId != null) out.createdIds.put('convertedOpportunityId', opportunityId);
-
-        System.debug('=== Lead Conversion Process Completed ===');
 
       } else {
         // If no leadId: try to resolve account/contact by webshopUserId or other info (left as minimal)
