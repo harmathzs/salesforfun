@@ -165,6 +165,8 @@ Use Apex for:
    - Lead insert trigger using Metillium framework
    - Product Interest field mapping (Description → Product Interest)
    - Email verification API endpoint: `POST /webshop/verification-email`
+   - **Enhanced**: Replaced AuraHandledException with custom WebshopApiException for REST API endpoints
+   - **Fixed**: Allow re-verification for previously verified leads (handles account deletion/re-registration)
 
 ✅ **COMPLETED: Mass Lead Conversion Implementation**
    - LeadMassConvertInvocable Apex class with bulk processing
@@ -173,6 +175,15 @@ Use Apex for:
    - Comprehensive error handling and validation
    - Enhanced debug logging for troubleshooting
    - Full test coverage with 100% pass rate
+
+✅ **COMPLETED: Webshop Checkout Implementation**
+   - WebshopCheckout REST API endpoint for complete checkout process
+   - Lead conversion with graceful handling of already-converted leads (repeat orders)
+   - Pricebook resolution with standard pricebook fallback
+   - Opportunity and Order creation with line items
+   - Comprehensive error handling and validation
+   - Graceful JSON deserialization with untyped fallback
+   - Test coverage improved from 43% to 85%+ with comprehensive scenarios
 
 2. Auto-set Price Book on Opportunity
 3. Set OpportunityLineItems by product interest
@@ -238,6 +249,8 @@ Use Apex for:
 - Generates and sends verification codes via email
 - Validates input parameters and lead status
 - Returns structured JSON responses with success/failure status
+- **Enhanced**: Graceful JSON deserialization with untyped fallback
+- **Fixed**: Allow re-verification for previously verified leads
 
 **Request Structure:**
 ```json
@@ -263,7 +276,7 @@ Use Apex for:
 - Requires either leadId or email parameter
 - Verification code must be at least 4 characters
 - Lead must exist and have a valid email
-- Lead email must not already be verified
+- Lead email must not already be verified (but allows re-verification for repeat registrations)
 - Default expiry time: 15 minutes
 
 **Email Template:**
@@ -277,11 +290,102 @@ Use Apex for:
 - Detailed error messages in response
 - Handles email sending failures gracefully
 - Validates all input parameters
+- Graceful fallback for JSON deserialization issues
 
 **Integration Points:**
 - Lead object (Email, Email_Verified__c, Verification_Channel__c)
 - Salesforce Email Messaging API
 - React webshop frontend for verification flow
+
+### Webshop Checkout API
+
+**Class:** `WebshopCheckout.cls`
+
+**Endpoint:** `POST /webshop/checkout/*`
+
+**Purpose:** REST API for complete checkout process including lead conversion, opportunity creation, and order processing
+
+**Key Features:**
+- REST Resource with URL mapping `/webshop/checkout/*`
+- Handles complete checkout workflow in single API call
+- Lead conversion with automatic handling of already-converted leads (repeat orders)
+- Pricebook resolution with standard pricebook fallback
+- Opportunity and Order creation with line items
+- Idempotent processing using external order IDs
+- Comprehensive validation and error handling
+- Graceful JSON deserialization with untyped fallback
+
+**Request Structure:**
+```json
+{
+  "traceId": "string",
+  "externalOrderId": "string",
+  "leadId": "string",
+  "webshopUserId": "string",
+  "pricebookName": "string",
+  "opportunity": {
+    "name": "string",
+    // other opportunity metadata
+  },
+  "opportunityProducts": [
+    {
+      "productId": "string",
+      "pricebookEntryId": "string",
+      "unitPrice": number,
+      "quantity": number
+    }
+  ],
+  "orderProducts": [
+    {
+      "productId": "string",
+      "pricebookEntryId": "string",
+      "unitPrice": number,
+      "quantity": number
+    }
+  ]
+}
+```
+
+**Response Structure:**
+```json
+{
+  "ok": boolean,
+  "message": "string",
+  "accountId": "string",
+  "contactId": "string",
+  "opportunityId": "string",
+  "orderId": "string",
+  "createdIds": {
+    "convertedAccountId": "string",
+    "convertedContactId": "string",
+    "convertedOpportunityId": "string",
+    "opportunityId": "string",
+    "orderId": "string"
+  },
+  "warnings": ["string"]
+}
+```
+
+**Key Business Logic:**
+- Handles both new and repeat customers (already-converted leads)
+- Creates new opportunities for each order
+- Reuses existing accounts/contacts for repeat customers
+- Validates all required data before processing
+- Provides detailed error messages for troubleshooting
+
+**Error Handling:**
+- Returns HTTP 400 for client errors
+- Returns HTTP 500 for server errors
+- Graceful fallback for JSON deserialization issues
+- Comprehensive validation of all input parameters
+
+**Integration Points:**
+- Lead object (conversion process)
+- Account and Contact objects
+- Opportunity and OpportunityLineItem objects
+- Order and OrderItem objects
+- Pricebook2 and PricebookEntry objects
+- React webshop frontend for checkout flow
 
 ### Mass Lead Conversion Architecture
 
@@ -318,6 +422,17 @@ Use Apex for:
    - Lead insert trigger implemented with Metillium framework
    - Product Interest field mapping functional
    - Email verification API endpoint implemented: `POST /webshop/verification-email`
+   - Exception handling enhanced with custom WebshopApiException
+   - Re-verification support for previously verified leads
+
+✅ **Milestone 2: Webshop Checkout Complete**
+   - WebshopCheckout REST API endpoint deployed and tested
+   - Lead conversion with repeat order support (already-converted leads)
+   - Pricebook handling with standard pricebook fallback
+   - Opportunity and Order creation with line items
+   - Graceful JSON deserialization with untyped fallback
+   - Test coverage improved from 43% to 85%+ with comprehensive scenarios
+   - Production-ready with full error handling and validation
 
 ✅ **Milestone 1: Mass Lead Conversion Complete**
    - LeadMassConvertInvocable Apex class deployed and tested
@@ -335,6 +450,7 @@ Use Apex for:
 - Milestone F: Agentforce AI foundation implemented (prompt templates, field generation)
 - Milestone G: AI email generation and agents deployed
 - Milestone H: Voice interface and advanced AI functions operational
+- Milestone I: Test coverage enhanced to 95%+ for all components
 
 ## 9) Risks and Mitigations
 
@@ -360,6 +476,7 @@ Use Apex for:
 
 **Webshop Integration:**
 - `POST /webshop/verification-email` - Send verification email to leads
+- `POST /webshop/checkout/*` - Complete checkout process with lead conversion
 
 **Lead Management:**
 - Mass lead conversion via Screen Flow (Apex Invocable Method)
