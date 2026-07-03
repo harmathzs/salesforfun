@@ -42,13 +42,27 @@ private class WebshopCheckoutTest {
    * @return String JSON request body
    */
   private static String createValidRequest(String leadId, String externalOrderId, String productId) {
-    // Use TestFactory to create the checkout request
-    WebshopCheckout.CheckoutRequest request = TestFactory.createCheckoutRequest(
-      leadId,
-      productId,
-      externalOrderId,
-      'Test Opportunity'
-    );
+    // Create a properly structured checkout request
+    WebshopCheckout.CheckoutRequest request = new WebshopCheckout.CheckoutRequest();
+    request.traceId = 'test-trace-' + String.valueOf(System.now().getTime());
+    request.externalOrderId = externalOrderId;
+    request.leadId = leadId;
+    request.webshopUserId = 'test-user-' + String.valueOf(System.now().getTime());
+    request.pricebookName = 'Standard Price Book';
+
+    // Create opportunity as a Map<String, Object> to match the expected structure
+    request.opportunity = new Map<String, Object>{
+      'name' => 'Test Opportunity'
+    };
+
+    // Create product lines
+    request.opportunityProducts = new List<WebshopCheckout.ProductLine>{
+      createProductLine(productId, 1.0, 100.00)
+    };
+
+    request.orderProducts = new List<WebshopCheckout.ProductLine>{
+      createProductLine(productId, 1.0, 100.00)
+    };
 
     return JSON.serialize(request);
   }

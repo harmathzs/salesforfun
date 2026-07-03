@@ -55,41 +55,67 @@ global with sharing class WebshopCheckout {
 
       System.debug('Body to parse: ' + body.substring(0, Math.min(1000, body.length())) + (body.length() > 1000 ? '...' : ''));
 
-      // Parse the request using untyped deserialization first for validation
-      Object parsedObj = JSON.deserializeUntyped(body);
-      System.debug('JSON parsing result: ' + (parsedObj == null ? 'NULL (invalid JSON)' : 'Success'));
-
-      // Check if we got null (completely invalid JSON)
-      if (parsedObj == null) {
-        System.debug('Error: Invalid JSON payload - could not parse');
-        out.message = 'Invalid JSON payload';
-        res.statusCode = 400;
-        res.responseBody = Blob.valueOf(JSON.serialize(out));
-        return;
-      }
-
-      // Try to deserialize as CheckoutRequest
+      // First, try to deserialize as CheckoutRequest (typed deserialization)
       CheckoutRequest r;
       try {
         System.debug('Attempting to deserialize as CheckoutRequest...');
         r = (CheckoutRequest) JSON.deserialize(body, CheckoutRequest.class);
         System.debug('Successfully deserialized CheckoutRequest');
       } catch (Exception e) {
-        System.debug('Error: Invalid request structure - ' + e.getMessage());
-        out.message = 'Invalid request structure: ' + e.getMessage();
-        res.statusCode = 400;
-        res.responseBody = Blob.valueOf(JSON.serialize(out));
-        return;
+        System.debug('Error: Typed deserialization failed - ' + e.getMessage());
+
+        // If typed deserialization fails, try untyped deserialization and manually construct request
+        try {
+          System.debug('Attempting untyped deserialization for graceful fallback...');
+          Object untypedObj = JSON.deserializeUntyped(body);
+
+          if (untypedObj == null) {
+            System.debug('Error: Completely invalid JSON - could not parse');
+            out.message = 'Invalid JSON payload: Could not parse JSON';
+            res.statusCode = 400;
+            res.responseBody = Blob.valueOf(JSON.serialize(out));
+            return;
+          }
+
+          // Try to manually construct CheckoutRequest from untyped data
+          Map<String, Object> untypedMap = (Map<String, Object>)untypedObj;
+          System.debug('Untyped structure keys: ' + untypedMap.keySet());
+
+          r = new CheckoutRequest();
+
+          // Map basic fields with helper methods
+          r.traceId = getStringValue(untypedMap, 'traceId');
+          r.externalOrderId = getStringValue(untypedMap, 'externalOrderId');
+          r.leadId = getStringValue(untypedMap, 'leadId');
+          r.webshopUserId = getStringValue(untypedMap, 'webshopUserId');
+          r.pricebookName = getStringValue(untypedMap, 'pricebookName', 'Standard Price Book'); // default fallback
+
+          // Map opportunity (can be Map<String,Object> or string name)
+          if (untypedMap.containsKey('opportunity')) {
+            Object oppValue = untypedMap.get('opportunity');
+            if (oppValue instanceof Map<String, Object>) {
+              r.opportunity = (Map<String, Object>)oppValue;
+            } else if (oppValue instanceof String) {
+              r.opportunity = new Map<String, Object>{'name' => oppValue};
+            }
+          }
+
+          // Map product lines using helper method
+          r.opportunityProducts = parseProductLines(untypedMap, 'opportunityProducts');
+          r.orderProducts = parseProductLines(untypedMap, 'orderProducts');
+
+          System.debug('Successfully constructed CheckoutRequest from untyped data');
+
+        } catch (Exception untypedError) {
+          System.debug('Error: Both typed and untyped deserialization failed - ' + untypedError.getMessage());
+          out.message = 'Invalid JSON payload: Could not construct request from provided data - ' + untypedError.getMessage();
+          res.statusCode = 400;
+          res.responseBody = Blob.valueOf(JSON.serialize(out));
+          return;
+        }
       }
 
-      // basic validation - check if deserialization resulted in null
-      if (r == null) {
-        System.debug('Error: Deserialization resulted in null CheckoutRequest');
-        out.message = 'Invalid JSON payload';
-        res.statusCode = 400;
-        res.responseBody = Blob.valueOf(JSON.serialize(out));
-        return;
-      }
+      // Deserialization was successful, proceed with request processing
 
       System.debug('CheckoutRequest details:');
       System.debug('  traceId: ' + r.traceId);
@@ -453,6 +479,70 @@ global with sharing class WebshopCheckout {
       System.debug('Returning unexpected error response');
       return;
     }
+  }
+
+  // Helper method to safely get string values from untyped map
+  private static String getStringValue(Map<String, Object> data, String key) {
+    return getStringValue(data, key, null);
+  }
+
+  // Helper method to safely get string values from untyped map with default
+  private static String getStringValue(Map<String, Object> data, String key, String defaultValue) {
+    if (data.containsKey(key)) {
+      Object value = data.get(key);
+      if (value instanceof String) {
+        return (String)value;
+      } else if (value != null) {
+        return String.valueOf(value);
+      }
+    }
+    return defaultValue;
+  }
+
+  // Helper method to parse product lines from untyped data
+  private static List<ProductLine> parseProductLines(Map<String, Object> data, String key) {
+    if (!data.containsKey(key)) {
+      return null;
+    }
+
+    Object value = data.get(key);
+    if (value instanceof List<Object>) {
+      List<ProductLine> result = new List<ProductLine>();
+      for (Object item : (List<Object>)value) {
+        if (item instanceof Map<String, Object>) {
+          Map<String, Object> productMap = (Map<String, Object>)item;
+          ProductLine pl = new ProductLine();
+          pl.productId = getStringValue(productMap, 'productId');
+          pl.pricebookEntryId = getStringValue(productMap, 'pricebookEntryId');
+          pl.unitPrice = getDecimalValue(productMap, 'unitPrice');
+          pl.quantity = getDecimalValue(productMap, 'quantity');
+          result.add(pl);
+        }
+      }
+      return result.isEmpty() ? null : result;
+    }
+    return null;
+  }
+
+  // Helper method to safely get decimal values from untyped map
+  private static Decimal getDecimalValue(Map<String, Object> data, String key) {
+    if (data.containsKey(key)) {
+      Object value = data.get(key);
+      if (value instanceof Decimal) {
+        return (Decimal)value;
+      } else if (value instanceof Integer) {
+        return Decimal.valueOf((Integer)value);
+      } else if (value instanceof Double) {
+        return Decimal.valueOf(String.valueOf(value));
+      } else if (value instanceof String) {
+        try {
+          return Decimal.valueOf((String)value);
+        } catch (Exception e) {
+          return null;
+        }
+      }
+    }
+    return null;
   }
 
   // simple custom exception for business errors
