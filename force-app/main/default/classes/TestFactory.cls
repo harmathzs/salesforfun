@@ -166,6 +166,7 @@ public with sharing class TestFactory {
    * @description Creates a pricebook entry in the standard pricebook
    *              for webshop checkout testing.
    */
+/*
   public static PricebookEntry createPricebookEntry(Id productId, Decimal unitPrice, Boolean isActive) {
     Id standardPricebookId = Test.getStandardPricebookId();
 
@@ -178,6 +179,8 @@ public with sharing class TestFactory {
     insert pbe;
     return pbe;
   }
+
+ */
 
   /**
    * Creates pricebook entries for multiple products.
