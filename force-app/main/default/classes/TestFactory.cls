@@ -89,6 +89,7 @@ public with sharing class TestFactory {
    * @description Convenience method for creating test datasets with both convertible
    *              and non-convertible leads. Useful for comprehensive conversion testing.
    */
+/*
   public static Lead[] getMixedTestLeads(Integer qualifiedCount, Integer unqualifiedCount) {
     Lead[] mixedLeads = new List<Lead>();
 
@@ -100,6 +101,8 @@ public with sharing class TestFactory {
 
     return mixedLeads;
   }
+
+ */
 
   /**
    * Creates a test product for e-commerce testing.
