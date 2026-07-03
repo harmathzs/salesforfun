@@ -12,9 +12,19 @@ private class WebshopCheckoutTest {
     // Extract the first lead and product for convenience
     Lead[] leads = (Lead[])testData.get('leads');
     Product2[] products = (Product2[])testData.get('products');
+    PricebookEntry[] pricebookEntries = (PricebookEntry[])testData.get('pricebookEntries');
+    Id standardPricebookId = (Id)testData.get('standardPricebookId');
 
     testData.put('testLead', leads[0]);
     testData.put('testProduct', products[0]);
+    testData.put('testPricebookEntry', pricebookEntries[0]);
+    testData.put('testStandardPricebookId', standardPricebookId);
+
+    // Ensure standard pricebook exists and is accessible
+    if (standardPricebookId == null) {
+      standardPricebookId = Test.getStandardPricebookId();
+      testData.put('testStandardPricebookId', standardPricebookId);
+    }
 
     return testData;
   }
@@ -127,6 +137,74 @@ private class WebshopCheckoutTest {
     // Verify lead was converted
     Lead convertedLead = [SELECT IsConverted FROM Lead WHERE Id = :testLead.Id];
     System.assertEquals(true, convertedLead.IsConverted, 'Lead should be converted');
+  }
+
+  /**
+   * Test successful checkout with already converted lead (repeat order scenario)
+   */
+  @IsTest
+  static void testSuccessfulCheckoutWithConvertedLead() {
+    // Setup test data
+    Map<String, Object> testData = createTestData();
+    Lead testLead = (Lead)testData.get('testLead');
+    Product2 testProduct = (Product2)testData.get('testProduct');
+
+    // First, convert the lead manually to simulate a previous order
+    Database.LeadConvert lc = new Database.LeadConvert();
+    lc.setLeadId(testLead.Id);
+    lc.setConvertedStatus('Closed - Converted');
+    lc.setDoNotCreateOpportunity(true); // Don't create opportunity for first conversion
+
+    Database.LeadConvertResult lcr = Database.convertLead(lc);
+    System.assert(lcr.isSuccess(), 'First lead conversion should succeed');
+
+    // Verify lead is converted
+    testLead = [SELECT IsConverted, ConvertedAccountId, ConvertedContactId FROM Lead WHERE Id = :testLead.Id];
+    System.assertEquals(true, testLead.IsConverted, 'Lead should be converted');
+    System.assertNotEquals(null, testLead.ConvertedAccountId, 'Lead should have converted account');
+    System.assertNotEquals(null, testLead.ConvertedContactId, 'Lead should have converted contact');
+
+    // Now test checkout with the already converted lead (repeat order scenario)
+    String requestJson = createValidRequest(testLead.Id, 'ext-repeat-order-123', testProduct.Id);
+
+    // Set up REST context
+    RestRequest req = new RestRequest();
+    RestResponse res = new RestResponse();
+    req.requestBody = Blob.valueOf(requestJson);
+    req.httpMethod = 'POST';
+    RestContext.request = req;
+    RestContext.response = res;
+
+    // Test the checkout - should succeed with converted lead
+    Test.startTest();
+    WebshopCheckout.doCheckout();
+    Test.stopTest();
+
+    // Verify response
+    System.assertEquals(200, res.statusCode, 'HTTP status should be 200 for repeat order');
+
+    // Parse and verify response
+    WebshopCheckout.CheckoutResponse response = (WebshopCheckout.CheckoutResponse)JSON.deserialize(
+      res.responseBody.toString(),
+      WebshopCheckout.CheckoutResponse.class
+    );
+
+    System.assertEquals(true, response.ok, 'Response should be successful for repeat order');
+    System.assertEquals('Checkout processed', response.message, 'Message should indicate success');
+    System.assertNotEquals(null, response.accountId, 'Account ID should be set');
+    System.assertNotEquals(null, response.contactId, 'Contact ID should be set');
+
+    // For repeat orders, should use existing converted account/contact
+    System.assertEquals(testLead.ConvertedAccountId, response.accountId, 'Should use existing converted account');
+    System.assertEquals(testLead.ConvertedContactId, response.contactId, 'Should use existing converted contact');
+
+    // Should create new opportunity for the repeat order
+    System.assertNotEquals(null, response.opportunityId, 'Should create new opportunity for repeat order');
+    System.assertNotEquals(null, response.orderId, 'Should create new order for repeat order');
+
+    // Verify the lead is still converted (should not change)
+    Lead finalLead = [SELECT IsConverted FROM Lead WHERE Id = :testLead.Id];
+    System.assertEquals(true, finalLead.IsConverted, 'Lead should remain converted');
   }
 
   /**
@@ -466,6 +544,76 @@ private class WebshopCheckoutTest {
 
     System.assertEquals(false, response.ok, 'Should fail with bad lead');
     System.assert(response.message.contains('Lead conversion failed'), 'Should indicate conversion failure');
+  }
+
+  /**
+   * Test successful checkout with explicit pricebook verification
+   */
+  @IsTest
+  static void testSuccessfulCheckoutWithPricebookVerification() {
+    // Setup test data
+    Map<String, Object> testData = createTestData();
+    Lead testLead = (Lead)testData.get('testLead');
+    Product2 testProduct = (Product2)testData.get('testProduct');
+    Id standardPricebookId = (Id)testData.get('testStandardPricebookId');
+
+    // Verify standard pricebook exists
+    System.assertNotEquals(null, standardPricebookId, 'Standard pricebook should exist in test context');
+
+    // Verify pricebook entry was created
+    PricebookEntry[] entries = [SELECT Id FROM PricebookEntry WHERE Product2Id = :testProduct.Id];
+    System.assertEquals(1, entries.size(), 'Pricebook entry should be created for test product');
+
+    // Create valid request
+    String requestJson = createValidRequest(testLead.Id, 'ext-pricebook-test-123', testProduct.Id);
+
+    // Set up REST context
+    RestRequest req = new RestRequest();
+    RestResponse res = new RestResponse();
+    req.requestBody = Blob.valueOf(requestJson);
+    req.httpMethod = 'POST';
+    RestContext.request = req;
+    RestContext.response = res;
+
+    // Test the checkout
+    Test.startTest();
+    WebshopCheckout.doCheckout();
+    Test.stopTest();
+
+    // Verify response
+    System.assertEquals(200, res.statusCode, 'HTTP status should be 200');
+
+    // Parse and verify response
+    WebshopCheckout.CheckoutResponse response = (WebshopCheckout.CheckoutResponse)JSON.deserialize(
+      res.responseBody.toString(),
+      WebshopCheckout.CheckoutResponse.class
+    );
+
+    System.assertEquals(true, response.ok, 'Response should be successful');
+    System.assertEquals('Checkout processed', response.message, 'Message should indicate success');
+    System.assertNotEquals(null, response.accountId, 'Account ID should be set');
+    System.assertNotEquals(null, response.contactId, 'Contact ID should be set');
+    System.assertNotEquals(null, response.opportunityId, 'Opportunity ID should be set');
+    System.assertNotEquals(null, response.orderId, 'Order ID should be set');
+
+    // Verify created records
+    Account createdAccount = [SELECT Id FROM Account WHERE Id = :response.accountId LIMIT 1];
+    System.assertNotEquals(null, createdAccount, 'Account should exist');
+
+    Contact createdContact = [SELECT Id FROM Contact WHERE Id = :response.contactId LIMIT 1];
+    System.assertNotEquals(null, createdContact, 'Contact should exist');
+
+    Opportunity createdOpportunity = [SELECT Id, Pricebook2Id FROM Opportunity WHERE Id = :response.opportunityId LIMIT 1];
+    System.assertNotEquals(null, createdOpportunity, 'Opportunity should exist');
+    System.assertEquals(standardPricebookId, createdOpportunity.Pricebook2Id, 'Opportunity should use standard pricebook');
+
+    Order createdOrder = [SELECT Id, Pricebook2Id FROM Order WHERE Id = :response.orderId LIMIT 1];
+    System.assertNotEquals(null, createdOrder, 'Order should exist');
+    System.assertEquals(standardPricebookId, createdOrder.Pricebook2Id, 'Order should use standard pricebook');
+
+    // Verify lead was converted
+    Lead convertedLead = [SELECT IsConverted FROM Lead WHERE Id = :testLead.Id];
+    System.assertEquals(true, convertedLead.IsConverted, 'Lead should be converted');
   }
 
   /**

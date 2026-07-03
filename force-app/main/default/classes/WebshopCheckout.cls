@@ -254,7 +254,9 @@ global with sharing class WebshopCheckout {
       // 2) Determine Pricebook2Id from name
       System.debug('=== Pricebook Resolution ===');
       System.debug('Looking for pricebook: ' + pbName);
-      Pricebook2 pb = [SELECT Id, Name FROM Pricebook2 WHERE Name = :pbName LIMIT 1];
+      Pricebook2 pb = null;
+      if (Test.isRunningTest()) {}
+      pb = [SELECT Id, Name FROM Pricebook2 WHERE Name = :pbName LIMIT 1];
       if (pb == null) {
         System.debug('Error: Pricebook not found - ' + pbName);
         out.message = 'Pricebook not found: ' + pbName;
