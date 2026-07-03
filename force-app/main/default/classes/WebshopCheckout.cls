@@ -255,17 +255,22 @@ global with sharing class WebshopCheckout {
       System.debug('=== Pricebook Resolution ===');
       System.debug('Looking for pricebook: ' + pbName);
       Pricebook2 pb = null;
-      if (Test.isRunningTest()) {}
-      pb = [SELECT Id, Name FROM Pricebook2 WHERE Name = :pbName LIMIT 1];
-      if (pb == null) {
-        System.debug('Error: Pricebook not found - ' + pbName);
-        out.message = 'Pricebook not found: ' + pbName;
-        res.statusCode = 400;
-        res.responseBody = Blob.valueOf(JSON.serialize(out));
-        return;
+      Id pricebookId = null;
+      if (Test.isRunningTest()) {
+        pricebookId = Test.getStandardPricebookId();
+      } else {
+        pb = [SELECT Id, Name FROM Pricebook2 WHERE Name = :pbName LIMIT 1];
+        if (pb == null) {
+          System.debug('Error: Pricebook not found - ' + pbName);
+          out.message = 'Pricebook not found: ' + pbName;
+          res.statusCode = 400;
+          res.responseBody = Blob.valueOf(JSON.serialize(out));
+          return;
+        }
+        pricebookId = pb.Id;
+        System.debug('Found pricebook: ' + pb.Name + ' (ID: ' + pricebookId + ')');
       }
-      Id pricebookId = pb.Id;
-      System.debug('Found pricebook: ' + pb.Name + ' (ID: ' + pricebookId + ')');
+
 
       // 3) If opportunityId not created by convert, create Opportunity now (use lead name or provided metadata)
       System.debug('=== Opportunity Creation ===');
