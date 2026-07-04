@@ -4,36 +4,39 @@ SalesforFun - my Salesforce Developer Edition org
 
 ## Current Progress
 
-✅ **Web-to-Lead Implementation Complete**
-- Developed React site at https://react-for-fun.vercel.app/ with Lead capture form
-- Implemented Web-to-Lead integration with Salesforce
-- Created Lead insert trigger using Metillium trigger framework (https://github.com/lfreeland/Saleforce-Trigger-Framework)
-- Product Interest field mapping: React form Description field → Salesforce Lead Product Interest field
-- **Enhanced**: Replaced AuraHandledException with custom WebshopApiException for REST API endpoints
-- **Fixed**: Allow re-verification for previously verified leads (handles account deletion/re-registration)
+### 🔄 React-Salesforce Integration (Web-to-Lead & Webshop)
 
-✅ **Mass Lead Conversion Implementation Complete**
-- Developed `LeadMassConvertInvocable` Apex class with `@InvocableMethod` annotation
-- Implemented bulk-safe lead conversion using `Database.convertLead()`
-- Supports multiple convertible statuses: Qualified, Working - Contacted, Nurturing, Closed - Not Converted
-- Comprehensive input validation and error handling
-- Enhanced System.debug statements for observability
-- Screen Flow integration for user-friendly mass conversion interface
-- Achieved 100% test coverage with comprehensive test scenarios
-- Production-ready with full observability and error reporting
+✅ **Web-to-Lead & User Registration Complete**
+- **React Site**: https://react-for-fun.vercel.app/ with Lead capture form and full webshop functionality
+- **Salesforce Integration**: Web-to-Lead integration with Metillium trigger framework
+- **User Management**: Complete registration, email verification, login, and account management flow
+- **Lead Processing**: Product Interest field mapping and lead verification status handling
+- **Enhanced Exception Handling**: Replaced AuraHandledException with custom WebshopApiException for REST API endpoints
+- **Re-registration Support**: Allow re-verification for previously verified leads (handles account deletion/re-registration)
 
 ✅ **Email Verification API Complete**
-- Developed `WebshopVerificationEmailApi` REST endpoint: `POST /webshop/verification-email`
-- Implements email verification for React 4 fun webshop registration
-- Features comprehensive ApexDoc documentation
-- Supports lead lookup by ID or email
-- Customizable verification codes with configurable expiry
-- Personalized email templates with dynamic content
-- Robust error handling and validation
-- Full integration with Salesforce email messaging API
-- **Enhanced**: Graceful JSON deserialization with untyped fallback for improved error handling
-- **Fixed**: Handle already converted leads for repeat orders in WebshopCheckout
-- **Improved**: Test coverage from 43% to 85%+ with comprehensive test scenarios
+- **REST Endpoint**: `POST /webshop/verification-email` for React site registration flow
+- **Features**: Lead lookup by ID/email, customizable verification codes, personalized email templates
+- **Integration**: Full integration with React site registration (`/api/register` → Apex REST endpoint)
+- **Robust Error Handling**: Graceful JSON deserialization with untyped fallback
+- **Test Coverage**: Comprehensive test scenarios covering all verification flows
+
+✅ **Webshop Checkout API Complete**
+- **REST Endpoint**: `POST /webshop/checkout/*` for complete checkout process
+- **Features**: Lead conversion, opportunity creation, order processing with line items
+- **Repeat Order Support**: Handles already-converted leads for returning customers
+- **Pricebook Handling**: Automatic standard pricebook resolution with fallback
+- **Idempotent Processing**: External order ID support for duplicate prevention
+- **Test Coverage**: Improved from 43% to 85%+ with comprehensive business scenarios
+
+### 👥 Salesforce Internal Tools (Admin-Facing)
+
+✅ **Mass Lead Conversion Implementation Complete**
+- **Apex Class**: `LeadMassConvertInvocable` with `@InvocableMethod` annotation
+- **Features**: Bulk-safe lead conversion, multiple status support, comprehensive validation
+- **Interface**: Screen Flow integration for admin-friendly mass conversion
+- **Quality**: 100% test coverage, enhanced debug logging, production-ready
+- **Use Case**: Internal sales operations tool, separate from customer-facing webshop flow
 
 ## Next Steps
 

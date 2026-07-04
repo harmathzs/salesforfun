@@ -159,7 +159,9 @@ Use Apex for:
 
 ## 7) Backlog (Refined From Current Notes)
 
-✅ **COMPLETED: Web-to-Lead Implementation**
+### 🔄 React-Salesforce Integration (Customer-Facing)
+
+✅ **COMPLETED: Web-to-Lead & Webshop User Registration**
    - React site with Lead capture form (https://react-for-fun.vercel.app/)
    - Web-to-Lead integration with Salesforce
    - Lead insert trigger using Metillium framework
@@ -168,15 +170,7 @@ Use Apex for:
    - **Enhanced**: Replaced AuraHandledException with custom WebshopApiException for REST API endpoints
    - **Fixed**: Allow re-verification for previously verified leads (handles account deletion/re-registration)
 
-✅ **COMPLETED: Mass Lead Conversion Implementation**
-   - LeadMassConvertInvocable Apex class with bulk processing
-   - Screen Flow integration for user interface
-   - Multiple convertible statuses supported
-   - Comprehensive error handling and validation
-   - Enhanced debug logging for troubleshooting
-   - Full test coverage with 100% pass rate
-
-✅ **COMPLETED: Webshop Checkout Implementation**
+✅ **COMPLETED: Webshop Checkout Process**
    - WebshopCheckout REST API endpoint for complete checkout process
    - Lead conversion with graceful handling of already-converted leads (repeat orders)
    - Pricebook resolution with standard pricebook fallback
@@ -184,6 +178,16 @@ Use Apex for:
    - Comprehensive error handling and validation
    - Graceful JSON deserialization with untyped fallback
    - Test coverage improved from 43% to 85%+ with comprehensive scenarios
+
+### 👥 Salesforce Internal Tools (Admin-Facing)
+
+✅ **COMPLETED: Mass Lead Conversion Implementation**
+   - LeadMassConvertInvocable Apex class with bulk processing
+   - Screen Flow integration for user interface
+   - Multiple convertible statuses supported
+   - Comprehensive error handling and validation
+   - Enhanced debug logging for troubleshooting
+   - Full test coverage with 100% pass rate
 
 2. Auto-set Price Book on Opportunity
 3. Set OpportunityLineItems by product interest
