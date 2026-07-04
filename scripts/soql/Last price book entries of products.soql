@@ -1,0 +1,9 @@
+/* Last price book entries of products */
+SELECT Id, CreatedDate
+    ,ProductCode
+    ,Product2.Name
+    ,Product2.Family
+    ,Product2.Description
+    ,UnitPrice
+FROM PricebookEntry
+ORDER BY CreatedDate DESC LIMIT 500

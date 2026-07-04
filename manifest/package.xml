@@ -67,6 +67,27 @@
         <members>Value__mdt</members>
         <members>mtf__Trigger_Action__mdt</members>
         <members>mtf__sObject_Trigger_Setting__mdt</members>
+        <members>AccountContactRole</members>
+        <members>BuyerAccount</members>
+        <members>BuyerGroup</members>
+        <members>BuyerGroupMember</members>
+        <members>BuyerGroupPricebook</members>
+        <members>BuyerGroupRelatedObject</members>
+        <members>Customer</members>
+        <members>Image</members>
+        <members>LocationGroup</members>
+        <members>LocationGroupAssignment</members>
+        <members>ProductCatalog</members>
+        <members>ProductCategory</members>
+        <members>ProductCategoryProduct</members>
+        <members>ProductSellingModel</members>
+        <members>SalesStore</members>
+        <members>SalesStoreCatalog</members>
+        <members>Seller</members>
+        <members>Site</members>
+        <members>WebCart</members>
+        <members>Webshop_Session__c</members>
+        <members>Webshop_User__c</members>
         <name>CustomObject</name>
     </types>
     <types>
@@ -105,6 +126,7 @@
     <types>
         <members>Mass_Lead_Evolution_Home</members>
         <members>Mass_Lead_Evolution_UtilityBar</members>
+        <members>My_Custom_Salesforce_Home_Page</members>
         <name>FlexiPage</name>
     </types>
     <types>
@@ -118,6 +140,25 @@
     <types>
         <members>Mass_Lead_Conversion_Screen_Flow</members>
         <name>FlowDefinition</name>
+    </types>
+    <types>
+        <members>Sales4fun_Store</members>
+        <name>CustomSite</name>
+    </types>
+    <types>
+        <members>Sales4fun_Store1</members>
+        <name>DigitalExperienceConfig</name>
+    </types>
+    <types>
+        <members>force__Commerce_Shopper</members>
+        <members>Sales4fun_Commerce_Shopper</members>
+        <name>PermissionSetGroup</name>
+    </types>
+    <types>
+        <members>Customer Community Plus User</members>
+        <members>Sales4fun Store Profile</members>
+        <members>Sales4fun Store Shopper Profile</members>
+        <name>Profile</name>
     </types>
     <version>66.0</version>
 </Package>

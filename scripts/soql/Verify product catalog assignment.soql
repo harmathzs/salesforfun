@@ -1,0 +1,5 @@
+/* Verify product catalog assignment */
+SELECT Id, Name
+FROM ProductCatalog
+
+LIMIT 200

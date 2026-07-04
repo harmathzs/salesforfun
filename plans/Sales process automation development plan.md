@@ -2,7 +2,7 @@
 
 ## 0) Goal and Scope
 
-Implement an end-to-end Salesforce sales process from Lead to Renewal with clear boundaries between native platform capabilities and custom development.
+Implement an end-to-end Salesforce sales process from Lead to Renewal with clear boundaries between native platform capabilities and custom development. Integrate Agentforce AI capabilities to enhance automation, user experience, and productivity while maintaining zero-cost implementation for all users.
 
 ## 1) Business Flow (Target State)
 
@@ -39,6 +39,15 @@ Implement an end-to-end Salesforce sales process from Lead to Renewal with clear
 - ERP integration for Invoice, Payment, Shipment status updates
 - Order-to-Asset automation and lifecycle updates
 - Renewal, Amendment, and Termination playbooks and automations
+
+### Agentforce AI Capabilities (Zero-Cost Implementation)
+
+- AI-powered prompt templates for sales communications
+- Dynamic field generation based on AI analysis
+- Automated email generation with natural language processing
+- Intelligent agents for sales assistance and automation
+- Voice interface capabilities for hands-free operations
+- AI functions for data enrichment and predictive insights
 
 ## 3) Delivery Phases
 
@@ -100,6 +109,30 @@ Implement an end-to-end Salesforce sales process from Lead to Renewal with clear
     - Amendment delta handling
     - Termination status and asset deactivation
 
+### Phase 6: Agentforce AI Integration (High Priority - Zero Cost)
+
+11. AI-Powered Sales Automation
+    - Prompt templates for sales communications (emails, follow-ups, proposals)
+    - Dynamic field generation based on lead/opportunity analysis
+    - Automated email generation with NLP
+    - Intelligent sales agents for process automation
+    - Voice interface for hands-free sales operations
+    - AI functions for data enrichment and predictive insights
+
+12. AI-Enhanced User Experience
+    - Context-aware help and suggestions
+    - Automated meeting summaries and action items
+    - Intelligent search and knowledge base integration
+    - Predictive opportunity scoring
+    - Automated follow-up recommendations
+
+13. AI-Powered Analytics
+    - Natural language query interface
+    - Automated report generation
+    - Predictive forecasting
+    - Anomaly detection in sales data
+    - Intelligent data visualization
+
 ## 4) Suggested Implementation Pattern (Flow First, Apex Where Needed)
 
 Use Record-Triggered Flows for straightforward field updates and object creation.
@@ -126,11 +159,27 @@ Use Apex for:
 
 ## 7) Backlog (Refined From Current Notes)
 
-✅ **COMPLETED: Web-to-Lead Implementation**
+### 🔄 React-Salesforce Integration (Customer-Facing)
+
+✅ **COMPLETED: Web-to-Lead & Webshop User Registration**
    - React site with Lead capture form (https://react-for-fun.vercel.app/)
    - Web-to-Lead integration with Salesforce
    - Lead insert trigger using Metillium framework
    - Product Interest field mapping (Description → Product Interest)
+   - Email verification API endpoint: `POST /webshop/verification-email`
+   - **Enhanced**: Replaced AuraHandledException with custom WebshopApiException for REST API endpoints
+   - **Fixed**: Allow re-verification for previously verified leads (handles account deletion/re-registration)
+
+✅ **COMPLETED: Webshop Checkout Process**
+   - WebshopCheckout REST API endpoint for complete checkout process
+   - Lead conversion with graceful handling of already-converted leads (repeat orders)
+   - Pricebook resolution with standard pricebook fallback
+   - Opportunity and Order creation with line items
+   - Comprehensive error handling and validation
+   - Graceful JSON deserialization with untyped fallback
+   - Test coverage improved from 43% to 85%+ with comprehensive scenarios
+
+### 👥 Salesforce Internal Tools (Admin-Facing)
 
 ✅ **COMPLETED: Mass Lead Conversion Implementation**
    - LeadMassConvertInvocable Apex class with bulk processing
@@ -154,7 +203,193 @@ Use Apex for:
    - Ordered products become Assets
 8. Renewal, Amendment, Termination options
 
+### Agentforce AI Backlog (Zero-Cost Implementation)
+
+9. AI Prompt Templates
+   - Sales email templates with dynamic content
+   - Follow-up message generators
+   - Proposal and quote explanation templates
+
+10. Dynamic Field Generation
+    - AI-powered field suggestions based on lead data
+    - Automated data enrichment from public sources
+    - Intelligent field mapping and validation
+
+11. Email Generation Automation
+    - Context-aware email drafting
+    - Personalized email content generation
+    - Automated email sequencing
+
+12. Intelligent Agents
+    - Sales process automation agents
+    - Opportunity management assistants
+    - Lead qualification and scoring agents
+
+13. Voice Interface Capabilities
+    - Voice-to-text for meeting notes
+    - Voice commands for Salesforce operations
+    - Hands-free data entry and navigation
+
+14. AI Functions
+    - Predictive lead scoring
+    - Opportunity win probability analysis
+    - Automated data cleansing and normalization
+    - Intelligent recommendation engine
+
 ## 8) Current Technical Implementation
+
+### Webshop Verification Email API
+
+**Class:** `WebshopVerificationEmailApi.cls`
+
+**Endpoint:** `POST /webshop/verification-email`
+
+**Purpose:** REST API for sending verification emails to leads during the webshop registration process
+
+**Key Features:**
+- REST Resource with URL mapping `/webshop/verification-email`
+- Handles POST requests for email verification
+- Supports both leadId and email-based lead lookup
+- Generates and sends verification codes via email
+- Validates input parameters and lead status
+- Returns structured JSON responses with success/failure status
+- **Enhanced**: Graceful JSON deserialization with untyped fallback
+- **Fixed**: Allow re-verification for previously verified leads
+
+**Request Structure:**
+```json
+{
+  "leadId": "string",           // Optional: Lead ID
+  "email": "string",             // Optional: Lead email (alternative to leadId)
+  "firstName": "string",         // Optional: Custom greeting name
+  "code": "string",               // Required: Verification code (min 4 chars)
+  "expiryMinutes": integer        // Optional: Code expiry time (default: 15)
+}
+```
+
+**Response Structure:**
+```json
+{
+  "ok": boolean,                  // Success status
+  "message": "string",           // Status message
+  "requestId": "string"           // Unique request identifier
+}
+```
+
+**Validation Rules:**
+- Requires either leadId or email parameter
+- Verification code must be at least 4 characters
+- Lead must exist and have a valid email
+- Lead email must not already be verified (but allows re-verification for repeat registrations)
+- Default expiry time: 15 minutes
+
+**Email Template:**
+- Subject: "Verify your React 4 fun account"
+- Personalized greeting using firstName or lead data
+- Includes verification code and expiry information
+- Plain text format for maximum compatibility
+
+**Error Handling:**
+- Returns HTTP 400 for client errors
+- Detailed error messages in response
+- Handles email sending failures gracefully
+- Validates all input parameters
+- Graceful fallback for JSON deserialization issues
+
+**Integration Points:**
+- Lead object (Email, Email_Verified__c, Verification_Channel__c)
+- Salesforce Email Messaging API
+- React webshop frontend for verification flow
+
+### Webshop Checkout API
+
+**Class:** `WebshopCheckout.cls`
+
+**Endpoint:** `POST /webshop/checkout/*`
+
+**Purpose:** REST API for complete checkout process including lead conversion, opportunity creation, and order processing
+
+**Key Features:**
+- REST Resource with URL mapping `/webshop/checkout/*`
+- Handles complete checkout workflow in single API call
+- Lead conversion with automatic handling of already-converted leads (repeat orders)
+- Pricebook resolution with standard pricebook fallback
+- Opportunity and Order creation with line items
+- Idempotent processing using external order IDs
+- Comprehensive validation and error handling
+- Graceful JSON deserialization with untyped fallback
+
+**Request Structure:**
+```json
+{
+  "traceId": "string",
+  "externalOrderId": "string",
+  "leadId": "string",
+  "webshopUserId": "string",
+  "pricebookName": "string",
+  "opportunity": {
+    "name": "string",
+    // other opportunity metadata
+  },
+  "opportunityProducts": [
+    {
+      "productId": "string",
+      "pricebookEntryId": "string",
+      "unitPrice": number,
+      "quantity": number
+    }
+  ],
+  "orderProducts": [
+    {
+      "productId": "string",
+      "pricebookEntryId": "string",
+      "unitPrice": number,
+      "quantity": number
+    }
+  ]
+}
+```
+
+**Response Structure:**
+```json
+{
+  "ok": boolean,
+  "message": "string",
+  "accountId": "string",
+  "contactId": "string",
+  "opportunityId": "string",
+  "orderId": "string",
+  "createdIds": {
+    "convertedAccountId": "string",
+    "convertedContactId": "string",
+    "convertedOpportunityId": "string",
+    "opportunityId": "string",
+    "orderId": "string"
+  },
+  "warnings": ["string"]
+}
+```
+
+**Key Business Logic:**
+- Handles both new and repeat customers (already-converted leads)
+- Creates new opportunities for each order
+- Reuses existing accounts/contacts for repeat customers
+- Validates all required data before processing
+- Provides detailed error messages for troubleshooting
+
+**Error Handling:**
+- Returns HTTP 400 for client errors
+- Returns HTTP 500 for server errors
+- Graceful fallback for JSON deserialization issues
+- Comprehensive validation of all input parameters
+
+**Integration Points:**
+- Lead object (conversion process)
+- Account and Contact objects
+- Opportunity and OpportunityLineItem objects
+- Order and OrderItem objects
+- Pricebook2 and PricebookEntry objects
+- React webshop frontend for checkout flow
 
 ### Mass Lead Conversion Architecture
 
@@ -190,6 +425,18 @@ Use Apex for:
    - Web-to-Lead integration working
    - Lead insert trigger implemented with Metillium framework
    - Product Interest field mapping functional
+   - Email verification API endpoint implemented: `POST /webshop/verification-email`
+   - Exception handling enhanced with custom WebshopApiException
+   - Re-verification support for previously verified leads
+
+✅ **Milestone 2: Webshop Checkout Complete**
+   - WebshopCheckout REST API endpoint deployed and tested
+   - Lead conversion with repeat order support (already-converted leads)
+   - Pricebook handling with standard pricebook fallback
+   - Opportunity and Order creation with line items
+   - Graceful JSON deserialization with untyped fallback
+   - Test coverage improved from 43% to 85%+ with comprehensive scenarios
+   - Production-ready with full error handling and validation
 
 ✅ **Milestone 1: Mass Lead Conversion Complete**
    - LeadMassConvertInvocable Apex class deployed and tested
@@ -204,6 +451,10 @@ Use Apex for:
 - Milestone C: Contract and PDF generation complete and approved
 - Milestone D: ERP synchronization complete with monitoring
 - Milestone E: Order-to-Asset and Renewal automation complete
+- Milestone F: Agentforce AI foundation implemented (prompt templates, field generation)
+- Milestone G: AI email generation and agents deployed
+- Milestone H: Voice interface and advanced AI functions operational
+- Milestone I: Test coverage enhanced to 95%+ for all components
 
 ## 9) Risks and Mitigations
 
@@ -217,5 +468,103 @@ Use Apex for:
 1. Phase 1 foundation
 2. Quote-to-Order line automation
 3. Contract and PDF generation
-4. ERP integration
-5. Lifecycle automation (renewal, amendment, termination)
+4. Agentforce AI foundation (prompt templates, field generation)
+5. AI email generation and agents
+6. ERP integration
+7. Voice interface and advanced AI functions
+8. Lifecycle automation (renewal, amendment, termination)
+
+## 11) API Endpoints Reference
+
+### Current REST API Endpoints
+
+**Webshop Integration:**
+- `POST /webshop/verification-email` - Send verification email to leads
+- `POST /webshop/checkout/*` - Complete checkout process with lead conversion
+
+**Lead Management:**
+- Mass lead conversion via Screen Flow (Apex Invocable Method)
+
+### Planned API Endpoints
+
+**Opportunity Automation:**
+- `POST /api/opportunity/pricebook` - Auto-set price book based on criteria
+- `POST /api/opportunity/contact-role` - Auto-create primary contact role
+
+**Quote and Order Processing:**
+- `POST /api/quote-to-order` - Convert quote to order with validation
+- `POST /api/quote/line-items` - Sync quote line items
+
+**Contract Management:**
+- `POST /api/contract/generate` - Generate contract from closed-won opportunity
+- `GET /api/contract/pdf/{contractId}` - Get contract PDF
+
+**ERP Integration:**
+- `POST /api/erp/invoice-sync` - Sync invoice data from ERP
+- `POST /api/erp/payment-sync` - Sync payment data from ERP
+- `POST /api/erp/shipment-sync` - Sync shipment data from ERP
+
+**Asset Management:**
+- `POST /api/order-to-assets` - Convert order products to assets
+
+**Agentforce AI Endpoints:**
+- `POST /api/ai/prompt-template` - Generate content from prompt templates
+- `POST /api/ai/email-generate` - Generate sales emails using AI
+- `POST /api/ai/field-suggestions` - Get AI field suggestions
+- `POST /api/ai/voice-process` - Process voice commands
+
+## 12) Agentforce Implementation Approach
+
+### Zero-Cost Implementation Strategy
+
+- Use native Salesforce AI capabilities (Einstein, etc.) where available
+- Implement custom Apex-based AI functions for specific business logic
+- Leverage open-source NLP libraries that can run in Salesforce environment
+- Use platform events and flows for AI process orchestration
+- Implement caching strategies to minimize API calls and processing costs
+
+### Technical Architecture
+
+**AI Services Layer:**
+- Prompt template management system
+- Field generation engine
+- Email generation service
+- Voice interface processor
+- AI function library
+
+**Integration Layer:**
+- Salesforce Flow integration
+- Apex controller classes
+- Lightning Web Components for UI
+- Platform events for async processing
+
+**Data Layer:**
+- AI configuration custom objects
+- Prompt template storage
+- AI processing logs and audit trails
+- Performance metrics tracking
+
+### Development Priorities
+
+1. **Core AI Functions (High Priority):**
+   - Prompt template management
+   - Basic field generation
+   - Simple email generation
+
+2. **User Experience Enhancements (Medium Priority):**
+   - Voice interface basics
+   - Context-aware help
+   - Automated suggestions
+
+3. **Advanced AI Capabilities (Lower Priority):**
+   - Predictive analytics
+   - Advanced NLP processing
+   - Complex automation agents
+
+### Quality and Governance
+
+- AI function test coverage (minimum 80%)
+- Performance monitoring for AI processes
+- User feedback mechanisms
+- AI ethics and bias mitigation
+- Data privacy and security compliance
