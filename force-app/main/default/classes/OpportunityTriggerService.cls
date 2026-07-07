@@ -25,6 +25,7 @@ public with sharing class OpportunityTriggerService {
    *
    * @note This method performs a single update operation to minimize governor limits.
    * @note Only processes opportunities that have a corresponding converted lead.
+   * @note Creates a new list for DML operations to avoid modifying trigger context variables directly.
    */
   public static void updateConvertedLead(List<Opportunity> newOpportunities) {
     // Get the IDs of the new opportunities
@@ -46,18 +47,25 @@ public with sharing class OpportunityTriggerService {
       opportunityToLeadMap.put(lead.ConvertedOpportunityId, lead);
     }
 
+    // Create a new list for opportunities that need to be updated
+    List<Opportunity> opportunitiesToUpdate = new List<Opportunity>();
+
     // Update the opportunities with the converted lead information
     for (Opportunity opp : newOpportunities) {
       if (opportunityToLeadMap.containsKey(opp.Id)) {
         Lead convertedLead = opportunityToLeadMap.get(opp.Id);
-        // Later we might want to update other fields as well
-        opp.Converted_Lead__c = convertedLead.Id;
+        // Create a new opportunity record for update to avoid DML on trigger context variables
+        Opportunity oppToUpdate = new Opportunity(
+          Id = opp.Id,
+          Converted_Lead__c = convertedLead.Id
+        );
+        opportunitiesToUpdate.add(oppToUpdate);
       }
     }
 
     // Update the opportunities if any were modified
-    if (!newOpportunities.isEmpty()) {
-      update newOpportunities;
+    if (!opportunitiesToUpdate.isEmpty()) {
+      update opportunitiesToUpdate;
     }
   }
 }
