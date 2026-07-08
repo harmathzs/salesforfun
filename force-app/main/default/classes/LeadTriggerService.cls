@@ -50,13 +50,13 @@ public with sharing class LeadTriggerService {
    * @note Only processes leads that have been converted (ConvertedOpportunityId is populated).
    * @note Creates a new list for DML operations to avoid modifying trigger context variables.
    */
-  public static void updateConvertedOpportunity(Map<Id, Lead> oldLeadsMap, Map<Id, Lead> newLeadsMap) {
-    List<Opportunity> opportunitiesToUpdate = new List<Opportunity>(); 
+  public static void updateConvertedOpportunity(Map<Id, SObject> oldLeadsMap, Map<Id, SObject> newLeadsMap) {
+    List<Opportunity> opportunitiesToUpdate = new List<Opportunity>();
 
     // Find leads that were just converted (ConvertedOpportunityId changed from null to a value)
     for (Id leadId : newLeadsMap.keySet()) {
-      Lead oldLead = oldLeadsMap.get(leadId);
-      Lead newLead = newLeadsMap.get(leadId);
+      Lead oldLead = (Lead) oldLeadsMap.get(leadId);
+      Lead newLead = (Lead) newLeadsMap.get(leadId);
 
       // Check if this lead was just converted
       if (oldLead.ConvertedOpportunityId == null && newLead.ConvertedOpportunityId != null) {
