@@ -11,16 +11,16 @@
  */
 @IsTest
 private class LeadTriggerTest {
-  /**
-   * Sets up test data that runs before each test method.
-   *
-   * @description Creates 10 standard test leads using TestFactory and inserts them.
-   *              These records are available for all test methods in this class.
-   *
-   * @see TestFactory.getTestLeads()
-   */
+    /**
+     * Sets up test data that runs before each test method.
+     *
+     * @description Creates 10 standard test leads using TestFactory and inserts them.
+     *              These records are available for all test methods in this class.
+     *
+     * @see TestFactory.createTestLeads()
+     */
   @TestSetup static void testBeforeEach() {
-    Lead[] leads = TestFactory.getTestLeads();
+    Lead[] leads = TestFactory.createTestLeads();
     insert leads;
   }
 

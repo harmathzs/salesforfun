@@ -9,7 +9,7 @@ private class WebshopVerificationTest {
    */
   private static Lead createTestLead() {
     // Get test leads from factory and insert the first one
-    Lead[] testLeads = TestFactory.getTestLeads();
+    Lead[] testLeads = TestFactory.createTestLeads();
     insert testLeads[0];
     return testLeads[0];
   }
@@ -21,7 +21,7 @@ private class WebshopVerificationTest {
    */
   private static Lead createQualifiedTestLead() {
     // Get qualified test leads from factory and insert the first one
-    Lead[] qualifiedLeads = TestFactory.getQualifiedTestLeads(1);
+    Lead[] qualifiedLeads = TestFactory.createQualifiedTestLeads(1);
     insert qualifiedLeads[0];
     return qualifiedLeads[0];
   }
@@ -33,7 +33,7 @@ private class WebshopVerificationTest {
    */
   private static Lead createUnqualifiedTestLead() {
     // Get unqualified test leads from factory and insert the first one
-    Lead[] unqualifiedLeads = TestFactory.getUnqualifiedTestLeads(1);
+    Lead[] unqualifiedLeads = TestFactory.createUnqualifiedTestLeads(1);
     insert unqualifiedLeads[0];
     return unqualifiedLeads[0];
   }
@@ -45,7 +45,7 @@ private class WebshopVerificationTest {
    */
   private static Lead createVerifiedTestLead() {
     // Get test lead from factory, mark as verified, and insert
-    Lead[] testLeads = TestFactory.getTestLeads();
+    Lead[] testLeads = TestFactory.createTestLeads();
     testLeads[0].Email_Verified__c = true;
     insert testLeads[0];
     return testLeads[0];

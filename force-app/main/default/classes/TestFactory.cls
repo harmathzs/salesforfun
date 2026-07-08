@@ -14,7 +14,7 @@ public with sharing class TestFactory {
    * @description Generates test leads with consistent naming pattern (Jane Doe 0-9)
    *              and standard field values for general testing purposes.
    */
-  public static Lead[] getTestLeads() {
+  public static Lead[] createTestLeads() {
     Lead[] testLeads = new List<Lead>();
     for (Integer i=0; i<10; i++) {
       testLeads.add(new Lead(
@@ -38,7 +38,7 @@ public with sharing class TestFactory {
    * @description Generates leads ready for conversion with consistent naming pattern.
    *              Useful for testing lead conversion functionality.
    */
-  public static Lead[] getQualifiedTestLeads(Integer count) {
+  public static Lead[] createQualifiedTestLeads(Integer count) {
     Lead[] qualifiedLeads = new List<Lead>();
     for (Integer i=0; i<count; i++) {
       qualifiedLeads.add(new Lead(
@@ -63,7 +63,7 @@ public with sharing class TestFactory {
    * @description Generates leads that should not be converted due to their status.
    *              Useful for testing validation and error handling in conversion processes.
    */
-  public static Lead[] getUnqualifiedTestLeads(Integer count) {
+  public static Lead[] createUnqualifiedTestLeads(Integer count) {
     Lead[] unqualifiedLeads = new List<Lead>();
     for (Integer i=0; i<count; i++) {
       unqualifiedLeads.add(new Lead(
@@ -192,7 +192,7 @@ public with sharing class TestFactory {
    * @description Creates pricebook entries in the standard pricebook
    *              for multiple products with sequential pricing.
    */
-  public static PricebookEntry[] createPricebookEntries(List<Id> productIds, Decimal basePrice) {
+  public static PricebookEntry[] createTestPricebookEntries(List<Id> productIds, Decimal basePrice) {
     PricebookEntry[] entries = new List<PricebookEntry>();
     Id standardPricebookId = Test.getStandardPricebookId();
 
@@ -223,7 +223,7 @@ public with sharing class TestFactory {
     Map<String, Object> testData = new Map<String, Object>();
 
     // Create test leads
-    Lead[] testLeads = getQualifiedTestLeads(leadCount);
+    Lead[] testLeads = createQualifiedTestLeads(leadCount);
     insert testLeads;
     testData.put('leads', testLeads);
 
@@ -236,7 +236,7 @@ public with sharing class TestFactory {
     for (Product2 prod : testProducts) {
       productIds.add(prod.Id);
     }
-    PricebookEntry[] entries = createPricebookEntries(productIds, 100.00);
+    PricebookEntry[] entries = createTestPricebookEntries(productIds, 100.00);
     testData.put('pricebookEntries', entries);
 
     // Add standard pricebook ID
@@ -257,7 +257,7 @@ public with sharing class TestFactory {
    * @description Helper method to create properly structured checkout requests
    *              for webshop testing scenarios.
    */
-  public static WebshopCheckout.CheckoutRequest createCheckoutRequest(
+  public static WebshopCheckout.CheckoutRequest createTestCheckoutRequest(
     Id leadId, Id productId, String externalOrderId, String opportunityName
   ) {
     WebshopCheckout.CheckoutRequest request = new WebshopCheckout.CheckoutRequest();
@@ -277,11 +277,11 @@ public with sharing class TestFactory {
 
     // Add product lines
     request.opportunityProducts = new List<WebshopCheckout.ProductLine>{
-      createProductLine(productId, 1, 100.00)
+      createTestProductLine(productId, 1, 100.00)
     };
 
     request.orderProducts = new List<WebshopCheckout.ProductLine>{
-      createProductLine(productId, 1, 100.00)
+      createTestProductLine(productId, 1, 100.00)
     };
 
     return request;
@@ -298,7 +298,7 @@ public with sharing class TestFactory {
    * @description Convenience method for creating product line items
    *              in webshop checkout test scenarios.
    */
-  public static WebshopCheckout.ProductLine createProductLine(Id productId, Decimal quantity, Decimal unitPrice) {
+  public static WebshopCheckout.ProductLine createTestProductLine(Id productId, Decimal quantity, Decimal unitPrice) {
     WebshopCheckout.ProductLine pl = new WebshopCheckout.ProductLine();
     pl.productId = productId;
     pl.quantity = quantity;

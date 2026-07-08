@@ -17,8 +17,8 @@ private class LeadMassConvertInvocableTest {
    * @description Creates 3 qualified leads and 2 unqualified leads using TestFactory.
    *              These records are inserted and available for all test methods via SOQL queries.
    *
-   * @see TestFactory.getQualifiedTestLeads()
-   * @see TestFactory.getUnqualifiedTestLeads()
+   * @see TestFactory.createQualifiedTestLeads()
+   * @see TestFactory.createUnqualifiedTestLeads()
    */
   @TestSetup
   static void setupTestData() {
@@ -26,10 +26,10 @@ private class LeadMassConvertInvocableTest {
     List<Lead> testLeads = new List<Lead>();
 
     // Create 3 qualified leads
-    testLeads.addAll(TestFactory.getQualifiedTestLeads(3));
+    testLeads.addAll(TestFactory.createQualifiedTestLeads(3));
 
     // Create 2 unqualified leads
-    testLeads.addAll(TestFactory.getUnqualifiedTestLeads(2));
+    testLeads.addAll(TestFactory.createUnqualifiedTestLeads(2));
 
     insert testLeads;
   }
