@@ -65,6 +65,8 @@ global with sharing class LeadTriggerAction extends mtf.TriggerAction {
    *              Delegates to LeadTriggerService.updateConvertedOpportunity to handle the business logic.
    */
   public override void afterUpdate(Map<Id, SObject> oldRecordsMap, Map<Id, SObject> newRecordsMap) {
+    System.debug('LeadTriggerAction afterUpdate oldRecordsMap: '+oldRecordsMap);
+    System.debug('LeadTriggerAction afterUpdate newRecordsMap: '+newRecordsMap);
     LeadTriggerService.updateConvertedOpportunity(oldRecordsMap, newRecordsMap);
   }
 
