@@ -35,7 +35,10 @@ Implement an end-to-end Salesforce sales process from Lead to Renewal with clear
    - Handles test context with standard pricebook fallback
    - Implemented in `OpportunityTriggerService.setPricebook()` method
 - Product-interest to OpportunityLineItem mapping
-- Auto-create primary Opportunity Contact Role
+- ✅ **IMPLEMENTED: Auto-create primary Opportunity Contact Role**
+   - Automatically creates primary contact role when opportunity is created
+   - Sets the converted lead's contact as primary contact role
+   - Ensures proper relationship between opportunity and contact
 - Annual Price Book rollover with percentage uplift and exceptions
 - Quote-to-Order automatic line copy with validation and idempotency
 - Closed Won Opportunity to Contract creation and PDF generation
@@ -78,7 +81,7 @@ Implement an end-to-end Salesforce sales process from Lead to Renewal with clear
 
 1. ✅ **IMPLEMENTED: Opportunity defaults**
    - ✅ **Auto-set Price Book** - Implemented in `OpportunityTriggerService.setPricebook()`
-   - Auto-create primary Opportunity Contact Role
+   - ✅ **Auto-create primary Opportunity Contact Role** - Automatically sets converted lead's contact as primary contact role
 2. Product-interest mapping to OpportunityLineItems
 
 ### Phase 2: Commercial Core (High Priority)
@@ -184,7 +187,10 @@ Implement an end-to-end Salesforce sales process from Lead to Renewal with clear
    - Auto-sets Price Book based on current year (e.g., "Price Book 2026")
    - Uses exact name matching for reliable pricebook selection
    - Implemented in `OpportunityTriggerService.setPricebook()` method
-2. Auto-create primary Opportunity Contact Role
+2. ✅ **IMPLEMENTED: Auto-create primary Opportunity Contact Role**
+   - Automatically creates primary contact role when opportunity is created
+   - Sets the converted lead's contact as primary contact role
+   - Ensures proper relationship between opportunity and contact
 3. Product-interest to OpportunityLineItem mapping
 4. Opportunity stage validation and automation
 
@@ -253,7 +259,38 @@ public static void setPricebook(List<Opportunity> newOpportunities) {
 - Pricebook2 object: Queries for current year pricebook
 - Test context: Uses standard pricebook for testing
 
-## 8) Object and Line-Item Sync Rules
+## 8) Opportunity Contact Role Auto-Fill Implementation
+
+### Implementation Details
+
+**Feature:** Auto-create primary Opportunity Contact Role
+
+**Key Features:**
+- Automatically creates primary contact role when opportunity is created
+- Sets the converted lead's contact as the primary contact role
+- Ensures proper relationship between opportunity and contact
+- Works seamlessly with lead conversion process
+
+**Business Logic:**
+1. When a lead is converted to an opportunity
+2. The system automatically identifies the contact created from the lead conversion
+3. Creates an OpportunityContactRole record linking the opportunity to the contact
+4. Sets the role as "Primary" for the main contact
+5. Ensures the opportunity has at least one contact role
+
+**Integration Points:**
+- Lead conversion process
+- Opportunity creation workflow
+- Contact object relationship
+- OpportunityContactRole junction object
+
+**Benefits:**
+- Eliminates manual contact role assignment
+- Ensures opportunities always have primary contacts
+- Improves data consistency and completeness
+- Enhances reporting accuracy for opportunity-contact relationships
+
+## 10) Object and Line-Item Sync Rules
 
 - Opportunity Products and Synced Quote Line Items: native synchronization available
 - Quote Line Items to Order Products: implement custom automation (Flow or Apex) for reliability and controls
@@ -266,7 +303,7 @@ public static void setPricebook(List<Opportunity> newOpportunities) {
 - Apex tests for all custom logic (line copy, contract creation, integration handlers)
 - UAT scripts per phase and release checklist
 
-## 9) Backlog (Refined From Current Notes)
+## 10) Backlog (Refined From Current Notes)
 
 ### 🔄 React-Salesforce Integration (Customer-Facing)
 
@@ -304,7 +341,10 @@ public static void setPricebook(List<Opportunity> newOpportunities) {
    - Handles test context with standard pricebook fallback
    - Implemented in `OpportunityTriggerService.setPricebook()` method
 3. Set OpportunityLineItems by product interest
-4. Auto-fill Opportunity Contact Role
+4. ✅ **IMPLEMENTED: Auto-fill Opportunity Contact Role**
+   - Automatically creates primary contact role for opportunities
+   - Sets converted lead's contact as primary contact role
+   - Ensures proper opportunity-contact relationship
 2. Actualize new-year Price Book by percentage of previous year
 3. Quote-to-Order
    - Auto-copy Quote Line Items to Order Products
@@ -565,14 +605,16 @@ public static void setPricebook(List<Opportunity> newOpportunities) {
    - Timing optimization achieved by moving conversion logic to Lead trigger
    - Clean architecture following Salesforce best practices
 
-- ✅ **Milestone A: Opportunity Price Book Auto-Setting Complete**
+- ✅ **Milestone A: Opportunity Automation Complete**
   - Auto-set Price Book implementation completed and tested
   - Uses current year format "Price Book YYYY" for reliable matching
   - Handles test context with standard pricebook fallback
   - Implemented in `OpportunityTriggerService.setPricebook()` method
-  - Ready for production deployment
+  - Auto-create primary Opportunity Contact Role implementation completed
+  - Automatically sets converted lead's contact as primary contact role
+  - Both features ready for production deployment
 
-- Milestone A2: Remaining Opportunity automation complete and tested
+- Milestone B: Quote-to-Order with line items complete and tested
 - Milestone B: Quote-to-Order with line items complete and tested
 - Milestone C: Contract and PDF generation complete and approved
 - Milestone D: ERP synchronization complete with monitoring
@@ -608,10 +650,11 @@ public static void setPricebook(List<Opportunity> newOpportunities) {
 - Web-to-Lead Implementation: May 2026
 - Mass Lead Conversion: May 2026
 - Trigger Architecture Refactoring: May 2026
-- Opportunity Price Book Auto-Setting: July 2026
+- Opportunity Automation (Price Book + Contact Role): July 2026
+  - Price Book Auto-Setting: July 2026
+  - Contact Role Auto-Creation: July 2026
 
 **Phase 2: Commercial Core (In Progress)**
-- Opportunity Contact Role Auto-Creation: July 2026
 - Product-Interest Mapping: July-August 2026
 - Price Book Annual Rollover: August 2026
 - Quote-to-Order Automation: August-September 2026
@@ -651,7 +694,7 @@ public static void setPricebook(List<Opportunity> newOpportunities) {
 7. Voice interface and advanced AI functions
 8. Lifecycle automation (renewal, amendment, termination)
 
-## 15) API Endpoints Reference
+## 16) API Endpoints Reference
 
 ### Current REST API Endpoints
 
@@ -690,7 +733,7 @@ public static void setPricebook(List<Opportunity> newOpportunities) {
 - `POST /api/ai/field-suggestions` - Get AI field suggestions
 - `POST /api/ai/voice-process` - Process voice commands
 
-## 16) Agentforce Implementation Approach
+## 17) Agentforce Implementation Approach
 
 ### Zero-Cost Implementation Strategy
 

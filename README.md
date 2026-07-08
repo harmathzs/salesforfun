@@ -43,15 +43,61 @@ SalesforFun - my Salesforce Developer Edition org
 Following the development plan to implement end-to-end sales process automation from Lead to Renewal.
 
 ### Immediate Priorities
-✅ **Opportunity Pricebook Automation Complete**
-- Auto-set Price Book based on current year (e.g., "Price Book 2026")
+✅ **Opportunity Automation Complete**
+
+**Pricebook Auto-Setting:**
+- Auto-sets Price Book based on current year (e.g., "Price Book 2026")
 - Implemented in `OpportunityTriggerService.setPricebook()` method
+- Uses exact name matching for reliable pricebook selection
 - Handles both production and test contexts appropriately
 - Robust error handling for missing pricebooks
+
+**Contact Role Auto-Fill:**
+- Automatically creates primary Opportunity Contact Role
+- Sets converted lead's contact as primary contact role
+- Ensures proper opportunity-contact relationship
+- Eliminates manual contact role assignment
+- Improves data consistency and reporting accuracy
 
 - Develop Product-interest to OpportunityLineItem mapping
 - Create Quote-to-Order automation with validation
 - Enhance test coverage to 95%+ for all components
+
+### Code Examples
+
+**Pricebook Auto-Setting Implementation:**
+```java
+// OpportunityTriggerService.setPricebook()
+public static void setPricebook(List<Opportunity> newOpportunities) {
+    Integer thisYear = Date.today().year();
+    String pricebookName = 'Price Book ' + thisYear;
+    
+    Pricebook2[] pricebooks = [SELECT Id, Name FROM Pricebook2 WHERE Name = :pricebookName];
+    Pricebook2 pricebook = null;
+    if (pricebooks.isEmpty()) {
+        pricebooks = [SELECT Id, Name FROM Pricebook2 WHERE Name = 'Standard Price Book'];
+    }
+    Id pricebookId = null;
+    if (!pricebooks.isEmpty()) {
+        pricebook = pricebooks.get(0);
+        pricebookId = pricebook.Id;
+    }
+    if (Test.isRunningTest()) {
+        pricebookId = Test.getStandardPricebookId();
+    }
+    
+    for (Opportunity oppy: newOpportunities) {
+        if (String.isBlank(oppy.Pricebook2Id)) {
+            oppy.Pricebook2Id = pricebookId;
+        }
+    }
+}
+```
+
+**Contact Role Auto-Fill:**
+- Automatically creates OpportunityContactRole when lead is converted
+- Sets the converted contact as primary contact role
+- Triggered during lead conversion process
 
 ### Trigger Architecture (Current Implementation)
 - **Lead Trigger**: Handles lead conversion and opportunity creation via `LeadTriggerService.updateConvertedOpportunity()`
