@@ -15,7 +15,9 @@ global with sharing class OpportunityTriggerAction extends mtf.TriggerAction {
    *
    * @description Placeholder for before insert logic. Currently empty but available for future enhancements.
    */
-  public override void beforeInsert(List<SObject> newRecords) {}
+  public override void beforeInsert(List<SObject> newRecords) {
+    OpportunityTriggerService.setPricebook(newRecords);
+  }
 
   /**
    * Handles before update trigger events for Opportunity records.

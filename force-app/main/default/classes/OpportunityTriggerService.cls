@@ -75,4 +75,29 @@ public with sharing class OpportunityTriggerService {
   }
 
  */
+  public static void setPricebook(List<Opportunity> newOpportunities) {
+    Integer thisYear = Date.today().year();
+    String pricebookName = 'Price Book ' + thisYear;
+
+    // Query for the specific pricebook name
+    Pricebook2[] pricebooks = [SELECT Id, Name FROM Pricebook2 WHERE Name = :pricebookName];
+    Pricebook2 pricebook = null;
+    if (pricebooks.isEmpty()) {
+      pricebooks = [SELECT Id, Name FROM Pricebook2 WHERE Name = 'Standard Price Book'];
+    }
+    Id pricebookId = null;
+    if (!pricebooks.isEmpty()) {
+      pricebook = pricebooks.get(0);
+      pricebookId = pricebook.Id;
+    }
+    if (Test.isRunningTest()) {
+      pricebookId = Test.getStandardPricebookId();
+    }
+
+    for (Opportunity oppy: newOpportunities) {
+      if (String.isBlank(oppy.Pricebook2Id)) {
+          oppy.Pricebook2Id = pricebookId;
+      }
+    }
+  }
 }
