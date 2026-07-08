@@ -257,6 +257,7 @@ public with sharing class TestFactory {
    * @description Helper method to create properly structured checkout requests
    *              for webshop testing scenarios.
    */
+/*
   public static WebshopCheckout.CheckoutRequest createTestCheckoutRequest(
     Id leadId, Id productId, String externalOrderId, String opportunityName
   ) {
@@ -287,6 +288,8 @@ public with sharing class TestFactory {
     return request;
   }
 
+ */
+
   /**
    * Helper method to create ProductLine instances for checkout requests.
    *
@@ -298,6 +301,7 @@ public with sharing class TestFactory {
    * @description Convenience method for creating product line items
    *              in webshop checkout test scenarios.
    */
+/*
   public static WebshopCheckout.ProductLine createTestProductLine(Id productId, Decimal quantity, Decimal unitPrice) {
     WebshopCheckout.ProductLine pl = new WebshopCheckout.ProductLine();
     pl.productId = productId;
@@ -305,4 +309,6 @@ public with sharing class TestFactory {
     pl.unitPrice = unitPrice;
     return pl;
   }
+
+ */
 }
