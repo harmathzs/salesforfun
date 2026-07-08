@@ -41,12 +41,12 @@ global with sharing class OpportunityTriggerAction extends mtf.TriggerAction {
    *
    * @param newRecords List of new Opportunity records that have been inserted.
    *
-   * @description Updates the Converted_Lead__c field on Opportunity records with the ID of the Lead that was converted to create the Opportunity.
-   *              Delegates the business logic to OpportunityTriggerService.updateConvertedLead method.
+   * @description Placeholder for after insert logic. Currently empty as lead conversion handling
+   *              has been moved to LeadTriggerAction.afterUpdate for better reliability.
    */
   public override void afterInsert(List<SObject> newRecords) {
-    Opportunity[] newOpportunities = newRecords;
-    OpportunityTriggerService.updateConvertedLead(newOpportunities);
+    // Lead conversion handling moved to LeadTriggerAction.afterUpdate
+    // This provides better timing and reliability for the conversion process
   }
 
   /**

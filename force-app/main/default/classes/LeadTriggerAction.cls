@@ -61,9 +61,12 @@ global with sharing class LeadTriggerAction extends mtf.TriggerAction {
    * @param oldRecordsMap Map of old Lead records keyed by Id.
    * @param newRecordsMap Map of updated Lead records keyed by Id.
    *
-   * @description Placeholder for after update logic. Currently empty but available for future enhancements.
+   * @description Updates opportunities with converted lead information when leads are converted.
+   *              Delegates to LeadTriggerService.updateConvertedOpportunity to handle the business logic.
    */
-  public override void afterUpdate(Map<Id, SObject> oldRecordsMap, Map<Id, SObject> newRecordsMap) { }
+  public override void afterUpdate(Map<Id, SObject> oldRecordsMap, Map<Id, SObject> newRecordsMap) {
+    LeadTriggerService.updateConvertedOpportunity(oldRecordsMap, newRecordsMap);
+  }
 
   /**
    * Handles after delete trigger events for Lead records.

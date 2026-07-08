@@ -40,12 +40,14 @@ public with sharing class OpportunityTriggerService {
       FROM Lead
       WHERE ConvertedOpportunityId IN :opportunityIds
     ];
+    System.debug('convertedLeads: '+convertedLeads);
 
     // Create a map of opportunity ID to lead for easy lookup
     Map<Id, Lead> opportunityToLeadMap = new Map<Id, Lead>();
     for (Lead lead : convertedLeads) {
       opportunityToLeadMap.put(lead.ConvertedOpportunityId, lead);
     }
+    System.debug('opportunityToLeadMap: '+opportunityToLeadMap);
 
     // Create a new list for opportunities that need to be updated
     List<Opportunity> opportunitiesToUpdate = new List<Opportunity>();
@@ -62,10 +64,12 @@ public with sharing class OpportunityTriggerService {
         opportunitiesToUpdate.add(oppToUpdate);
       }
     }
+    System.debug('opportunitiesToUpdate: '+opportunitiesToUpdate);
 
     // Update the opportunities if any were modified
     if (!opportunitiesToUpdate.isEmpty()) {
       update opportunitiesToUpdate;
+      System.debug('Updated opportunitiesToUpdate: '+opportunitiesToUpdate);
     }
   }
 }
