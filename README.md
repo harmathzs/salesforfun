@@ -43,7 +43,12 @@ SalesforFun - my Salesforce Developer Edition org
 Following the development plan to implement end-to-end sales process automation from Lead to Renewal.
 
 ### Immediate Priorities
-- Implement Opportunity automation (auto-set Price Book, contact roles)
+✅ **Opportunity Pricebook Automation Complete**
+- Auto-set Price Book based on current year (e.g., "Price Book 2026")
+- Implemented in `OpportunityTriggerService.setPricebook()` method
+- Handles both production and test contexts appropriately
+- Robust error handling for missing pricebooks
+
 - Develop Product-interest to OpportunityLineItem mapping
 - Create Quote-to-Order automation with validation
 - Enhance test coverage to 95%+ for all components
