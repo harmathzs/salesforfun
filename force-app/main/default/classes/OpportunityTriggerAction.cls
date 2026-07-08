@@ -13,7 +13,7 @@ global with sharing class OpportunityTriggerAction extends mtf.TriggerAction {
    *
    * @param newRecords List of new Opportunity records being inserted.
    *
-   * @description Placeholder for before insert logic. Currently empty but available for future enhancements.
+   * @description Auto-set pricebook on Opportunity.
    */
   public override void beforeInsert(List<SObject> newRecords) {
     OpportunityTriggerService.setPricebook(newRecords);
