@@ -14,7 +14,7 @@ public with sharing class TestFactory {
    * @description Generates test leads with consistent naming pattern (Jane Doe 0-9)
    *              and standard field values for general testing purposes.
    */
-  public static Lead[] getTestLeads() {
+  public static Lead[] createTestLeads() {
     Lead[] testLeads = new List<Lead>();
     for (Integer i=0; i<10; i++) {
       testLeads.add(new Lead(
@@ -38,7 +38,7 @@ public with sharing class TestFactory {
    * @description Generates leads ready for conversion with consistent naming pattern.
    *              Useful for testing lead conversion functionality.
    */
-  public static Lead[] getQualifiedTestLeads(Integer count) {
+  public static Lead[] createQualifiedTestLeads(Integer count) {
     Lead[] qualifiedLeads = new List<Lead>();
     for (Integer i=0; i<count; i++) {
       qualifiedLeads.add(new Lead(
@@ -63,7 +63,7 @@ public with sharing class TestFactory {
    * @description Generates leads that should not be converted due to their status.
    *              Useful for testing validation and error handling in conversion processes.
    */
-  public static Lead[] getUnqualifiedTestLeads(Integer count) {
+  public static Lead[] createUnqualifiedTestLeads(Integer count) {
     Lead[] unqualifiedLeads = new List<Lead>();
     for (Integer i=0; i<count; i++) {
       unqualifiedLeads.add(new Lead(
@@ -192,7 +192,7 @@ public with sharing class TestFactory {
    * @description Creates pricebook entries in the standard pricebook
    *              for multiple products with sequential pricing.
    */
-  public static PricebookEntry[] createPricebookEntries(List<Id> productIds, Decimal basePrice) {
+  public static PricebookEntry[] createTestPricebookEntries(List<Id> productIds, Decimal basePrice) {
     PricebookEntry[] entries = new List<PricebookEntry>();
     Id standardPricebookId = Test.getStandardPricebookId();
 
@@ -223,7 +223,7 @@ public with sharing class TestFactory {
     Map<String, Object> testData = new Map<String, Object>();
 
     // Create test leads
-    Lead[] testLeads = getQualifiedTestLeads(leadCount);
+    Lead[] testLeads = createQualifiedTestLeads(leadCount);
     insert testLeads;
     testData.put('leads', testLeads);
 
@@ -236,7 +236,7 @@ public with sharing class TestFactory {
     for (Product2 prod : testProducts) {
       productIds.add(prod.Id);
     }
-    PricebookEntry[] entries = createPricebookEntries(productIds, 100.00);
+    PricebookEntry[] entries = createTestPricebookEntries(productIds, 100.00);
     testData.put('pricebookEntries', entries);
 
     // Add standard pricebook ID
@@ -257,7 +257,8 @@ public with sharing class TestFactory {
    * @description Helper method to create properly structured checkout requests
    *              for webshop testing scenarios.
    */
-  public static WebshopCheckout.CheckoutRequest createCheckoutRequest(
+/*
+  public static WebshopCheckout.CheckoutRequest createTestCheckoutRequest(
     Id leadId, Id productId, String externalOrderId, String opportunityName
   ) {
     WebshopCheckout.CheckoutRequest request = new WebshopCheckout.CheckoutRequest();
@@ -277,15 +278,17 @@ public with sharing class TestFactory {
 
     // Add product lines
     request.opportunityProducts = new List<WebshopCheckout.ProductLine>{
-      createProductLine(productId, 1, 100.00)
+      createTestProductLine(productId, 1, 100.00)
     };
 
     request.orderProducts = new List<WebshopCheckout.ProductLine>{
-      createProductLine(productId, 1, 100.00)
+      createTestProductLine(productId, 1, 100.00)
     };
 
     return request;
   }
+
+ */
 
   /**
    * Helper method to create ProductLine instances for checkout requests.
@@ -298,11 +301,157 @@ public with sharing class TestFactory {
    * @description Convenience method for creating product line items
    *              in webshop checkout test scenarios.
    */
-  public static WebshopCheckout.ProductLine createProductLine(Id productId, Decimal quantity, Decimal unitPrice) {
+/*
+  public static WebshopCheckout.ProductLine createTestProductLine(Id productId, Decimal quantity, Decimal unitPrice) {
     WebshopCheckout.ProductLine pl = new WebshopCheckout.ProductLine();
     pl.productId = productId;
     pl.quantity = quantity;
     pl.unitPrice = unitPrice;
     return pl;
+  }
+
+ */
+  /**
+   * Creates a list of standard test accounts.
+   *
+   * @param count Number of test accounts to create
+   * @return List<Account> Array of created test Account records
+   *
+   * @description Generates test accounts with consistent naming pattern
+   *              and standard field values for general testing purposes.
+   */
+  public static Account[] createTestAccounts(Integer count) {
+    Account[] testAccounts = new List<Account>();
+
+    for (Integer i = 0; i < count; i++) {
+      testAccounts.add(new Account(
+        Name = 'Test Account ' + i,
+        Industry = 'Technology',
+        BillingStreet = '123 Test Street',
+        BillingCity = 'London',
+        BillingPostalCode = 'SW1A 1AA',
+        BillingCountry = 'United Kingdom',
+        Phone = '(415) 555-01' + String.valueOf(i).right(2),
+        Website = 'www.testaccount' + i + '.com',
+        Description = 'Test account for unit testing purposes'
+      ));
+    }
+
+    return testAccounts;
+  }
+
+  /**
+   * Creates a list of standard test contacts.
+   *
+   * @param count Number of test contacts to create
+   * @param accountId Optional account ID to associate contacts with
+   * @return List<Contact> Array of created test Contact records
+   *
+   * @description Generates test contacts with consistent naming pattern
+   *              and standard field values. Can optionally associate with an account.
+   */
+  public static Contact[] createTestContacts(Integer count, Id accountId) {
+    Contact[] testContacts = new List<Contact>();
+
+    for (Integer i = 0; i < count; i++) {
+      Contact contact = new Contact(
+        FirstName = 'Test',
+        LastName = 'Contact ' + i,
+        Email = 'testcontact' + i + '@example.com',
+        Phone = '(415) 555-01' + String.valueOf(i).right(2),
+        Title = 'Test User',
+        Department = 'Quality Assurance',
+        Description = 'Test contact for unit testing purposes'
+      );
+
+      if (accountId != null) {
+        contact.AccountId = accountId;
+      }
+
+      testContacts.add(contact);
+    }
+
+    return testContacts;
+  }
+
+  /**
+   * Creates a list of standard test opportunities.
+   *
+   * @param count Number of test opportunities to create
+   * @param accountId Optional account ID to associate opportunities with
+   * @param stageName Optional stage name for the opportunities, like 'Prospecting'
+   * @param closeDate Optional close date for the opportunities
+   * @return List<Opportunity> Array of created test Opportunity records
+   *
+   * @description Generates test opportunities with consistent naming pattern
+   *              and standard field values. Can optionally associate with an account
+   *              and set specific stage and close date.
+   */
+  public static Opportunity[] createTestOpportunities(Integer count, Id accountId, String stageName, Date closeDate) {
+    Opportunity[] testOpportunities = new List<Opportunity>();
+
+    if (closeDate == null) {
+      closeDate = System.today().addDays(30);
+    }
+
+    for (Integer i = 0; i < count; i++) {
+      Opportunity opp = new Opportunity(
+        Name = 'Test Opportunity ' + i,
+        StageName = stageName,
+        CloseDate = closeDate,
+        Description = 'Test opportunity for unit testing purposes',
+        Amount = 10000 + (i * 1000)
+      );
+
+      if (accountId != null) {
+        opp.AccountId = accountId;
+      }
+
+      testOpportunities.add(opp);
+    }
+
+    return testOpportunities;
+  }
+
+  /**
+   * Creates a complete set of related test data (Accounts, Contacts, Opportunities).
+   *
+   * @param accountCount Number of test accounts to create
+   * @param contactsPerAccount Number of contacts to create per account
+   * @param opportunitiesPerAccount Number of opportunities to create per account
+   * @return Map<String, Object> Map containing all created test records organized by type
+   *
+   * @description Comprehensive setup method that creates a complete hierarchy of
+   *              related test data for complex testing scenarios involving accounts,
+   *              contacts, and opportunities.
+   *              WARNING: This method actually Inserts records with Ids !!!
+   */
+  public static Map<String, Object> createCompleteTestSetup(Integer accountCount, Integer contactsPerAccount, Integer opportunitiesPerAccount) {
+    Map<String, Object> testData = new Map<String, Object>();
+
+    // Create test accounts
+    Account[] testAccounts = createTestAccounts(accountCount);
+    insert testAccounts;
+    testData.put('accounts', testAccounts);
+
+    // Create contacts for each account
+    List<Contact> allContacts = new List<Contact>();
+    for (Account acc : testAccounts) {
+      Contact[] accountContacts = createTestContacts(contactsPerAccount, acc.Id);
+      allContacts.addAll(accountContacts);
+    }
+    insert allContacts;
+    testData.put('contacts', allContacts);
+
+    // Create opportunities for each account
+    List<Opportunity> allOpportunities = new List<Opportunity>();
+    for (Account acc : testAccounts) {
+      Opportunity[] accountOpportunities = createTestOpportunities(opportunitiesPerAccount, acc.Id, 'Prospecting', Date.today());
+      allOpportunities.addAll(accountOpportunities);
+    }
+    insert allOpportunities;
+    testData.put('opportunities', allOpportunities);
+
+    return testData;
   }
 }

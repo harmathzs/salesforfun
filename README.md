@@ -48,6 +48,12 @@ Following the development plan to implement end-to-end sales process automation 
 - Create Quote-to-Order automation with validation
 - Enhance test coverage to 95%+ for all components
 
+### Trigger Architecture (Current Implementation)
+- **Lead Trigger**: Handles lead conversion and opportunity creation via `LeadTriggerService.updateConvertedOpportunity()`
+- **Opportunity Trigger**: Simplified architecture with proper separation of concerns
+- **Best Practices**: Follows Salesforce trigger framework patterns with clear separation between trigger actions and service layers
+- **Timing Optimization**: Lead conversion logic moved to Lead trigger for better timing and reliability
+
 ### Upcoming Phases
 - Contract generation and PDF customization
 - ERP integration for Invoice, Payment, Shipment synchronization

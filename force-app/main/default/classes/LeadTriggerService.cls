@@ -31,4 +31,54 @@ public with sharing class LeadTriggerService {
       }
     }
   }
+
+  /**
+   * Updates opportunities with converted lead information when a lead is converted.
+   *
+   * @param oldLeadsMap Map of old Lead records keyed by Id.
+   * @param newLeadsMap Map of updated Lead records keyed by Id.
+   *
+   * @description When a lead is converted, this method updates the corresponding opportunity
+   *              with the converted lead's ID in the Converted_Lead__c field.
+   *              This approach is more reliable than querying from the opportunity side
+   *              as it triggers when the lead conversion is complete and the relationship is established.
+   *
+   * @example
+   * // After update trigger context
+   * LeadTriggerService.updateConvertedOpportunity(Trigger.oldMap, Trigger.newMap);
+   *
+   * @note Only processes leads that have been converted (ConvertedOpportunityId is populated).
+   * @note Creates a new list for DML operations to avoid modifying trigger context variables.
+   */
+  public static void updateConvertedOpportunity(Map<Id, SObject> oldLeadsMap, Map<Id, SObject> newLeadsMap) {
+    System.debug('LeadTriggerService updateConvertedOpportunity start');
+
+    List<Opportunity> opportunitiesToUpdate = new List<Opportunity>();
+
+    // Find leads that were just converted (ConvertedOpportunityId changed from null to a value)
+    for (Id leadId : newLeadsMap.keySet()) {
+      Lead oldLead = (Lead) oldLeadsMap.get(leadId);
+      Lead newLead = (Lead) newLeadsMap.get(leadId);
+
+      System.debug('LeadTriggerService updateConvertedOpportunity oldLead: '+oldLead);
+      System.debug('LeadTriggerService updateConvertedOpportunity newLead: '+newLead);
+
+      // Check if this lead was just converted
+      if (oldLead.ConvertedOpportunityId == null && newLead.ConvertedOpportunityId != null) {
+        // Create opportunity update record
+        Opportunity oppToUpdate = new Opportunity(
+          Id = newLead.ConvertedOpportunityId,
+          Converted_Lead__c = newLead.Id
+        );
+        opportunitiesToUpdate.add(oppToUpdate);
+      }
+      System.debug('LeadTriggerService updateConvertedOpportunity opportunitiesToUpdate: '+opportunitiesToUpdate);
+    }
+
+    // Update the opportunities if any were found
+    if (!opportunitiesToUpdate.isEmpty()) {
+      update opportunitiesToUpdate;
+      System.debug('LeadTriggerService updateConvertedOpportunity opportunitiesToUpdate after update: '+opportunitiesToUpdate);
+    }
+  }
 }
