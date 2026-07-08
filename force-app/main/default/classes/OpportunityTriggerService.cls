@@ -27,6 +27,7 @@ public with sharing class OpportunityTriggerService {
    * @note Only processes opportunities that have a corresponding converted lead.
    * @note Creates a new list for DML operations to avoid modifying trigger context variables directly.
    */
+/*
   public static void updateConvertedLead(List<Opportunity> newOpportunities) {
     // Get the IDs of the new opportunities
     Set<Id> opportunityIds = new Set<Id>();
@@ -72,4 +73,6 @@ public with sharing class OpportunityTriggerService {
       System.debug('Updated opportunitiesToUpdate: '+opportunitiesToUpdate);
     }
   }
+
+ */
 }
