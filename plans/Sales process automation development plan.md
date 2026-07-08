@@ -66,6 +66,12 @@ Implement an end-to-end Salesforce sales process from Lead to Renewal with clear
    - Screen Flow integration for user-friendly mass conversion interface
    - Comprehensive test coverage (100% pass rate)
 
+✅ **COMPLETED: Trigger Architecture Refactoring**
+   - Lead Trigger: Handles lead conversion and opportunity creation via `LeadTriggerService.updateConvertedOpportunity()`
+   - Opportunity Trigger: Simplified architecture with proper separation of concerns
+   - Best Practices: Follows Salesforce trigger framework patterns with clear separation between trigger actions and service layers
+   - Timing Optimization: Lead conversion logic moved to Lead trigger for better timing and reliability
+
 1. Opportunity defaults
    - Auto-set Price Book
    - Auto-create primary Opportunity Contact Role
@@ -133,7 +139,54 @@ Implement an end-to-end Salesforce sales process from Lead to Renewal with clear
     - Anomaly detection in sales data
     - Intelligent data visualization
 
-## 4) Suggested Implementation Pattern (Flow First, Apex Where Needed)
+## 4) Trigger Architecture Implementation
+
+### Current Trigger Framework
+
+**Lead Trigger Architecture:**
+- **LeadTriggerAction.cls**: Trigger handler following Metillium framework patterns
+- **LeadTriggerService.cls**: Service layer containing business logic
+- **Key Method**: `updateConvertedOpportunity()` handles lead conversion and opportunity creation
+- **Timing**: Fires on Lead afterUpdate when ConvertedOpportunityId changes from null to a value
+- **Advantages**: Direct access to converted opportunity ID, reliable timing, proper separation of concerns
+
+**Opportunity Trigger Architecture:**
+- **OpportunityTriggerAction.cls**: Simplified trigger handler
+- **OpportunityTriggerService.cls**: Service layer (with unused `updateConvertedLead` method that can be removed)
+- **Current State**: Minimal logic since lead conversion is handled in Lead trigger
+- **Best Practices**: Follows same separation of concerns pattern as Lead trigger
+
+### Trigger Design Patterns
+
+**Separation of Concerns:**
+- Trigger Actions: Handle trigger context and call service methods
+- Service Layer: Contain all business logic and DML operations
+- No business logic in trigger actions themselves
+
+**Timing Optimization:**
+- Lead conversion logic in Lead trigger (afterUpdate) for reliable timing
+- Opportunity-related logic in Opportunity trigger when needed
+- Avoid cross-object queries when possible
+
+**Error Handling:**
+- Comprehensive try-catch blocks in service methods
+- Meaningful error messages for debugging
+- Graceful handling of governor limit exceptions
+
+### Future Trigger Development
+
+**Planned Opportunity Trigger Enhancements:**
+1. Auto-set Price Book based on opportunity criteria
+2. Auto-create primary Opportunity Contact Role
+3. Product-interest to OpportunityLineItem mapping
+4. Opportunity stage validation and automation
+
+**Planned Quote/Order Trigger Architecture:**
+1. Quote-to-Order conversion triggers
+2. Order validation and processing triggers
+3. Integration with ERP systems via trigger-based processing
+
+## 5) Suggested Implementation Pattern (Flow First, Apex Where Needed)
 
 Use Record-Triggered Flows for straightforward field updates and object creation.
 
@@ -144,20 +197,20 @@ Use Apex for:
 - Retryable integration orchestration
 - PDF generation controllers
 
-## 5) Object and Line-Item Sync Rules
+## 6) Object and Line-Item Sync Rules
 
 - Opportunity Products and Synced Quote Line Items: native synchronization available
 - Quote Line Items to Order Products: implement custom automation (Flow or Apex) for reliability and controls
 - Order Products to Assets: implement custom automation with lifecycle rules
 
-## 6) Governance, Security, and Quality
+## 7) Governance, Security, and Quality
 
 - Permission Sets for Sales Ops, Sales Rep, Finance Ops, Service Ops
 - Validation Rules for stage gates and required commercial data
 - Apex tests for all custom logic (line copy, contract creation, integration handlers)
 - UAT scripts per phase and release checklist
 
-## 7) Backlog (Refined From Current Notes)
+## 8) Backlog (Refined From Current Notes)
 
 ### 🔄 React-Salesforce Integration (Customer-Facing)
 
@@ -236,7 +289,7 @@ Use Apex for:
     - Automated data cleansing and normalization
     - Intelligent recommendation engine
 
-## 8) Current Technical Implementation
+## 9) Current Technical Implementation
 
 ### Webshop Verification Email API
 
@@ -418,7 +471,7 @@ Use Apex for:
 - Test scenarios include: empty lists, null inputs, qualified leads, unqualified leads, mixed leads
 - Bulk testing with multiple leads per transaction
 
-## 9) Milestones and Acceptance
+## 10) Milestones and Acceptance
 
 ✅ **Milestone 0: Web-to-Lead Implementation Complete**
    - React site with Lead capture form deployed
@@ -446,6 +499,12 @@ Use Apex for:
    - 100% test coverage with all tests passing
    - Production-ready with full observability
 
+✅ **Milestone 3: Trigger Architecture Refactoring Complete**
+   - Lead trigger handles conversion via `LeadTriggerService.updateConvertedOpportunity()`
+   - Opportunity trigger simplified with proper separation of concerns
+   - Timing optimization achieved by moving conversion logic to Lead trigger
+   - Clean architecture following Salesforce best practices
+
 - Milestone A: Opportunity automation complete and tested
 - Milestone B: Quote-to-Order with line items complete and tested
 - Milestone C: Contract and PDF generation complete and approved
@@ -456,14 +515,14 @@ Use Apex for:
 - Milestone H: Voice interface and advanced AI functions operational
 - Milestone I: Test coverage enhanced to 95%+ for all components
 
-## 9) Risks and Mitigations
+## 11) Risks and Mitigations
 
 - Data quality risk: enforce validation and picklist normalization
 - Duplicate transaction risk: use external IDs and idempotent keys
 - Integration latency risk: async queue with retries and dead-letter reporting
 - Pricing drift risk: annual rollover audit report and approval step
 
-## 10) Recommended Build Order
+## 12) Recommended Build Order
 
 1. Phase 1 foundation
 2. Quote-to-Order line automation
@@ -474,7 +533,7 @@ Use Apex for:
 7. Voice interface and advanced AI functions
 8. Lifecycle automation (renewal, amendment, termination)
 
-## 11) API Endpoints Reference
+## 14) API Endpoints Reference
 
 ### Current REST API Endpoints
 
@@ -513,7 +572,7 @@ Use Apex for:
 - `POST /api/ai/field-suggestions` - Get AI field suggestions
 - `POST /api/ai/voice-process` - Process voice commands
 
-## 12) Agentforce Implementation Approach
+## 14) Agentforce Implementation Approach
 
 ### Zero-Cost Implementation Strategy
 
