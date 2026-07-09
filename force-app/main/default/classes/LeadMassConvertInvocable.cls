@@ -59,6 +59,8 @@ public with sharing class LeadMassConvertInvocable {
 
       // Validate lead status - allow common convertible statuses
       Set<String> convertibleStatuses = new Set<String>{'Qualified', 'Working - Contacted', 'Nurturing', 'Closed - Not Converted'};
+      // Add "Open - Not Contacted" for mass converting those as well
+      convertibleStatuses.add('Open - Not Contacted');
       if (!convertibleStatuses.contains(lead.Status)) {
         System.debug('LeadMassConvertInvocable.massConvert; lead not qualified - Id: ' + lead.Id + ', Status: ' + lead.Status);
         Map<String, String> errorResult = new Map<String, String>{
