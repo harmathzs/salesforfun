@@ -4,10 +4,10 @@ import { getRecord } from 'lightning/uiRecordApi';
 export default class LeadToOpportunityProductMapper extends LightningElement {
   @api recordId;
 
-  @wire(getRecord, { recordId: '$recordId', fields: ['Lead.Id', 'Lead.Name'] })
-  lead;
+  @wire(getRecord, { recordId: '$recordId', fields: ['Opportunity.Id', 'Opportunity.Name'] })
+  opportunity;
 
-  get leadName() {
-    return this.lead.data ? this.lead.data.fields.Name.value : 'Loading...';
+  get opportunityName() {
+    return this.opportunity.data ? this.opportunity.data.fields.Name.value : 'Loading...';
   }
 }
