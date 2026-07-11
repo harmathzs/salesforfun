@@ -1,20 +1,30 @@
 import { LightningElement, api } from 'lwc';
 
 import getOpportunity from '@salesforce/apex/LeadToOpportunityProductMapperController.getOpportunity';
+import getPricebook from '@salesforce/apex/LeadToOpportunityProductMapperController.getPricebook';
 
 export default class LeadToOpportunityProductMapper extends LightningElement {
-  _opportunityId;
+  opportunityId;
   opportunity;
-  @api get recordId() {
-    return this._opportunityId
-  }
-  set recordId(value) {
-    this._opportunityId = value
 
-    getOpportunity({opportunityId: this._opportunityId})
-      .then(gotOpportunity=>{
+  pricebookId;
+  pricebook;
+
+  @api get recordId() {
+    return this.opportunityId
+  }
+
+  set recordId(value) {
+    this.opportunityId = value
+
+    getOpportunity({opportunityId: this.opportunityId})
+      .then(async (gotOpportunity)=>{
         this.opportunity = gotOpportunity
         console.log('opportunity', this.opportunity)
+
+        this.pricebookId = this.opportunity.Pricebook2Id
+        this.pricebook = await getPricebook({pricebookId: this.pricebookId})
+        console.log('pricebook', this.pricebook)
       })
       .catch(console.warn)
   }

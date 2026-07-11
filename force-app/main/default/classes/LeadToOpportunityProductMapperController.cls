@@ -13,4 +13,21 @@ public with sharing class LeadToOpportunityProductMapperController {
       LIMIT 1
     ];
   }
+
+  @AuraEnabled
+  public static Pricebook2 getPricebook(String pricebookId) {
+    return [
+      SELECT Id
+        ,Name
+        ,(SELECT Id
+          ,Name
+          ,Product2Id
+          ,Product2.Name
+          ,UnitPrice
+        FROM PricebookEntries)
+      FROM Pricebook2
+      WHERE Id = :pricebookId
+      LIMIT 1
+    ];
+  }
 }
