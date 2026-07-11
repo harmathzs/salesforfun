@@ -85,6 +85,19 @@
     border-left: 3px solid #2a5885;
 }
 
+.product-interest-text.no-interest {
+    color: #6b6b6b;
+    background-color: #f3f2f2;
+    border-left: 3px solid #6b6b6b;
+    opacity: 0.8;
+}
+
+.existing-icon {
+    color: #236d2d;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+}
+
 /* Quantity Input Styles */
 .quantity-input {
     width: 60px;

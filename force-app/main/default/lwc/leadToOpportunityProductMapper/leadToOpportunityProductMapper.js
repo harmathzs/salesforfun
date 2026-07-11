@@ -23,7 +23,7 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
     this.opportunityId = value;
 
     if (this.opportunityId) {
-      this.loadData();
+      this.loadData().catch(console.warn);
     }
   }
 
@@ -44,6 +44,19 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
   get existingLineItems() {
     return this.opportunity?.OpportunityLineItems || [];
   }
+
+  // Getter functions for template compatibility
+  getProductSelected = (productId) => {
+    return this.selectedProducts.some(p => p.Id === productId);
+  };
+
+  getExistingProduct = (product2Id) => {
+    return this.existingLineItems.some(item => item.Product2Id === product2Id);
+  };
+
+  getHasRemovableProducts = () => {
+    return this.selectedProducts.some(p => !p.isExisting);
+  };
 
   async loadData() {
     this.isLoading = true;
@@ -115,6 +128,13 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
         return;
       }
 
+      // Check if this is an existing product (shouldn't be selectable due to disabled checkbox)
+      const isExistingProduct = this.existingLineItems.some(item => item.Product2Id === productEntry.Product2Id);
+      if (isExistingProduct) {
+        console.warn(`Product ${productId} is an existing product and cannot be re-selected`);
+        return;
+      }
+
       // Add to selected products
       this.selectedProducts = [...this.selectedProducts, {
         Id: productEntry.Id,
@@ -136,7 +156,12 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
 
   handleQuantityChange(event) {
     const productId = event.target.dataset.id;
-    const quantity = +event.target.value || 1;
+    const quantityInput = event.target.value;
+
+    // If input is empty or invalid, set to minimum quantity (1)
+    const quantity = quantityInput === '' || isNaN(+quantityInput) || +quantityInput < 1
+      ? 1
+      : +quantityInput;
 
     this.selectedProducts = this.selectedProducts.map(product => {
       if (product.Id === productId) {
@@ -236,7 +261,7 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
 
   // Currency formatting helper
   formatCurrency(value) {
-    if (value == null || value === undefined) return '';
+    if (value == null) return '';
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',

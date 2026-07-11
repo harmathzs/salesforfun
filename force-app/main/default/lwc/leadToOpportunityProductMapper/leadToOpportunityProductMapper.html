@@ -4,7 +4,12 @@
         <!-- Product Interest Section -->
         <div class="slds-p-around_medium">
             <h3>Product Interest:</h3>
-            <p class="product-interest-text">{productInterest}</p>
+            <template if:true={productInterest}>
+                <p class="product-interest-text">{productInterest}</p>
+            </template>
+            <template if:false={productInterest}>
+                <p class="product-interest-text no-interest">No product interest specified</p>
+            </template>
         </div>
 
         <!-- Loading State -->
@@ -36,35 +41,40 @@
                     <template if:true={pricebook}>
                         <template if:true={pricebook.PricebookEntries}>
                             <div class="product-list available-products">
-                            <template for:each={pricebook.PricebookEntries} for:item="entry">
-                                <div key={entry.Id} class="slds-p-vertical_xx-small product-item">
-                                    <div class="slds-grid slds-grid_align-spread">
-                                        <div> <!-- checked={selectedProducts.some(p => p.Id === entry.Id)} -->
-                                            <lightning-input
-                                                type="checkbox"
-                                                name="product-select"
-                                                data-id={entry.Id}
-                                                onchange={handleProductSelect}
-                                                label={entry.Product2.Name}>
-                                            </lightning-input>
+                                <template for:each={pricebook.PricebookEntries} for:item="entry">
+                                    <div key={entry.Id} class="slds-p-vertical_xx-small product-item">
+                                        <div class="slds-grid slds-grid_align-spread">
+                                            <div>
+                                                <lightning-input
+                                                    type="checkbox"
+                                                    name="product-select"
+                                                    data-id={entry.Id}
+                                                    onchange={handleProductSelect}
+                                                    label={entry.Product2.Name}
+
+                                                    >
+                                                </lightning-input>
+
+                                                    <lightning-icon icon-name="utility:check" size="x-small" class="existing-icon"></lightning-icon>
+
+                                            </div>
+                                            <div>
+                                                <span class="product-price">{entry.UnitPrice}</span>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <span class="product-price">{formatCurrency(entry.UnitPrice)}</span>
+                                        <div class="slds-p-left_large product-description">
+                                            <small>{entry.Product2.Description}</small>
                                         </div>
                                     </div>
-                                    <div class="slds-p-left_large product-description">
-                                        <small>{entry.Product2.Description}</small>
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
+                                </template>
+                            </div>
                         </template>
-                    </template>
-                    <template if:false={pricebook.PricebookEntries}>
-                        <div class="slds-text-align_center slds-p-vertical_large">
-                            <lightning-icon icon-name="utility:error" size="small"></lightning-icon>
-                            <p>No products available in this pricebook</p>
-                        </div>
+                        <template if:false={pricebook.PricebookEntries}>
+                            <div class="slds-text-align_center slds-p-vertical_large">
+                                <lightning-icon icon-name="utility:error" size="small"></lightning-icon>
+                                <p>No products available in this pricebook</p>
+                            </div>
+                        </template>
                     </template>
                 </div>
 
@@ -94,11 +104,12 @@
                                                 data-id={product.Id}
                                                 value={product.quantity}
                                                 min="1"
+                                                step="1"
                                                 onchange={handleQuantityChange}
                                                 class="quantity-input">
                                             </lightning-input>
                                             <span class="slds-m-left_x-small">
-                                                @ {formatCurrency(product.UnitPrice)} = <strong>{formatCurrency(product.total)}</strong>
+                                                @ {formatCurrency(product.UnitPrice)} = <strong>{product.total}</strong>
                                             </span>
                                             <template if:false={product.isExisting}>
                                                 <lightning-button-icon
@@ -116,15 +127,15 @@
                         </div>
 
                         <div class="slds-m-top_small slds-text-align_right total-section">
-                            <strong>Total: {formatCurrency(calculatedTotal)}</strong>
+                            <strong>Total: {calculatedTotal}</strong>
                         </div>
 
-                        <div class="slds-m-top_small slds-text-align_right">   <!-- disabled={!selectedProducts.some(p => !p.isExisting)} -->
+                        <div class="slds-m-top_small slds-text-align_right">
                             <lightning-button
                                 label="Remove All"
                                 variant="destructive-text"
                                 onclick={handleRemoveAll}
-                                >
+                                disabled={getHasRemovableProducts}>
                             </lightning-button>
                         </div>
                     </template>
@@ -145,12 +156,12 @@
                     label="Cancel"
                     onclick={handleCancel}
                     class="slds-m-right_small">
-                </lightning-button>   <!-- disabled={!hasSelectedProducts || isSaving} -->
+                </lightning-button>
                 <lightning-button
                     label="Save to Opportunity"
                     variant="brand"
                     onclick={handleSave}
-                    >
+                    disabled={hasSelectedProducts}>
                 </lightning-button>
             </div>
 
