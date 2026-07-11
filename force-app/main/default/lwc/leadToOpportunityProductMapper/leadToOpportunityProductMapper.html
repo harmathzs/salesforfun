@@ -44,14 +44,12 @@
                                                 type="checkbox"
                                                 name="product-select"
                                                 data-id={entry.Id}
-
                                                 onchange={handleProductSelect}
-                                                label={entry.Product2.Name}
-                                                variant="label-hidden">
+                                                label={entry.Product2.Name}>
                                             </lightning-input>
                                         </div>
                                         <div>
-                                            <span class="product-price">${entry.UnitPrice}</span>
+                                            <span class="product-price">{formatCurrency(entry.UnitPrice)}</span>
                                         </div>
                                     </div>
                                     <div class="slds-p-left_large product-description">
@@ -100,7 +98,7 @@
                                                 class="quantity-input">
                                             </lightning-input>
                                             <span class="slds-m-left_x-small">
-                                                @ ${product.UnitPrice} = <strong>${product.total}</strong>
+                                                @ {formatCurrency(product.UnitPrice)} = <strong>{formatCurrency(product.total)}</strong>
                                             </span>
                                             <template if:false={product.isExisting}>
                                                 <lightning-button-icon
@@ -118,7 +116,7 @@
                         </div>
 
                         <div class="slds-m-top_small slds-text-align_right total-section">
-                            <strong>Total: ${calculatedTotal}</strong>
+                            <strong>Total: {formatCurrency(calculatedTotal)}</strong>
                         </div>
 
                         <div class="slds-m-top_small slds-text-align_right">   <!-- disabled={!selectedProducts.some(p => !p.isExisting)} -->
