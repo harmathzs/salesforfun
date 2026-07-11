@@ -1,17 +1,159 @@
 <!-- Lead to Opportunity Product Mapper -->
 <template>
     <lightning-card title="Lead to Opportunity Product Mapper" icon-name="standard:opportunity">
+        <!-- Product Interest Section -->
         <div class="slds-p-around_medium">
             <h3>Product Interest:</h3>
-            <p>{productInterest}</p>
+            <p class="product-interest-text">{productInterest}</p>
         </div>
-      <div class="slds-p-around_medium">
-        <h3>Opportunity Products:</h3>
-        <p></p>
-      </div>
-      <div class="slds-p-around_medium">
-        <h3>Pricebook Entries:</h3>
-        <p></p>
-      </div>
+
+        <!-- Loading State -->
+        <template if:true={isSaving}>
+            <div class="slds-p-around_medium slds-text-align_center">
+                <lightning-spinner alternative-text="Saving..." size="medium"></lightning-spinner>
+                <p>Saving opportunity line items...</p>
+            </div>
+        </template>
+
+        <!-- Main Content Area -->
+        <template if:false={isSaving}>
+            <div class="slds-grid slds-wrap slds-p-around_medium product-selection-container">
+                <!-- Available Products Panel -->
+                <div class="slds-col slds-size_1-of-2 slds-p-right_small available-products-panel">
+                    <div class="panel-header">
+                        <h3>Available Products</h3>
+                        <p class="slds-text-body_small">Select products based on lead's interest</p>
+                    </div>
+
+                    <template if:true={pricebook.PricebookEntries}>
+                        <div class="product-list available-products">
+                            <template for:each={pricebook.PricebookEntries} for:item="entry">
+                                <div key={entry.Id} class="slds-p-vertical_xx-small product-item">
+                                    <div class="slds-grid slds-grid_align-spread">
+                                        <div> <!-- checked={selectedProducts.some(p => p.Id === entry.Id)} -->
+                                            <lightning-input
+                                                type="checkbox"
+                                                name="product-select"
+                                                data-id={entry.Id}
+
+                                                onchange={handleProductSelect}
+                                                label={entry.Product2.Name}
+                                                variant="label-hidden">
+                                            </lightning-input>
+                                        </div>
+                                        <div>
+                                            <span class="product-price">${entry.UnitPrice}</span>
+                                        </div>
+                                    </div>
+                                    <div class="slds-p-left_large product-description">
+                                        <small>{entry.Product2.Description}</small>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+
+                    <template if:false={pricebook.PricebookEntries}>
+                        <div class="slds-text-align_center slds-p-vertical_large">
+                            <lightning-icon icon-name="utility:error" size="small"></lightning-icon>
+                            <p>No products available in this pricebook</p>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Selected Products Panel -->
+                <div class="slds-col slds-size_1-of-2 selected-products-panel">
+                    <div class="panel-header">
+                        <h3>Selected Products</h3>
+                        <p class="slds-text-body_small">Review and adjust quantities</p>
+                    </div>
+
+                    <template if:true={hasSelectedProducts}>
+                        <div class="product-list selected-products">
+                            <template for:each={selectedProducts} for:item="product">
+                                <div key={product.Id} class="slds-p-vertical_xx-small product-item selected">
+                                    <div class="slds-grid slds-grid_align-spread">
+                                        <div>
+                                            <strong>{product.Product2.Name}</strong>
+                                            <template if:true={product.isExisting}>
+                                                <lightning-badge label="Existing" class="slds-m-left_x-small"></lightning-badge>
+                                            </template>
+                                        </div>
+                                        <div class="slds-grid slds-grid_align-end">
+                                            <lightning-input
+                                                type="number"
+                                                name="quantity"
+                                                label="Quantity"
+                                                data-id={product.Id}
+                                                value={product.quantity}
+                                                min="1"
+                                                onchange={handleQuantityChange}
+                                                class="quantity-input">
+                                            </lightning-input>
+                                            <span class="slds-m-left_x-small">
+                                                @ ${product.UnitPrice} = <strong>${product.total}</strong>
+                                            </span>
+                                            <template if:false={product.isExisting}>
+                                                <lightning-button-icon
+                                                    icon-name="utility:delete"
+                                                    data-id={product.Id}
+                                                    onclick={handleRemoveProduct}
+                                                    alternative-text="Remove"
+                                                    class="slds-m-left_x-small">
+                                                </lightning-button-icon>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class="slds-m-top_small slds-text-align_right total-section">
+                            <strong>Total: ${calculatedTotal}</strong>
+                        </div>
+
+                        <div class="slds-m-top_small slds-text-align_right">   <!-- disabled={!selectedProducts.some(p => !p.isExisting)} -->
+                            <lightning-button
+                                label="Remove All"
+                                variant="destructive-text"
+                                onclick={handleRemoveAll}
+                                >
+                            </lightning-button>
+                        </div>
+                    </template>
+
+                    <template if:false={hasSelectedProducts}>
+                        <div class="slds-text-align_center slds-p-vertical_large empty-state">
+                            <lightning-icon icon-name="utility:add" size="small"></lightning-icon>
+                            <p>No products selected</p>
+                            <p class="slds-text-body_small">Select products from the left panel</p>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="slds-p-around_medium slds-text-align_right action-buttons">
+                <lightning-button
+                    label="Cancel"
+                    onclick={handleCancel}
+                    class="slds-m-right_small">
+                </lightning-button>   <!-- disabled={!hasSelectedProducts || isSaving} -->
+                <lightning-button
+                    label="Save to Opportunity"
+                    variant="brand"
+                    onclick={handleSave}
+                    >
+                </lightning-button>
+            </div>
+
+            <!-- Error Message -->
+            <template if:true={errorMessage}>
+                <div class="slds-p-around_medium slds-theme_error error-message">
+                    <lightning-icon icon-name="utility:error" size="x-small"></lightning-icon>
+                    <span>{errorMessage}</span>
+                </div>
+            </template>
+        </template>
     </lightning-card>
 </template>
