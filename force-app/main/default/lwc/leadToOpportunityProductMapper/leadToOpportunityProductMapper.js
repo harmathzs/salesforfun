@@ -11,6 +11,7 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
   @track pricebook;
   @track selectedProducts = [];
   @track isSaving = false;
+  @track isLoading = false;
   @track errorMessage = '';
   @track showSuccess = false;
 
@@ -45,6 +46,9 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
   }
 
   async loadData() {
+    this.isLoading = true;
+    this.errorMessage = '';
+
     try {
       this.opportunity = await getOpportunity({ opportunityId: this.opportunityId });
       console.log('opportunity', this.opportunity);
@@ -56,11 +60,13 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
         console.log('pricebook json: ', JSON.stringify(this.pricebook));
 
         // Initialize selected products from existing line items
-        // TODO - this.initializeSelectedProducts();
+        this.initializeSelectedProducts();
       }
     } catch (error) {
       console.error('Error loading data:', error);
       this.errorMessage = 'Error loading opportunity data: ' + (error.body?.message || error.message);
+    } finally {
+      this.isLoading = false;
     }
   }
 
@@ -85,17 +91,30 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
   }
 
   handleProductSelect(event) {
-/*
     const productId = event.target.dataset.id;
     const isSelected = event.target.checked;
 
-    if (!this.pricebook?.PricebookEntries) {
+    // Defensive checks
+    if (!productId || !this.pricebook?.PricebookEntries) {
+      console.warn('Product selection aborted: missing productId or pricebook data');
       return;
     }
 
-    const productEntry = this.pricebook?.PricebookEntries?.find(entry => entry.Id === productId);
+    const productEntry = this.pricebook.PricebookEntries.find(entry => entry.Id === productId);
+
+    if (!productEntry) {
+      console.warn(`Product entry not found for ID: ${productId}`);
+      return;
+    }
 
     if (isSelected && productEntry) {
+      // Check if already selected (to prevent duplicates)
+      const alreadySelected = this.selectedProducts.some(p => p.Id === productId);
+      if (alreadySelected) {
+        console.warn(`Product ${productId} already selected`);
+        return;
+      }
+
       // Add to selected products
       this.selectedProducts = [...this.selectedProducts, {
         Id: productEntry.Id,
@@ -113,8 +132,6 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
         !(product.Id === productId && !product.isExisting)
       );
     }
-
- */
   }
 
   handleQuantityChange(event) {

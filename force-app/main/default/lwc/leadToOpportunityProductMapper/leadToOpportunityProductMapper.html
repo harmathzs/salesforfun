@@ -15,8 +15,16 @@
             </div>
         </template>
 
+        <!-- Loading State -->
+        <template if:true={isLoading}>
+            <div class="slds-p-around_medium slds-text-align_center">
+                <lightning-spinner alternative-text="Loading..." size="medium"></lightning-spinner>
+                <p>Loading opportunity data...</p>
+            </div>
+        </template>
+
         <!-- Main Content Area -->
-        <template if:false={isSaving}>
+        <template if:false={isLoading}>
             <div class="slds-grid slds-wrap slds-p-around_medium product-selection-container">
                 <!-- Available Products Panel -->
                 <div class="slds-col slds-size_1-of-2 slds-p-right_small available-products-panel">
@@ -25,8 +33,9 @@
                         <p class="slds-text-body_small">Select products based on lead's interest</p>
                     </div>
 
-                    <template if:true={pricebook.PricebookEntries}>
-                        <div class="product-list available-products">
+                    <template if:true={pricebook}>
+                        <template if:true={pricebook.PricebookEntries}>
+                            <div class="product-list available-products">
                             <template for:each={pricebook.PricebookEntries} for:item="entry">
                                 <div key={entry.Id} class="slds-p-vertical_xx-small product-item">
                                     <div class="slds-grid slds-grid_align-spread">
@@ -51,8 +60,8 @@
                                 </div>
                             </template>
                         </div>
+                        </template>
                     </template>
-
                     <template if:false={pricebook.PricebookEntries}>
                         <div class="slds-text-align_center slds-p-vertical_large">
                             <lightning-icon icon-name="utility:error" size="small"></lightning-icon>
