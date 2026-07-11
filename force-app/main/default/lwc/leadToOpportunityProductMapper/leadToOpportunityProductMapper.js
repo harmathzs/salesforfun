@@ -1,19 +1,22 @@
-import { LightningElement, api, wire } from 'lwc';
-import { getRecord } from 'lightning/uiRecordApi';
+import { LightningElement, api } from 'lwc';
+
+import getOpportunity from '@salesforce/apex/LeadToOpportunityProductMapperController.getOpportunity';
 
 export default class LeadToOpportunityProductMapper extends LightningElement {
-  @api recordId;
-
-  @wire(getRecord, { recordId: '$recordId',
-    fields: ['Opportunity.Id', 'Opportunity.Name', 'Opportunity.Converted_Lead__c', 'Opportunity.Converted_Lead__r.ProductInterest__c'] })
+  _opportunityId;
   opportunity;
+  @api get recordId() {
+    return this._opportunityId
+  }
+  set recordId(value) {
+    this._opportunityId = value
 
-  get opportunityName() {
-    console.log('opportunity.data.fields', this.opportunity.data ? this.opportunity.data.fields : "no oppy data yet")
-    return this.opportunity.data ? this.opportunity.data.fields.Name.value : 'Loading...';
+    getOpportunity({opportunityId: this._opportunityId})
+      .then(gotOpportunity=>{
+        this.opportunity = gotOpportunity
+        console.log('opportunity', this.opportunity)
+      })
+      .catch(console.warn)
   }
 
-  get productInterest() {
-    return this.opportunity.data ? this.opportunity.data.fields.Converted_Lead__r.value.fields.ProductInterest__c.value : 'Loading...'
-  }
 }
