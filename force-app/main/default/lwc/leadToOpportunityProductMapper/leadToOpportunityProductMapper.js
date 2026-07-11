@@ -14,6 +14,7 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
   @track isLoading = false;
   @track errorMessage = '';
   @track showSuccess = false;
+  showCheckIcons = false;
 
   @api get recordId() {
     return this.opportunityId;
@@ -32,9 +33,10 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
   }
 
   get calculatedTotal() {
-    return this.selectedProducts.reduce((total, product) => {
+    const totalAmount = this.selectedProducts.reduce((total, product) => {
       return total + (product.total || 0);
     }, 0);
+    return this.formatCurrency(totalAmount);
   }
 
   get hasSelectedProducts() {
@@ -72,6 +74,9 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
         console.log('pricebook', this.pricebook);
         console.log('pricebook json: ', JSON.stringify(this.pricebook));
 
+        // Format pricebook entry prices
+        this.formatPricebookEntries();
+
         // Initialize selected products from existing line items
         this.initializeSelectedProducts();
       }
@@ -99,6 +104,8 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
       UnitPrice: item.UnitPrice,
       quantity: item.Quantity,
       total: item.TotalPrice,
+      formattedTotal: this.formatCurrency(item.TotalPrice),
+      formattedUnitPrice: this.formatCurrency(item.UnitPrice),
       isExisting: true
     }));
   }
@@ -144,6 +151,8 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
         UnitPrice: productEntry.UnitPrice,
         quantity: 1,
         total: productEntry.UnitPrice,
+        formattedTotal: this.formatCurrency(productEntry.UnitPrice),
+        formattedUnitPrice: this.formatCurrency(productEntry.UnitPrice),
         isExisting: false
       }];
     } else {
@@ -169,7 +178,9 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
         return {
           ...product,
           quantity: quantity,
-          total: newTotal
+          total: newTotal,
+          formattedTotal: this.formatCurrency(newTotal),
+          formattedUnitPrice: this.formatCurrency(product.UnitPrice)
         };
       }
       return product;
@@ -257,6 +268,15 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
 
   getQuantityInputId(productId) {
     return `quantity-input-${productId}`;
+  }
+
+  formatPricebookEntries() {
+    if (this.pricebook?.PricebookEntries) {
+      this.pricebook.PricebookEntries = this.pricebook.PricebookEntries.map(entry => ({
+        ...entry,
+        formattedUnitPrice: this.formatCurrency(entry.UnitPrice)
+      }));
+    }
   }
 
   // Currency formatting helper

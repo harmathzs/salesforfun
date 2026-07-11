@@ -54,12 +54,12 @@
 
                                                     >
                                                 </lightning-input>
-
+                                                <template if:true={showCheckIcons}>
                                                     <lightning-icon icon-name="utility:check" size="x-small" class="existing-icon"></lightning-icon>
-
+                                                </template>
                                             </div>
                                             <div>
-                                                <span class="product-price">{entry.UnitPrice}</span>
+                                                <span class="product-price">{entry.formattedUnitPrice}</span>
                                             </div>
                                         </div>
                                         <div class="slds-p-left_large product-description">
@@ -109,7 +109,7 @@
                                                 class="quantity-input">
                                             </lightning-input>
                                             <span class="slds-m-left_x-small">
-                                                @ {formatCurrency(product.UnitPrice)} = <strong>{product.total}</strong>
+                                                @ {product.formattedUnitPrice} = <strong>{product.formattedTotal}</strong>
                                             </span>
                                             <template if:false={product.isExisting}>
                                                 <lightning-button-icon
@@ -135,7 +135,7 @@
                                 label="Remove All"
                                 variant="destructive-text"
                                 onclick={handleRemoveAll}
-                                disabled={getHasRemovableProducts}>
+                                >
                             </lightning-button>
                         </div>
                     </template>
@@ -161,7 +161,7 @@
                     label="Save to Opportunity"
                     variant="brand"
                     onclick={handleSave}
-                    disabled={hasSelectedProducts}>
+                    >
                 </lightning-button>
             </div>
 
