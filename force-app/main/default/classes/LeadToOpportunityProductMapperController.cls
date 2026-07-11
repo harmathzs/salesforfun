@@ -8,6 +8,15 @@ public with sharing class LeadToOpportunityProductMapperController {
         ,Converted_Lead__r.ProductInterest__c
         ,Pricebook2Id
         ,Pricebook2.Name
+        ,(SELECT Id
+          ,Name
+          ,Product2Id
+          ,Product2.Name
+          ,Quantity
+          ,UnitPrice
+          ,ListPrice
+          ,TotalPrice
+        FROM OpportunityLineItems)
       FROM Opportunity
       WHERE Id = :opportunityId
       LIMIT 1

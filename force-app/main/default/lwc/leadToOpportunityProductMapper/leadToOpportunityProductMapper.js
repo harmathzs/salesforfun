@@ -21,12 +21,17 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
       .then(async (gotOpportunity)=>{
         this.opportunity = gotOpportunity
         console.log('opportunity', this.opportunity)
+        console.log('opportunity json: ', JSON.stringify(this.opportunity))
 
         this.pricebookId = this.opportunity.Pricebook2Id
         this.pricebook = await getPricebook({pricebookId: this.pricebookId})
         console.log('pricebook', this.pricebook)
+        console.log('pricebook json: ', JSON.stringify(this.pricebook))
       })
       .catch(console.warn)
   }
 
+  get productInterest() {
+    return this.opportunity?.Converted_Lead__r?.ProductInterest__c
+  }
 }
