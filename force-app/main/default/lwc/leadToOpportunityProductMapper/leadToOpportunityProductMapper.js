@@ -103,6 +103,7 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
       Product2Id: item.Product2Id,
       UnitPrice: item.UnitPrice,
       quantity: item.Quantity,
+      originalQuantity: item.Quantity, // Store original quantity for comparison
       total: item.TotalPrice,
       formattedTotal: this.formatCurrency(item.TotalPrice),
       formattedUnitPrice: this.formatCurrency(item.UnitPrice),
@@ -150,6 +151,7 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
         Product2Id: productEntry.Product2Id,
         UnitPrice: productEntry.UnitPrice,
         quantity: 1,
+        originalQuantity: 1, // Initial quantity for new products
         total: productEntry.UnitPrice,
         formattedTotal: this.formatCurrency(productEntry.UnitPrice),
         formattedUnitPrice: this.formatCurrency(productEntry.UnitPrice),
@@ -211,11 +213,13 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
       console.log('handleSave selectedProducts', JSON.stringify(this.selectedProducts) )
       // Prepare data for Apex controller
       const lineItemsToCreate = this.selectedProducts
-        .filter(product => !product.isExisting)
+        .filter(product => !product.isExisting || product.quantity !== product.originalQuantity)
         .map(product => ({
           pricebookEntryId: product.Id,
           quantity: product.quantity,
-          unitPrice: product.UnitPrice
+          unitPrice: product.UnitPrice,
+          // Include ID for existing products to enable update operation
+          ...(product.isExisting && { id: product.Id })
         }));
       console.log('lineItemsToCreate', JSON.stringify(lineItemsToCreate) )
 
