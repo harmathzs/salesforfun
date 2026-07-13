@@ -131,7 +131,9 @@ public with sharing class LeadToOpportunityProductMapperController {
           );
 
           // Set ID if this is an update (existing item)
-          if (itemData.containsKey('id')) {
+          if (itemData.containsKey('Id')) {
+            oli.Id = (Id)itemData.get('Id');
+          } else if (itemData.containsKey('id')) {
             oli.Id = (Id)itemData.get('id');
           }
 

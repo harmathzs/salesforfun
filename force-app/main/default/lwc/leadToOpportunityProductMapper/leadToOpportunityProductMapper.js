@@ -225,7 +225,7 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
           quantity: product.quantity,
           unitPrice: product.UnitPrice,
           // Include ID for existing products to enable update operation
-          ...(product.isExisting && { Id: product.Id })
+          ...(product.isExisting && { id: product.Id })
         }));
       console.log('lineItemsToCreate', JSON.stringify(lineItemsToCreate) )
 
