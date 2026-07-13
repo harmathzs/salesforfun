@@ -115,12 +115,20 @@ public with sharing class LeadToOpportunityProductMapperController {
           // Validate line item data using helper method
           validateLineItemData(itemData);
 
-          itemsToUpsert.add(new OpportunityLineItem(
+          // Create OpportunityLineItem with ID if it's an update operation
+          OpportunityLineItem oli = new OpportunityLineItem(
             OpportunityId = opportunityId,
             PricebookEntryId = (Id)itemData.get('pricebookEntryId'),
             Quantity = (Decimal)itemData.get('quantity'),
             UnitPrice = (Decimal)itemData.get('unitPrice')
-          ));
+          );
+
+          // Set ID if this is an update (existing item)
+          if (itemData.containsKey('id')) {
+            oli.Id = (Id)itemData.get('id');
+          }
+
+          itemsToUpsert.add(oli);
         } catch (Exception e) {
           throw new AuraHandledException('Error processing line item: ' + e.getMessage());
         }
