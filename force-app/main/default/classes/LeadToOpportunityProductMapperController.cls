@@ -70,6 +70,7 @@ public with sharing class LeadToOpportunityProductMapperController {
         ,Pricebook2.Name
         ,(SELECT Id
           ,Name
+          ,PricebookEntryId
           ,Product2Id
           ,Product2.Name
           ,Quantity
@@ -108,10 +109,16 @@ public with sharing class LeadToOpportunityProductMapperController {
     List<OpportunityLineItem> itemsToUpsert = new List<OpportunityLineItem>();
     List<OpportunityLineItem> itemsToDelete = new List<OpportunityLineItem>();
 
+    // Debug: Log received data
+    System.debug('LeadToOpportunityProductMapperController.saveOpportunityLineItems lineItemsToCreate: ' + JSON.serializePretty(lineItemsToCreate));
+
     // Process items to create/update
     if (lineItemsToCreate != null && !lineItemsToCreate.isEmpty()) {
       for (Map<String, Object> itemData : lineItemsToCreate) {
         try {
+          // Debug: Log individual item
+          System.debug('Processing item: ' + JSON.serializePretty(itemData));
+
           // Validate line item data using helper method
           validateLineItemData(itemData);
 

@@ -97,7 +97,8 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
 
     // Map existing line items to our selected products format
     this.selectedProducts = existingItems.map(item => ({
-      Id: item.Id,
+      Id: item.Id, // OpportunityLineItem ID (for updates)
+      PricebookEntryId: item.PricebookEntryId, // PricebookEntry ID (for upsert)
       Name: item.Name,
       Product2: { Name: item.Product2?.Name, Id: item.Product2Id },
       Product2Id: item.Product2Id,
@@ -211,11 +212,16 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
 
     try {
       console.log('handleSave selectedProducts', JSON.stringify(this.selectedProducts) )
+      // Debug: Check PricebookEntryId values
+      this.selectedProducts.forEach(product => {
+        console.log(`Product ${product.Name}: PricebookEntryId=${product.PricebookEntryId}, Id=${product.Id}, isExisting=${product.isExisting}`)
+      });
+
       // Prepare data for Apex controller
       const lineItemsToCreate = this.selectedProducts
         .filter(product => !product.isExisting || product.quantity !== product.originalQuantity)
         .map(product => ({
-          pricebookEntryId: product.Id,
+          pricebookEntryId: product.PricebookEntryId || product.Id,
           quantity: product.quantity,
           unitPrice: product.UnitPrice,
           // Include ID for existing products to enable update operation
