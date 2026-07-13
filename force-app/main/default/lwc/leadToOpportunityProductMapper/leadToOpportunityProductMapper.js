@@ -49,7 +49,7 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
 
   // Getter functions for template compatibility
   getProductSelected = (productId) => {
-    return this.selectedProducts.some(p => p.Id === productId);
+    return this.selectedProducts.some(p => p.Id === productId && !p.markedForDeletion);
   };
 
   getExistingProduct = (product2Id) => {
@@ -81,6 +81,9 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
 
         // Format pricebook entry prices
         this.formatPricebookEntries();
+
+        // Set selected state on pricebook entries
+        this.updatePricebookSelectedState();
 
         // Initialize selected products from existing line items
         this.initializeSelectedProducts();
@@ -137,7 +140,7 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
 
     if (isSelected && productEntry) {
       // Check if already selected (to prevent duplicates)
-      const alreadySelected = this.selectedProducts.some(p => p.Id === productId);
+      const alreadySelected = this.selectedProducts.some(p => p.Id === productId && !p.markedForDeletion);
       if (alreadySelected) {
         console.warn(`Product ${productId} already selected`);
         return;
@@ -171,6 +174,9 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
         !(product.Id === productId && !product.isExisting)
       );
     }
+
+    // Update the isSelected property on the pricebook entry
+    this.formatPricebookEntries();
   }
 
   handleQuantityChange(event) {
@@ -220,6 +226,9 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
         productClass: product.markedForDeletion ? 'slds-p-vertical_xx-small product-item selected deleted' : 'slds-p-vertical_xx-small product-item selected'
       };
     }).filter(product => product !== null); // Remove null entries (new products)
+
+    // Update the isSelected property on the pricebook entries
+    this.formatPricebookEntries();
   }
 
   handleRemoveAll() {
@@ -237,6 +246,9 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
         return null;
       }
     }).filter(product => product !== null); // Remove null entries (new products)
+
+    // Update the isSelected property on the pricebook entries
+    this.formatPricebookEntries();
   }
 
   async handleSave() {
@@ -332,7 +344,8 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
     if (this.pricebook?.PricebookEntries) {
       this.pricebook.PricebookEntries = this.pricebook.PricebookEntries.map(entry => ({
         ...entry,
-        formattedUnitPrice: this.formatCurrency(entry.UnitPrice)
+        formattedUnitPrice: this.formatCurrency(entry.UnitPrice),
+        isSelected: this.selectedProducts.some(p => p.Id === entry.Id && !p.markedForDeletion)
       }));
     }
   }
