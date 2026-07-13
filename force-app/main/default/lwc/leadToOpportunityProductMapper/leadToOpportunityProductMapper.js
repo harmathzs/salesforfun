@@ -81,7 +81,7 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
         this.initializeSelectedProducts();
       }
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.warn('Error loading data:', error);
       this.errorMessage = 'Error loading opportunity data: ' + (error.body?.message || error.message);
     } finally {
       this.isLoading = false;
@@ -216,10 +216,12 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
           quantity: product.quantity,
           unitPrice: product.UnitPrice
         }));
+      console.log('lineItemsToCreate', lineItemsToCreate)
 
       const lineItemIdsToDelete = this.existingLineItems
         .filter(existingItem => !this.selectedProducts.some(selected => selected.Id === existingItem.Id))
         .map(item => item.Id);
+      console.log('lineItemIdsToDelete', lineItemIdsToDelete)
 
       // Call Apex method
       await saveOpportunityLineItems({
@@ -236,7 +238,7 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
       await this.loadData();
 
     } catch (error) {
-      console.error('Error saving line items:', error);
+      console.warn('Error saving line items:', error);
       const errorMessage = error.body?.message || error.message || 'Unknown error';
       this.errorMessage = 'Error saving line items: ' + errorMessage;
       this.showSuccessMessage('Error', errorMessage, 'error');

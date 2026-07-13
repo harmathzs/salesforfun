@@ -132,6 +132,9 @@ public with sharing class LeadToOpportunityProductMapperController {
       itemsToDelete = [SELECT Id FROM OpportunityLineItem WHERE Id IN :lineItemIdsToDelete];
     }
 
+    System.debug('LeadToOpportunityProductMapperController.saveOpportunityLineItems itemsToUpsert: '+itemsToUpsert);
+    System.debug('LeadToOpportunityProductMapperController.saveOpportunityLineItems itemsToDelete: '+itemsToDelete);
+
     // Perform DML operations
     try {
       // Use partial success to allow some records to save even if others fail
