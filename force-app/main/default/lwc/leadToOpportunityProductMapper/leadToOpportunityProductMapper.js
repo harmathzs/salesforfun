@@ -216,12 +216,12 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
           quantity: product.quantity,
           unitPrice: product.UnitPrice
         }));
-      console.log('lineItemsToCreate', lineItemsToCreate)
+      console.log('lineItemsToCreate', JSON.stringify(lineItemsToCreate) )
 
       const lineItemIdsToDelete = this.existingLineItems
         .filter(existingItem => !this.selectedProducts.some(selected => selected.Id === existingItem.Id))
         .map(item => item.Id);
-      console.log('lineItemIdsToDelete', lineItemIdsToDelete)
+      console.log('lineItemIdsToDelete', JSON.stringify(lineItemIdsToDelete) )
 
       // Call Apex method
       await saveOpportunityLineItems({
