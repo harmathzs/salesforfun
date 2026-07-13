@@ -208,6 +208,7 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
     this.showSuccess = false;
 
     try {
+      console.log('handleSave selectedProducts', JSON.stringify(this.selectedProducts) )
       // Prepare data for Apex controller
       const lineItemsToCreate = this.selectedProducts
         .filter(product => !product.isExisting)
