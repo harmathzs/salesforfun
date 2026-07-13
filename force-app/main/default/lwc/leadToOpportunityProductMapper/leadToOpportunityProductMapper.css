@@ -52,6 +52,16 @@
     margin-bottom: 0.5rem;
 }
 
+.product-item.deleted {
+    opacity: 0.6;
+    background-color: #fff0f0;
+}
+
+.product-item.deleted .product-name {
+    text-decoration: line-through;
+    color: #999;
+}
+
 .product-item:last-child {
     border-bottom: none;
 }

@@ -88,10 +88,10 @@
                     <template if:true={hasSelectedProducts}>
                         <div class="product-list selected-products">
                             <template for:each={selectedProducts} for:item="product">
-                                <div key={product.Id} class="slds-p-vertical_xx-small product-item selected">
+                                <div key={product.Id} class={product.productClass}>
                                     <div class="slds-grid slds-grid_align-spread">
                                         <div>
-                                            <strong>{product.Product2.Name}</strong>
+                                            <strong class="product-name">{product.Product2.Name}</strong>
                                             <template if:true={product.isExisting}>
                                                 <lightning-badge label="Existing" class="slds-m-left_x-small"></lightning-badge>
                                             </template>
@@ -111,15 +111,13 @@
                                             <span class="slds-m-left_x-small">
                                                 @ {product.formattedUnitPrice} = <strong>{product.formattedTotal}</strong>
                                             </span>
-                                            <template if:false={product.isExisting}>
-                                                <lightning-button-icon
-                                                    icon-name="utility:delete"
-                                                    data-id={product.Id}
-                                                    onclick={handleRemoveProduct}
-                                                    alternative-text="Remove"
-                                                    class="slds-m-left_x-small">
-                                                </lightning-button-icon>
-                                            </template>
+                                            <lightning-button-icon
+                                                icon-name="utility:delete"
+                                                data-id={product.Id}
+                                                onclick={handleRemoveProduct}
+                                                alternative-text="Remove"
+                                                class="slds-m-left_x-small">
+                                            </lightning-button-icon>
                                         </div>
                                     </div>
                                 </div>

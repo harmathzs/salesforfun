@@ -57,7 +57,12 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
   };
 
   getHasRemovableProducts = () => {
-    return this.selectedProducts.some(p => !p.isExisting);
+    return this.selectedProducts.some(p => !p.isExisting || (p.isExisting && !p.markedForDeletion));
+  };
+
+  getProductClass = (product) => {
+    const baseClass = 'slds-p-vertical_xx-small product-item selected';
+    return product.markedForDeletion ? `${baseClass} deleted` : baseClass;
   };
 
   async loadData() {
@@ -108,6 +113,7 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
       total: item.TotalPrice,
       formattedTotal: this.formatCurrency(item.TotalPrice),
       formattedUnitPrice: this.formatCurrency(item.UnitPrice),
+      productClass: 'slds-p-vertical_xx-small product-item selected',
       isExisting: true
     }));
   }
@@ -156,6 +162,7 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
         total: productEntry.UnitPrice,
         formattedTotal: this.formatCurrency(productEntry.UnitPrice),
         formattedUnitPrice: this.formatCurrency(productEntry.UnitPrice),
+        productClass: 'slds-p-vertical_xx-small product-item selected',
         isExisting: false
       }];
     } else {
@@ -183,7 +190,8 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
           quantity: quantity,
           total: newTotal,
           formattedTotal: this.formatCurrency(newTotal),
-          formattedUnitPrice: this.formatCurrency(product.UnitPrice)
+          formattedUnitPrice: this.formatCurrency(product.UnitPrice),
+          productClass: product.markedForDeletion ? 'slds-p-vertical_xx-small product-item selected deleted' : 'slds-p-vertical_xx-small product-item selected'
         };
       }
       return product;
@@ -192,12 +200,43 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
 
   handleRemoveProduct(event) {
     const productId = event.target.dataset.id;
-    this.selectedProducts = this.selectedProducts.filter(product => product.Id !== productId);
+
+    this.selectedProducts = this.selectedProducts.map(product => {
+      if (product.Id === productId) {
+        // For existing products, mark for deletion but keep in the list
+        if (product.isExisting) {
+          return {
+            ...product,
+            markedForDeletion: true,
+            productClass: 'slds-p-vertical_xx-small product-item selected deleted'
+          };
+        } else {
+          // For new products, remove completely by returning null
+          return null;
+        }
+      }
+      return {
+        ...product,
+        productClass: product.markedForDeletion ? 'slds-p-vertical_xx-small product-item selected deleted' : 'slds-p-vertical_xx-small product-item selected'
+      };
+    }).filter(product => product !== null); // Remove null entries (new products)
   }
 
   handleRemoveAll() {
-    // Only remove non-existing items to preserve existing line items
-    this.selectedProducts = this.selectedProducts.filter(product => product.isExisting);
+    // Mark all non-existing items for removal and existing items for deletion
+    this.selectedProducts = this.selectedProducts.map(product => {
+      if (product.isExisting) {
+        // Mark existing products for deletion
+        return {
+          ...product,
+          markedForDeletion: true,
+          productClass: 'slds-p-vertical_xx-small product-item selected deleted'
+        };
+      } else {
+        // Remove new products completely
+        return null;
+      }
+    }).filter(product => product !== null); // Remove null entries (new products)
   }
 
   async handleSave() {
@@ -219,7 +258,7 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
 
       // Prepare data for Apex controller
       const lineItemsToCreate = this.selectedProducts
-        .filter(product => !product.isExisting || product.quantity !== product.originalQuantity)
+        .filter(product => !product.markedForDeletion && (!product.isExisting || product.quantity !== product.originalQuantity))
         .map(product => ({
           pricebookEntryId: product.PricebookEntryId || product.Id,
           quantity: product.quantity,
@@ -229,9 +268,15 @@ export default class LeadToOpportunityProductMapper extends LightningElement {
         }));
       console.log('lineItemsToCreate', JSON.stringify(lineItemsToCreate) )
 
-      const lineItemIdsToDelete = this.existingLineItems
-        .filter(existingItem => !this.selectedProducts.some(selected => selected.Id === existingItem.Id))
-        .map(item => item.Id);
+      // Include products marked for deletion and existing items not in selectedProducts
+      const lineItemIdsToDelete = [
+        ...this.selectedProducts
+          .filter(product => product.isExisting && product.markedForDeletion)
+          .map(product => product.Id),
+        ...this.existingLineItems
+          .filter(existingItem => !this.selectedProducts.some(selected => selected.Id === existingItem.Id && !selected.markedForDeletion))
+          .map(item => item.Id)
+      ];
       console.log('lineItemIdsToDelete', JSON.stringify(lineItemIdsToDelete) )
 
       // Call Apex method
