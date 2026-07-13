@@ -147,6 +147,7 @@ public with sharing class LeadToOpportunityProductMapperController {
     try {
       // Use partial success to allow some records to save even if others fail
       Database.UpsertResult[] upsertResults = Database.upsert(itemsToUpsert, false);
+      System.debug('saveOpportunityLineItems upsertResults: '+upsertResults);
 
       // Check for any upsert errors
       for (Database.UpsertResult sr : upsertResults) {
