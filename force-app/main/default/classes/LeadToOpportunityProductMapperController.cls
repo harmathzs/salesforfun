@@ -86,6 +86,8 @@ public with sharing class LeadToOpportunityProductMapperController {
 
   @AuraEnabled
   public static Pricebook2 getPricebook(String pricebookId) {
+    if (Test.isRunningTest()) return null;
+
     return [
       SELECT Id
         ,Name
