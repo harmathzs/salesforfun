@@ -11,6 +11,31 @@ private class PriceBookActualizationTest {
     return Test.getStandardPricebookId();
   }
 
+  private static Pricebook2 createSourcePricebookWithEntries(String pricebookName, Decimal unitPrice) {
+    Pricebook2 sourcePb = new Pricebook2(Name = pricebookName, IsActive = true);
+    insert sourcePb;
+
+    Id standardPricebookId = getStandardPricebookIdForTest();
+    Product2 product = new Product2(Name = pricebookName + ' Product', IsActive = true);
+    insert product;
+
+    insert new PricebookEntry(
+      Pricebook2Id = standardPricebookId,
+      Product2Id = product.Id,
+      UnitPrice = unitPrice,
+      UseStandardPrice = false
+    );
+
+    insert new PricebookEntry(
+      Pricebook2Id = sourcePb.Id,
+      Product2Id = product.Id,
+      UnitPrice = unitPrice,
+      UseStandardPrice = false
+    );
+
+    return sourcePb;
+  }
+
   /**
    * Test: Load pricebooks successfully via controller instance
    */
@@ -73,12 +98,13 @@ private class PriceBookActualizationTest {
   @IsTest
   static void testValidateNewPricebookNameBlank() {
     Test.startTest();
+    Boolean threwException = false;
     try {
       PriceBookActualizationController.validateNewPricebookName('');
-      System.assert(false, 'Should have thrown AuraHandledException');
     } catch (AuraHandledException e) {
-      // System.assert(e.getMessage().contains('cannot be blank'), 'Error message should mention blank');
+      threwException = true;
     }
+    System.assert(threwException, 'Should have thrown AuraHandledException');
     Test.stopTest();
   }
 
@@ -160,6 +186,112 @@ private class PriceBookActualizationTest {
 
     System.assertEquals(expectedPrice1, newEntries[0].UnitPrice, 'First product price should be adjusted');
     System.assertEquals(expectedPrice2, newEntries[1].UnitPrice, 'Second product price should be adjusted');
+  }
+
+  /**
+   * Test: createPriceBook action - success path
+   */
+  @IsTest
+  static void testCreatePriceBookSuccess() {
+    Pricebook2 sourcePb = createSourcePricebookWithEntries('Action Source Price Book', 25);
+
+    PriceBookActualizationController controller = new PriceBookActualizationController();
+    controller.selectedSourceId = sourcePb.Id;
+    controller.percentageAdjustment = 5;
+    controller.newPricebookName = 'Action Price Book 2026';
+
+    Test.startTest();
+    controller.createPriceBook();
+    Test.stopTest();
+
+    System.assertEquals(true, controller.resultSuccess, 'Action should succeed');
+    System.assertEquals(true, controller.showResults, 'Results should be visible');
+    System.assertEquals(null, controller.selectedSourceId, 'Source should clear after success');
+    System.assertEquals(null, controller.percentageAdjustment, 'Percentage should clear after success');
+    System.assertEquals(null, controller.newPricebookName, 'Name should clear after success');
+    System.assertEquals(null, controller.previewEntryCount, 'Preview should clear after success');
+    System.assert(controller.resultMessage.contains('Successfully created pricebook'), 'Should report success');
+
+    Pricebook2 createdPb = [SELECT Id, Name FROM Pricebook2 WHERE Name = 'Action Price Book 2026' LIMIT 1];
+    System.assertNotEquals(null, createdPb, 'New pricebook should exist');
+  }
+
+  /**
+   * Test: createPriceBook action - missing source pricebook
+   */
+  @IsTest
+  static void testCreatePriceBookMissingSource() {
+    PriceBookActualizationController controller = new PriceBookActualizationController();
+    controller.percentageAdjustment = 5;
+    controller.newPricebookName = 'Missing Source Price Book';
+
+    Test.startTest();
+    controller.createPriceBook();
+    Test.stopTest();
+
+    System.assertEquals(false, controller.resultSuccess, 'Action should fail');
+    System.assertEquals(true, controller.showResults, 'Results should be visible');
+    System.assert(controller.resultMessage.contains('select a source pricebook'), 'Should require source');
+  }
+
+  /**
+   * Test: createPriceBook action - missing percentage
+   */
+  @IsTest
+  static void testCreatePriceBookMissingPercentage() {
+    Pricebook2 sourcePb = createSourcePricebookWithEntries('Missing Percentage Source', 25);
+
+    PriceBookActualizationController controller = new PriceBookActualizationController();
+    controller.selectedSourceId = sourcePb.Id;
+    controller.newPricebookName = 'Missing Percentage Price Book';
+
+    Test.startTest();
+    controller.createPriceBook();
+    Test.stopTest();
+
+    System.assertEquals(false, controller.resultSuccess, 'Action should fail');
+    System.assert(controller.resultMessage.contains('percentage adjustment'), 'Should require percentage');
+  }
+
+  /**
+   * Test: createPriceBook action - missing new pricebook name
+   */
+  @IsTest
+  static void testCreatePriceBookMissingName() {
+    Pricebook2 sourcePb = createSourcePricebookWithEntries('Missing Name Source', 25);
+
+    PriceBookActualizationController controller = new PriceBookActualizationController();
+    controller.selectedSourceId = sourcePb.Id;
+    controller.percentageAdjustment = 5;
+
+    Test.startTest();
+    controller.createPriceBook();
+    Test.stopTest();
+
+    System.assertEquals(false, controller.resultSuccess, 'Action should fail');
+    System.assert(controller.resultMessage.contains('new pricebook'), 'Should require new name');
+  }
+
+  /**
+   * Test: cancel action resets form state
+   */
+  @IsTest
+  static void testCancelAction() {
+    PriceBookActualizationController controller = new PriceBookActualizationController();
+    controller.percentageAdjustment = 5;
+    controller.newPricebookName = 'Temporary Name';
+
+    Test.startTest();
+    controller.createPriceBook();
+    controller.cancel();
+    Test.stopTest();
+
+    System.assertEquals(null, controller.selectedSourceId, 'Source should clear');
+    System.assertEquals(null, controller.percentageAdjustment, 'Percentage should clear');
+    System.assertEquals(null, controller.newPricebookName, 'Name should clear');
+    System.assertEquals(null, controller.previewEntryCount, 'Preview should clear');
+    System.assertEquals(false, controller.showResults, 'Results should hide');
+    System.assertEquals(0, controller.resultErrors.size(), 'Errors should clear');
   }
 
   /**
