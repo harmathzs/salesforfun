@@ -41,14 +41,15 @@ SalesforFun - my Salesforce Developer Edition org
 ✅ **Lead-to-Opportunity Product Mapper LWC Complete**
 - **Component**: `leadToOpportunityProductMapper` Lightning Web Component
 - **Apex Controller**: `LeadToOpportunityProductMapperController.cls` with upsert/delete operations
-- **Features**: Manual opportunity line item selection based on lead's product interest
+- **Features**: Manual opportunity line item selection based on lead's product interest with product descriptions
+- **Two-Panel Layout**: Available Products (left) vs Selected Products (right) for intuitive workflow
 - **Currency Formatting**: Proper 2-decimal precision using `Intl.NumberFormat`, all computed in JS
-- **Duplicate Prevention**: Disables checkboxes for existing products with visual indicators
-- **Quantity Management**: Real-time total calculation, minimum quantity validation (default: 1)
-- **Delete Functionality**: Full delete support for both new and existing products with visual feedback
-- **Checkbox Management**: Automatic checkbox reset via property binding (`entry.isSelected`) — no function calls in templates
-- **UX Improvements**: Strikethrough and faded background for deleted products, intuitive workflow
-- **Key Patterns**: Property-based binding, reactive `formatPricebookEntries()` updates, proper LWC syntax throughout
+- **Duplicate Prevention**: Prevents re-selection of existing products via JS logic with "Existing" badge visual indicator
+- **Quantity Management**: Real-time total calculation, minimum quantity validation (default: 1), updates total dynamically
+- **Delete Functionality**: Full delete support—new products removed completely, existing products marked for deletion with strikethrough styling
+- **Batch Operations**: "Remove All" button to quickly clear all selections while preserving existing items for review
+- **Event Handling**: Defensive checks and onchange handlers for robust product selection and quantity management
+- **UX Improvements**: Visual feedback with strikethrough and faded background for deleted products, loading spinners, error messages, success toasts
 
 ## Next Steps
 
