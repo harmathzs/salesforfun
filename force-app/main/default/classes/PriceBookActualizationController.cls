@@ -11,7 +11,7 @@ public with sharing class PriceBookActualizationController {
   public String selectedSourceId { get; set; }
   public Decimal percentageAdjustment { get; set; }
   public String newPricebookName { get; set; }
-  public List<Map<String, String>> pricebooks { get; private set; }
+  public List<SelectOption> pricebooks { get; private set; }
   public Boolean showResults { get; private set; }
   public Boolean resultSuccess { get; private set; }
   public String resultMessage { get; private set; }
@@ -31,7 +31,8 @@ public with sharing class PriceBookActualizationController {
    */
   public void loadPricebooks() {
     System.debug('PriceBookActualizationController.loadPricebooks started');
-    pricebooks = new List<Map<String, String>>();
+    pricebooks = new List<SelectOption>();
+    pricebooks.add(new SelectOption('', '-- Select a PriceBook --'));
 
     try {
       Pricebook2[] allPricebooks = [
@@ -43,11 +44,7 @@ public with sharing class PriceBookActualizationController {
       System.debug('PriceBookActualizationController.loadPricebooks; found ' + allPricebooks.size() + ' pricebooks');
 
       for (Pricebook2 pb : allPricebooks) {
-        Map<String, String> pbMap = new Map<String, String>{
-          'id' => pb.Id,
-          'name' => pb.Name
-        };
-        pricebooks.add(pbMap);
+        pricebooks.add(new SelectOption(pb.Id, pb.Name));
       }
     } catch (Exception e) {
       System.debug('ERROR in PriceBookActualizationController.loadPricebooks: ' + e.getMessage());
@@ -123,39 +120,6 @@ public with sharing class PriceBookActualizationController {
     resultMessage = message;
     resultErrors.add(message);
     showResults = true;
-  }
-
-  /**
-   * Get all active pricebooks for dropdown selection (static method for Visualforce remoting)
-   *
-   * @return List<Map<String, String>> with Id and Name for each pricebook
-   */
-  public static List<Map<String, String>> getPricebooks() {
-    System.debug('PriceBookActualizationController.getPricebooks started');
-    List<Map<String, String>> pricebooks = new List<Map<String, String>>();
-
-    try {
-      Pricebook2[] allPricebooks = [
-        SELECT Id, Name
-        FROM Pricebook2
-        ORDER BY Name ASC
-      ];
-
-      System.debug('PriceBookActualizationController.getPricebooks; found ' + allPricebooks.size() + ' pricebooks');
-
-      for (Pricebook2 pb : allPricebooks) {
-        Map<String, String> pbMap = new Map<String, String>{
-          'id' => pb.Id,
-          'name' => pb.Name
-        };
-        pricebooks.add(pbMap);
-      }
-    } catch (Exception e) {
-      System.debug('ERROR in PriceBookActualizationController.getPricebooks: ' + e.getMessage());
-      throw new AuraHandledException('Failed to load pricebooks: ' + e.getMessage());
-    }
-
-    return pricebooks;
   }
 
   /**

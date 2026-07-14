@@ -8,7 +8,7 @@
 private class PriceBookActualizationTest {
 
   /**
-   * Test: Load pricebooks successfully
+   * Test: Load pricebooks successfully via controller instance
    */
   @isTest
   static void testLoadPricebooks() {
@@ -16,18 +16,18 @@ private class PriceBookActualizationTest {
     Pricebook2 testPb = new Pricebook2(Name = 'Test PriceBook', IsActive = true);
     insert testPb;
 
-    // Get pricebooks
+    // Instantiate controller - constructor calls loadPricebooks()
     Test.startTest();
-    List<Map<String, String>> pricebooks = PriceBookActualizationController.getPricebooks();
+    PriceBookActualizationController controller = new PriceBookActualizationController();
     Test.stopTest();
 
-    // Verify
-    System.assertNotEquals(null, pricebooks, 'Pricebooks list should not be null');
-    System.assert(pricebooks.size() > 0, 'Should have at least one pricebook');
+    // Verify SelectOption list is populated
+    System.assertNotEquals(null, controller.pricebooks, 'Pricebooks list should not be null');
+    System.assert(controller.pricebooks.size() > 1, 'Should have placeholder + at least one pricebook');
 
     Boolean foundTestPb = false;
-    for (Map<String, String> pb : pricebooks) {
-      if (pb.get('name') == 'Test PriceBook') {
+    for (SelectOption opt : controller.pricebooks) {
+      if (opt.getLabel() == 'Test PriceBook') {
         foundTestPb = true;
         break;
       }

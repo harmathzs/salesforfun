@@ -40,10 +40,7 @@
               </label>
               <div class="slds-form-element__control">
                 <apex:selectList id="sourcePricebook" value="{!selectedSourceId}" size="1" styleClass="slds-select">
-                  <apex:selectOption itemValue="" itemLabel="-- Select a PriceBook --" />
-                  <apex:repeat value="{!pricebooks}" var="pb">
-                    <apex:selectOption itemValue="{!pb['id']}" itemLabel="{!pb['name']}" />
-                  </apex:repeat>
+                  <apex:selectOptions value="{!pricebooks}" />
                 </apex:selectList>
               </div>
             </div>
