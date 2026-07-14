@@ -1,0 +1,154 @@
+<apex:page controller="PriceBookActualizationController" standardStylesheets="true" lightningStylesheets="true" docType="html-5">
+  <apex:slds />
+
+  <div class="slds-scope">
+    <div class="slds-page-header">
+      <div class="slds-page-header__content">
+        <h1 class="slds-page-header__title">PriceBook Actualization</h1>
+        <p class="slds-page-header__info">Clone an existing pricebook and apply percentage adjustments to all entries</p>
+      </div>
+    </div>
+
+    <div class="slds-container_center slds-container_small slds-m-top_large">
+      <apex:pageMessages id="messages" />
+
+      <!-- Info Section -->
+      <div class="slds-box slds-m-bottom_large">
+        <div class="slds-box__body">
+          <p>
+            <strong>How it works:</strong> Select a source pricebook, enter a percentage adjustment, and provide a name for the new pricebook.
+            All product entries will be cloned with their prices adjusted by the specified percentage.
+          </p>
+          <p class="slds-m-top_small" style="color: #706e6b;">
+            <em>Example:</em> If you select "Price Book 2025" and enter 5%, a new pricebook will be created with all prices increased by 5%.
+          </p>
+        </div>
+      </div>
+
+      <!-- Main Form -->
+      <apex:form id="pbkForm">
+        <div class="slds-box">
+          <fieldset class="slds-box__body slds-form">
+            <legend class="slds-form__legend slds-form__legend_horizontal slds-size_1-of-1 slds-m-bottom_medium">
+              <span class="slds-required-mark">*</span> Create New PriceBook
+            </legend>
+
+            <!-- Source PriceBook Dropdown -->
+            <div class="slds-form-element slds-m-bottom_medium">
+              <label class="slds-form-element__label" for="sourcePricebook">
+                <span class="slds-required">*</span> Source PriceBook
+              </label>
+              <div class="slds-form-element__control">
+                <apex:selectList id="sourcePricebook" value="{!selectedSourceId}" size="1" styleClass="slds-select">
+                  <apex:selectOption itemValue="" itemLabel="-- Select a PriceBook --" />
+                  <apex:repeat value="{!pricebooks}" var="pb">
+                    <apex:selectOption itemValue="{!pb['id']}" itemLabel="{!pb['name']}" />
+                  </apex:repeat>
+                </apex:selectList>
+              </div>
+            </div>
+
+            <!-- Percentage Adjustment Field -->
+            <div class="slds-form-element slds-m-bottom_medium">
+              <label class="slds-form-element__label" for="percentageField">
+                <span class="slds-required">*</span> Percentage Adjustment
+              </label>
+              <div class="slds-form-element__control">
+                <apex:inputText id="percentageField"
+                  value="{!percentageAdjustment}"
+                  styleClass="slds-input"
+                />
+              </div>
+              <div class="slds-form-element__help" style="color: #706e6b; margin-top: 0.5rem;">
+                Enter a decimal value. Positive values increase prices, negative values decrease them.
+              </div>
+            </div>
+
+            <!-- New PriceBook Name Field -->
+            <div class="slds-form-element slds-m-bottom_medium">
+              <label class="slds-form-element__label" for="newNameField">
+                <span class="slds-required">*</span> New PriceBook Name
+              </label>
+              <div class="slds-form-element__control">
+                <apex:inputText id="newNameField"
+                  value="{!newPricebookName}"
+                  styleClass="slds-input"
+                  maxlength="100" />
+              </div>
+            </div>
+
+            <!-- Preview Section -->
+            <apex:outputPanel rendered="{!NOT(ISNULL(previewEntryCount)) && previewEntryCount > 0}" id="previewPanel">
+              <div class="slds-box slds-m-bottom_medium" style="background-color: #f3f3f3;">
+                <div class="slds-box__body">
+                  <p style="margin: 0;">
+                    <strong>Preview:</strong> This will create <strong>{!previewEntryCount}</strong> new pricebook entries with the specified percentage adjustment.
+                  </p>
+                </div>
+              </div>
+            </apex:outputPanel>
+
+            <!-- Action Buttons -->
+            <div class="slds-form-element">
+              <div class="slds-form-element__control">
+                <apex:commandButton id="createBtn"
+                  value="Create New PriceBook"
+                  action="{!createPriceBook}"
+                  styleClass="slds-button slds-button_brand"
+                  rerender="messages, pbkForm" />
+                <apex:commandButton id="cancelBtn"
+                  value="Cancel"
+                  action="{!cancel}"
+                  immediate="true"
+                  styleClass="slds-button slds-button_neutral"
+                  rerender="messages, pbkForm" />
+              </div>
+            </div>
+          </fieldset>
+        </div>
+      </apex:form>
+
+      <!-- Results Section -->
+      <apex:outputPanel rendered="{!showResults}" id="resultsPanel" styleClass="slds-m-top_large">
+        <div class="slds-box">
+          <div class="slds-box__body">
+            <apex:outputPanel rendered="{!resultSuccess}">
+              <div class="slds-notify slds-notify_alert slds-alert_success" role="alert">
+                <span class="slds-assistive-text">Success</span>
+                <span class="slds-icon_container slds-m-right_small" title="Success">
+                  <svg class="slds-icon slds-icon_small slds-icon-text-success" aria-hidden="true" viewBox="0 0 24 24">
+                    <path d="M9.86 18L3.5 11.63Q3.9 11.25 4.325 11.25Q4.75 11.25 5.15 11.65L9.86 16.35L18.85 7.35Q19.25 6.95 19.675 6.95Q20.1 6.95 20.5 7.35Q20.9 7.75 20.9 8.175Q20.9 8.6 20.5 9L10.86 18.65Q10.475 19.025 10.05 19.025Q9.625 19.025 9.86 18Z"></path>
+                  </svg>
+                </span>
+                <div class="slds-notify__content">
+                  <h2 class="slds-text-heading_small">{!resultMessage}</h2>
+                </div>
+              </div>
+            </apex:outputPanel>
+
+            <apex:outputPanel rendered="{!!resultSuccess}">
+              <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+                <span class="slds-assistive-text">Error</span>
+                <span class="slds-icon_container slds-m-right_small" title="Error">
+                  <svg class="slds-icon slds-icon_small slds-icon-text-error" aria-hidden="true" viewBox="0 0 24 24">
+                    <path d="M12 20.1q3.3 0 5.775-2.475Q20.25 15.15 20.25 11.85q0-3.3-2.475-5.775Q15.3 3.6 12 3.6q-3.3 0-5.775 2.475Q3.75 8.55 3.75 11.85q0 3.3 2.475 5.775Q8.7 20.1 12 20.1Zm0-1.8q-2.65 0-4.525-1.875T5.6 11.85q0-2.65 1.875-4.525T11.85 5.45q2.65 0 4.525 1.875T18.25 11.85q0 2.65-1.875 4.525T12 18.3Zm0-8.4q.425 0 .7125-.2875T13.1 8.9q0-.425-.2875-.7125T12 8.1q-.425 0-.7125.2875T11.1 8.9q0 .425.2875.7125T12 9.9Zm-.8 6h1.6v-4h-1.6Z"></path>
+                  </svg>
+                </span>
+                <div class="slds-notify__content">
+                  <h2 class="slds-text-heading_small">{!resultMessage}</h2>
+                  <apex:outputPanel rendered="{!resultErrors.size > 0}">
+                    <ul class="slds-list_dotted slds-m-top_small">
+                      <apex:repeat value="{!resultErrors}" var="error">
+                        <li>{!error}</li>
+                      </apex:repeat>
+                    </ul>
+                  </apex:outputPanel>
+                </div>
+              </div>
+            </apex:outputPanel>
+          </div>
+        </div>
+      </apex:outputPanel>
+    </div>
+  </div>
+</apex:page>
