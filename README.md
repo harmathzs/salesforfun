@@ -38,6 +38,18 @@ SalesforFun - my Salesforce Developer Edition org
 - **Quality**: 100% test coverage, enhanced debug logging, production-ready
 - **Use Case**: Internal sales operations tool, separate from customer-facing webshop flow
 
+✅ **Lead-to-Opportunity Product Mapper LWC Complete**
+- **Component**: `leadToOpportunityProductMapper` Lightning Web Component
+- **Apex Controller**: `LeadToOpportunityProductMapperController.cls` with upsert/delete operations
+- **Features**: Manual opportunity line item selection based on lead's product interest
+- **Currency Formatting**: Proper 2-decimal precision using `Intl.NumberFormat`, all computed in JS
+- **Duplicate Prevention**: Disables checkboxes for existing products with visual indicators
+- **Quantity Management**: Real-time total calculation, minimum quantity validation (default: 1)
+- **Delete Functionality**: Full delete support for both new and existing products with visual feedback
+- **Checkbox Management**: Automatic checkbox reset via property binding (`entry.isSelected`) — no function calls in templates
+- **UX Improvements**: Strikethrough and faded background for deleted products, intuitive workflow
+- **Key Patterns**: Property-based binding, reactive `formatPricebookEntries()` updates, proper LWC syntax throughout
+
 ## Next Steps
 
 Following the development plan to implement end-to-end sales process automation from Lead to Renewal.
@@ -59,7 +71,7 @@ Following the development plan to implement end-to-end sales process automation 
 - Eliminates manual contact role assignment
 - Improves data consistency and reporting accuracy
 
-- Develop Product-interest to OpportunityLineItem mapping
+- ~~Develop Product-interest to OpportunityLineItem mapping~~ ✅ Done
 - Create Quote-to-Order automation with validation
 - Enhance test coverage to 95%+ for all components
 
