@@ -2,6 +2,10 @@
 private class LeadToOpportunityProductMapperTest {
   @TestSetup static void testFactory() {
     Map<String, Object> data = TestFactory.createCompleteTestSetup(1, 1, 1);
+    Product2[] products = TestFactory.createTestProducts(4);
+    Id productId = products[0].Id;
+    Id[] productIds = new List<Id>{productId};
+    PricebookEntry[] pbes = TestFactory.createTestPricebookEntries(productIds, 100);
   }
 
   @IsTest
@@ -29,6 +33,20 @@ private class LeadToOpportunityProductMapperTest {
 
     oppy = LeadToOpportunityProductMapperController.getOpportunity(oppy.Id);
 
+    List<Map<String, Object>> lineItemsToCreate = new List<Map<String, Object>>();
+    PricebookEntry pbe = [SELECT Id, Product2Id, UnitPrice FROM PricebookEntry LIMIT 1];
+      Map<String, Object> lineItemToCreate = new Map<String, Object>{
+        'pricebookEntryId' => pbe.Id,
+        'quantity' => 1,
+        'unitPrice' => 100
+      };
+    lineItemsToCreate.add(lineItemToCreate);
+
+    String[] lineItemIdsToDelete = new List<String>();
+
+
+
+    LeadToOpportunityProductMapperController.saveOpportunityLineItems(oppy.Id, lineItemsToCreate, lineItemIdsToDelete);
 
   }
 
