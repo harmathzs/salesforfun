@@ -65,6 +65,34 @@ private class PriceBookActualizationTest {
   }
 
   /**
+   * Test: default source pricebook from Opportunity record context
+   */
+  @IsTest
+  static void testDefaultSourceFromOpportunityRecord() {
+    Pricebook2 sourcePb = createSourcePricebookWithEntries('Opportunity Default Source', 10);
+    Account account = new Account(Name = 'Opportunity Default Account');
+    insert account;
+
+    Opportunity opportunity = new Opportunity(
+      Name = 'Opportunity Default Test',
+      AccountId = account.Id,
+      StageName = 'Prospecting',
+      CloseDate = Date.today().addDays(30),
+      Pricebook2Id = sourcePb.Id
+    );
+    insert opportunity;
+
+    Test.setCurrentPage(new PageReference('/apex/PriceBookActualization'));
+    ApexPages.currentPage().getParameters().put('recordId', opportunity.Id);
+
+    Test.startTest();
+    PriceBookActualizationController controller = new PriceBookActualizationController();
+    Test.stopTest();
+
+    System.assertEquals(sourcePb.Id, controller.selectedSourceId, 'Should preselect the Opportunity pricebook');
+  }
+
+  /**
    * Test: Validate new pricebook name - success case
    */
   @IsTest

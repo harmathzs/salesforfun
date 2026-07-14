@@ -22,8 +22,54 @@ public with sharing class PriceBookActualizationController {
   public PriceBookActualizationController() {
     System.debug('PriceBookActualizationController constructor called');
     loadPricebooks();
+    applyOpportunityDefaults();
     showResults = false;
     resultErrors = new List<String>();
+  }
+
+  /**
+   * Prefill the source pricebook from the current Opportunity record context, if available.
+   */
+  private void applyOpportunityDefaults() {
+    String opportunityId = getCurrentRecordId();
+    if (String.isBlank(opportunityId)) {
+      return;
+    }
+
+    List<Opportunity> opportunities = [
+      SELECT Id, Name, Pricebook2Id, Pricebook2.Name
+      FROM Opportunity
+      WHERE Id = :opportunityId
+      LIMIT 1
+    ];
+
+    if (!opportunities.isEmpty() && opportunities[0].Pricebook2Id != null) {
+      selectedSourceId = opportunities[0].Pricebook2Id;
+      System.debug('PriceBookActualizationController.applyOpportunityDefaults; preselected source pricebook from Opportunity ' + opportunities[0].Name);
+    }
+  }
+
+  /**
+   * Read the current record id from the page context.
+   *
+   * Supports both standard record page parameters: id and recordId.
+   */
+  private String getCurrentRecordId() {
+    PageReference currentPage = ApexPages.currentPage();
+    if (currentPage == null) {
+      return null;
+    }
+
+    Map<String, String> params = currentPage.getParameters();
+    if (params.containsKey('recordId') && !String.isBlank(params.get('recordId'))) {
+      return params.get('recordId');
+    }
+
+    if (params.containsKey('id') && !String.isBlank(params.get('id'))) {
+      return params.get('id');
+    }
+
+    return null;
   }
 
   /**
