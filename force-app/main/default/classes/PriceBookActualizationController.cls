@@ -25,6 +25,8 @@ public with sharing class PriceBookActualizationController {
     applyOpportunityDefaults();
     showResults = false;
     resultErrors = new List<String>();
+
+    percentageAdjustment = 0;
   }
 
   /**
@@ -138,7 +140,7 @@ public with sharing class PriceBookActualizationController {
     // Clear form on success
     if (resultSuccess) {
       selectedSourceId = null;
-      percentageAdjustment = null;
+      percentageAdjustment = 0;
       newPricebookName = null;
       previewEntryCount = null;
       loadPricebooks();
@@ -151,7 +153,7 @@ public with sharing class PriceBookActualizationController {
   public void cancel() {
     System.debug('PriceBookActualizationController.cancel called');
     selectedSourceId = null;
-    percentageAdjustment = null;
+    percentageAdjustment = 0;
     newPricebookName = null;
     previewEntryCount = null;
     showResults = false;
