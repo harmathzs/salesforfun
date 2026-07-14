@@ -38,6 +38,20 @@ SalesforFun - my Salesforce Developer Edition org
 - **Quality**: 100% test coverage, enhanced debug logging, production-ready
 - **Use Case**: Internal sales operations tool, separate from customer-facing webshop flow
 
+✅ **Lead-to-Opportunity Product Mapper LWC Complete**
+- **Component**: `leadToOpportunityProductMapper` Lightning Web Component
+- **Apex Controller**: `LeadToOpportunityProductMapperController.cls` with upsert/delete operations
+- **Features**: Manual opportunity line item selection based on lead's product interest with product descriptions
+- **Two-Panel Layout**: Available Products (left) vs Selected Products (right) for intuitive workflow
+- **Currency Formatting**: Proper 2-decimal precision using `Intl.NumberFormat`, all computed in JS
+- **Duplicate Prevention**: Prevents re-selection of existing products via JS logic with "Existing" badge visual indicator
+- **Quantity Management**: Real-time total calculation, minimum quantity validation (default: 1), updates total dynamically
+- **Delete Functionality**: Full delete support—new products removed completely, existing products marked for deletion with strikethrough styling
+- **Batch Operations**: "Remove All" button to quickly clear all selections while preserving existing items for review
+- **Event Handling**: Defensive checks and onchange handlers for robust product selection and quantity management
+- **UX Improvements**: Visual feedback with strikethrough and faded background for deleted products, loading spinners, error messages, success toasts
+- **Test Coverage**: 89% - Comprehensive unit tests covering all CRUD operations, validation scenarios, edge cases, and error handling
+
 ## Next Steps
 
 Following the development plan to implement end-to-end sales process automation from Lead to Renewal.
@@ -59,7 +73,7 @@ Following the development plan to implement end-to-end sales process automation 
 - Eliminates manual contact role assignment
 - Improves data consistency and reporting accuracy
 
-- Develop Product-interest to OpportunityLineItem mapping
+- ~~Develop Product-interest to OpportunityLineItem mapping~~ ✅ Done
 - Create Quote-to-Order automation with validation
 - Enhance test coverage to 95%+ for all components
 
