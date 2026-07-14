@@ -91,10 +91,11 @@ Implement an end-to-end Salesforce sales process from Lead to Renewal with clear
 
 ### Phase 2: Commercial Core (High Priority)
 
-4. Price Book new-year actualization
-   - Clone previous year entries
-   - Apply percentage uplift
-   - Support exclusions and rounding policy
+4. ✅ **COMPLETED: Price Book new-year actualization**
+   - Visualforce admin page for cloning an existing pricebook
+   - Applies percentage uplift or reduction with rounding policy
+   - Lightning-styled UI with pricebook selection, percentage input, and new name
+   - Supports Opportunity record page context defaulting via `recordId` / `id`
 5. Quote-to-Order automation
    - Header validation (Account, dates, status, approved quote)
    - Quote Line Items to Order Products copy
@@ -263,6 +264,36 @@ public static void setPricebook(List<Opportunity> newOpportunities) {
 - Opportunity Trigger: Calls this method during opportunity creation/updates
 - Pricebook2 object: Queries for current year pricebook
 - Test context: Uses standard pricebook for testing
+
+## 7) PriceBook Actualization Visualforce Tool
+
+### Implementation Details
+
+**Page:** `PriceBookActualization.page`
+
+**Controller:** `PriceBookActualizationController.cls`
+
+**Key Features:**
+- Select an existing pricebook from a Lightning-styled dropdown
+- Enter a percentage adjustment (positive, negative, or zero)
+- Provide a new pricebook name
+- Clone all PricebookEntry records into a new Pricebook2 record
+- Apply `setScale(2, RoundingMode.HALF_UP)` to adjusted prices
+- Preselect the source pricebook when the page is placed on an Opportunity record page and receives `recordId` or `id`
+
+**Business Logic:**
+1. Load pricebooks into `SelectOption` values for the dropdown
+2. Detect Opportunity record context from page parameters
+3. Default the source pricebook from the Opportunity's `Pricebook2Id`
+4. Validate source, percentage, and name before DML
+5. Create the new Pricebook2 and copy all entries with adjusted prices
+
+**Testing:**
+- Page initialization
+- Validation failures
+- Positive, negative, and zero percentage adjustments
+- Decimal rounding behavior
+- Opportunity record context defaulting
 
 ## 8) Opportunity Contact Role Auto-Fill Implementation
 
