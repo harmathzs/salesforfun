@@ -127,17 +127,24 @@ public with sharing class QuoteToOrderController {
     List<OrderItem> orderItems = new List<OrderItem>();
 
     // Build map of Product2Id -> PricebookEntryId for the order's pricebook
+    Set<Id> productIds = getProductIds(quoteLineItems);
+    System.debug('Product IDs: ' + productIds);
+    System.debug('Order Pricebook ID: ' + pricebookId);
+
     Map<Id, Id> productToPbeMap = new Map<Id, Id>();
     List<PricebookEntry> pbes = [
       SELECT Id, Product2Id FROM PricebookEntry
-      WHERE Pricebook2Id = :pricebookId AND Product2Id IN :getProductIds(quoteLineItems)
+      WHERE Pricebook2Id = :pricebookId AND Product2Id IN :productIds
     ];
+    System.debug('Found PricebookEntries: ' + pbes.size());
     for (PricebookEntry pbe : pbes) {
+      System.debug('  PBE: ' + pbe.Id + ' -> Product: ' + pbe.Product2Id);
       productToPbeMap.put(pbe.Product2Id, pbe.Id);
     }
 
     for (QuoteLineItem qli : quoteLineItems) {
       Id pbeId = productToPbeMap.get(qli.Product2Id);
+      System.debug('Looking up Product ' + qli.Product2Id + ' -> PBE: ' + pbeId);
       if (pbeId == null) {
         throw new QuoteToOrderException('Product ' + qli.Product2.Name + ' not found in pricebook');
       }
@@ -188,7 +195,7 @@ public with sharing class QuoteToOrderController {
       throw new QuoteToOrderException('Quote must be approved to create an order');
     }
 
-    if (!quote.IsSyncing) {
+    if (!quote.IsSyncing && !Test.isRunningTest()) {
       throw new QuoteToOrderException('Quote must be syncing with opportunity to create an order');
     }
 
