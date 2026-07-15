@@ -5,7 +5,15 @@ import getQuoteLineItems from '@salesforce/apex/QuoteToOrderController.getQuoteL
 import createOrderFromQuote from '@salesforce/apex/QuoteToOrderController.createOrderFromQuote';
 
 export default class QuoteToOrder extends LightningElement {
-  @api recordId;
+  _recordId;
+  @api get recordId() {
+    return this._recordId
+  }
+  set recordId(value) {
+    this._recordId = value
+
+    this.init().catch(console.warn)
+  }
 
   quote = null;
   lineItems = [];
@@ -15,9 +23,12 @@ export default class QuoteToOrder extends LightningElement {
   createdOrderId = null;
   isCreatingOrder = false;
 
+  /*
   connectedCallback() {
     this.init().catch(console.warn)
   }
+
+   */
 
   async init() {
     try {
