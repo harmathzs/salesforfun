@@ -98,6 +98,10 @@ export default class QuoteToOrder extends LightningElement {
     return this.quote && this.quote.IsApproved && this.quote.IsSyncing;
   }
 
+  get accountName() {
+    return this.quote && this.quote.Account ? this.quote.Account.Name : this.quote?.AccountId || 'N/A';
+  }
+
   get isCreateButtonDisabled() {
     return this.isLoading || this.isCreatingOrder || this.orderCreated || !this.isQuoteValid || this.lineItems.length === 0;
   }

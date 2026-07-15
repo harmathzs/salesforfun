@@ -43,10 +43,10 @@ public with sharing class QuoteToOrderController {
     } else if (sObjectName == 'Opportunity') {
       // Opportunity context: find synced quote
       List<Quote> quotes = [
-        SELECT Id, Name, AccountId, QuoteNumber, Status, IsSyncing,
+        SELECT Id, Name, AccountId, Account.Name, QuoteNumber, Status, IsSyncing,
                ExpirationDate, Subtotal, TotalPrice, Tax, GrandTotal, OpportunityId
         FROM Quote
-        WHERE OpportunityId = :recordId AND IsSyncing = TRUE AND Status IN ('Approved', 'Accepted')
+        WHERE OpportunityId = :recordId AND IsSyncing = TRUE
         LIMIT 1
       ];
       if (quotes.isEmpty()) {
