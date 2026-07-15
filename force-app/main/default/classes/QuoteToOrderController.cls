@@ -125,10 +125,26 @@ public with sharing class QuoteToOrderController {
 
     // Create order line items from quote line items
     List<OrderItem> orderItems = new List<OrderItem>();
+
+    // Build map of Product2Id -> PricebookEntryId for the order's pricebook
+    Map<Id, Id> productToPbeMap = new Map<Id, Id>();
+    List<PricebookEntry> pbes = [
+      SELECT Id, Product2Id FROM PricebookEntry
+      WHERE Pricebook2Id = :pricebookId AND Product2Id IN :getProductIds(quoteLineItems)
+    ];
+    for (PricebookEntry pbe : pbes) {
+      productToPbeMap.put(pbe.Product2Id, pbe.Id);
+    }
+
     for (QuoteLineItem qli : quoteLineItems) {
+      Id pbeId = productToPbeMap.get(qli.Product2Id);
+      if (pbeId == null) {
+        throw new QuoteToOrderException('Product ' + qli.Product2.Name + ' not found in pricebook');
+      }
+
       OrderItem oi = new OrderItem(
         OrderId = order.Id,
-        Product2Id = qli.Product2Id,
+        PricebookEntryId = pbeId,
         Quantity = qli.Quantity,
         UnitPrice = qli.UnitPrice
       );
@@ -141,6 +157,14 @@ public with sharing class QuoteToOrderController {
     }
 
     return order;
+  }
+
+  private static Set<Id> getProductIds(List<QuoteLineItem> quoteLineItems) {
+    Set<Id> productIds = new Set<Id>();
+    for (QuoteLineItem qli : quoteLineItems) {
+      productIds.add(qli.Product2Id);
+    }
+    return productIds;
   }
 
   private static Quote queryQuoteById(Id quoteId) {
