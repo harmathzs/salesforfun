@@ -391,16 +391,15 @@ public static void setPricebook(List<Opportunity> newOpportunities) {
    - Sets converted lead's contact as primary contact role
    - Ensures proper opportunity-contact relationship
 
-2. Actualize new-year Price Book by percentage of previous year
-3. Quote-to-Order
+2. Quote-to-Order
    - Auto-copy Quote Line Items to Order Products
-4. Opportunity-to-Contract
+3. Opportunity-to-Contract
    - Closed Won Opportunity creates Contract with custom PDF
-5. Quote PDF custom Visualforce
-6. Invoice-Payment-Shipment ERP integration
-7. Order-to-Assets
+4. Quote PDF custom Visualforce
+5. Invoice-Payment-Shipment ERP integration
+6. Order-to-Assets
    - Ordered products become Assets
-8. Renewal, Amendment, Termination options
+7. Renewal, Amendment, Termination options
 
 ### Agentforce AI Backlog (Zero-Cost Implementation)
 
