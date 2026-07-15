@@ -37,6 +37,7 @@ export default class QuoteToOrder extends LightningElement {
 
       // Load quote from context (Quote or Opportunity)
       this.quote = await getQuoteFromContext({ recordId: this.recordId });
+      this.quote.IsApproved = this.quote.Status === "Approved" || this.quote.Status === "Accepted"
       console.log('Quote loaded:', this.quote);
 
       // Load quote line items for display
