@@ -7,7 +7,7 @@ public class QuoteToOrderControllerTest {
 
   @TestSetup
   static void setup() {
-    standardPb = [SELECT Id FROM Pricebook2 WHERE IsStandard = TRUE LIMIT 1];
+    standardPb = new Pricebook2(Id = Test.getStandardPricebookId());
 
     testAccount = new Account(Name = 'Test Account');
     insert testAccount;
@@ -17,14 +17,14 @@ public class QuoteToOrderControllerTest {
       AccountId = testAccount.Id,
       CloseDate = Date.today().addDays(30),
       StageName = 'Proposal',
-      Pricebook2Id = standardPb.Id
+      Pricebook2Id = Test.getStandardPricebookId()
     );
     insert testOpp;
 
     testQuote = new Quote(
       Name = 'Test Quote',
       OpportunityId = testOpp.Id,
-      Pricebook2Id = standardPb.Id,
+      Pricebook2Id = Test.getStandardPricebookId(),
       ExpirationDate = Date.today().addDays(30)
     );
     insert testQuote;
@@ -33,7 +33,7 @@ public class QuoteToOrderControllerTest {
     insert product;
 
     PricebookEntry pbe = new PricebookEntry(
-      Pricebook2Id = standardPb.Id,
+      Pricebook2Id = Test.getStandardPricebookId(),
       Product2Id = product.Id,
       UnitPrice = 100,
       IsActive = true
@@ -240,7 +240,7 @@ public class QuoteToOrderControllerTest {
     Quote emptyQuote = new Quote(
       Name = 'Empty Quote',
       OpportunityId = testOpp.Id,
-      Pricebook2Id = standardPb.Id,
+      Pricebook2Id = Test.getStandardPricebookId(),
       ExpirationDate = Date.today().addDays(30),
       Status = 'Approved'
     );
@@ -256,13 +256,11 @@ public class QuoteToOrderControllerTest {
 
   @IsTest
   static void testCreateOrderFromQuoteMultipleLineItems() {
-    Pricebook2 pb = [SELECT Id FROM Pricebook2 WHERE IsStandard = TRUE LIMIT 1];
-
     Product2 product2 = new Product2(Name = 'Test Product 2', IsActive = true);
     insert product2;
 
     PricebookEntry pbe2 = new PricebookEntry(
-      Pricebook2Id = pb.Id,
+      Pricebook2Id = Test.getStandardPricebookId(),
       Product2Id = product2.Id,
       UnitPrice = 200,
       IsActive = true
