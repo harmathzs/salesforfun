@@ -131,6 +131,8 @@
     </types>
     <types>
         <members>MassConvertLeads</members>
+        <members>Quote.quoteToOrder</members>
+        <members>Opportunity.opportunityToOrder</members>
         <name>QuickAction</name>
     </types>
     <types>
