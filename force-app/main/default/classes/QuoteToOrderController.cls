@@ -145,7 +145,7 @@ public with sharing class QuoteToOrderController {
 
   private static Quote queryQuoteById(Id quoteId) {
     List<Quote> quotes = [
-      SELECT Id, Name, AccountId, QuoteNumber, Status, IsSyncing,
+      SELECT Id, Name, AccountId, Account.Name, QuoteNumber, Status, IsSyncing,
              ExpirationDate, Subtotal, TotalPrice, Tax, GrandTotal, OpportunityId
       FROM Quote
       WHERE Id = :quoteId
