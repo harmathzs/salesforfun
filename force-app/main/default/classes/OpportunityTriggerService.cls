@@ -113,7 +113,10 @@ public with sharing class OpportunityTriggerService {
       if (!oldOpportunity.IsWon && newOpportunity.IsWon) {
         Contract contract = new Contract(
           AccountId = newOpportunity.AccountId,
-          Pricebook2Id = newOpportunity.Pricebook2Id
+          Pricebook2Id = newOpportunity.Pricebook2Id,
+          Status = 'Draft',
+          StartDate = Date.today(),
+          ContractTerm = 24
         );
         contractsToInsert.add(contract);
       }
