@@ -90,4 +90,43 @@ private class OpportunityTriggerTest {
     delete oppys;
     undelete oppys;
   }
+
+  /**
+   * testContractWithOppLIs
+   * Creates OpportunityLineItems via TestFactory and transitions the Opportunity to Closed Won.
+   * Asserts that Contract and Contract Line Items (Contract_Line_Item__c) are created and linked.
+   */
+  @IsTest
+  static void testContractWithOppLIs() {
+    Map<String, Object> accContOppysMap = TestFactory.createCompleteTestSetup(1, 1, 1);
+    Opportunity opp = ((List<Opportunity>) accContOppysMap.get('opportunities'))[0];
+
+    // Ensure Opportunity has Pricebook2Id set
+    opp.Pricebook2Id = Test.getStandardPricebookId();
+    update opp;
+
+    // Create OpportunityLineItems
+    OpportunityLineItem[] olis = TestFactory.createTestOpportunityProducts(opp.Id, 2, 100.00);
+    insert olis;
+    System.assertEquals(2, olis.size(), 'Two OpportunityLineItems should be created');
+
+    // Transition to Closed Won
+    opp.StageName = 'Closed Won';
+    Test.startTest();
+    update opp;
+    Test.stopTest();
+
+    // Assert Contract created
+    Contract[] contracts = [SELECT Id, Opportunity__c FROM Contract WHERE Opportunity__c = :opp.Id];
+    System.assertEquals(1, contracts.size(), 'Expected one Contract created for the Opportunity');
+    Id contractId = contracts[0].Id;
+
+    // Assert Contract Line Items created and linked to contract
+    List<Contract_Line_Item__c> clis = [SELECT Id, Contract__c, Opportunity__c FROM Contract_Line_Item__c WHERE Contract__c = :contractId];
+    System.assertEquals(2, clis.size(), 'Expected two Contract Line Items created for the contract');
+
+    for (Contract_Line_Item__c cli : clis) {
+      System.assertEquals(opp.Id, cli.Opportunity__c, 'Contract Line Item should reference source Opportunity');
+    }
+  }
 }
