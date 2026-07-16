@@ -114,6 +114,7 @@ public with sharing class OpportunityTriggerService {
         Contract contract = new Contract(
           AccountId = newOpportunity.AccountId,
           Pricebook2Id = newOpportunity.Pricebook2Id,
+          Opportunity__c = opportunityId,
           Status = 'Draft',
           StartDate = Date.today(),
           ContractTerm = 24
