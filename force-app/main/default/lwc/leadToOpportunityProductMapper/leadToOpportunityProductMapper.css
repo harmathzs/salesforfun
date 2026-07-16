@@ -1,0 +1,163 @@
+/* Lead to Opportunity Product Mapper CSS */
+.slds-p-around_medium {
+    padding: 1rem;
+}
+
+/* Layout and Container Styles */
+.product-selection-container {
+    min-height: 400px;
+}
+
+.available-products-panel, .selected-products-panel {
+    border: 1px solid #dddbda;
+    border-radius: 0.25rem;
+    background-color: #f3f2f2;
+    padding: 1rem;
+}
+
+.panel-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #16325c;
+}
+
+.panel-header h3 {
+    color: #16325c;
+    margin-bottom: 0.25rem;
+}
+
+/* Product List Styles */
+.product-list {
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.product-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.product-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.product-list::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.product-item {
+    border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.product-item.deleted {
+    opacity: 0.6;
+    background-color: #fff0f0;
+}
+
+.product-item.deleted .product-name {
+    text-decoration: line-through;
+    color: #999;
+}
+
+.product-item:last-child {
+    border-bottom: none;
+}
+
+.product-item.selected {
+    background-color: white;
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+    margin-bottom: 0.5rem;
+}
+
+/* Product Information Styles */
+.product-price {
+    font-weight: bold;
+    color: #2a5885;
+}
+
+.product-description {
+    font-size: 0.75rem;
+    color: #6b6b6b;
+    font-style: italic;
+}
+
+.product-interest-text {
+    font-style: italic;
+    color: #2a5885;
+    background-color: #e6f3ff;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    border-left: 3px solid #2a5885;
+}
+
+.product-interest-text.no-interest {
+    color: #6b6b6b;
+    background-color: #f3f2f2;
+    border-left: 3px solid #6b6b6b;
+    opacity: 0.8;
+}
+
+.existing-icon {
+    color: #236d2d;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+}
+
+/* Quantity Input Styles */
+.quantity-input {
+    width: 60px;
+}
+
+/* Total Section Styles */
+.total-section {
+    font-size: 1.1rem;
+    color: #16325c;
+    padding: 0.5rem;
+    background-color: white;
+    border-radius: 0.25rem;
+}
+
+/* Action Buttons */
+.action-buttons {
+    border-top: 1px solid #dddbda;
+    padding-top: 1rem;
+}
+
+/* Error and Success Messages */
+.error-message {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Empty State */
+.empty-state {
+    color: #6b6b6b;
+}
+
+.empty-state lightning-icon {
+    color: #d8d8d8;
+    margin-bottom: 0.5rem;
+}
+
+/* Loading State */
+.slds-spinner_container {
+    margin: 1rem auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .slds-size_1-of-2 {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .slds-p-right_small {
+        padding-right: 0;
+    }
+}

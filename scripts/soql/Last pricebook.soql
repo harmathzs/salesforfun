@@ -1,0 +1,15 @@
+/* Last pricebook */
+SELECT CreatedDate
+    ,Name
+    ,(SELECT Id
+        ,UnitPrice
+        ,Product2Id
+        ,ProductCode
+        ,Product2.Name
+        ,Product2.StockKeepingUnit
+        ,Product2.Family
+        ,Product2.Description
+    FROM PricebookEntries LIMIT 500)
+FROM Pricebook2
+WHERE Name='Standard Price Book'
+LIMIT 1

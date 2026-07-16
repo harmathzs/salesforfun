@@ -1,0 +1,18 @@
+/* Commerce Products */
+SELECT Id
+        ,Name
+        ,(SELECT Id
+            ,Name
+            ,Catalog.Name
+            ,IsPrimaryCategory
+            ,ProductCategory.Name
+        FROM ProductCategoryProducts
+        LIMIT 3
+        )
+    ,StockKeepingUnit
+    ,(SELECT Id, CreatedDate
+        ,UnitPrice
+    FROM PricebookEntries
+    ORDER BY CreatedDate DESC
+    LIMIT 3)
+FROM Product2 LIMIT 500

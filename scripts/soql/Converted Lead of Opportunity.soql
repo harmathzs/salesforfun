@@ -1,0 +1,9 @@
+/* Converted Lead of Opportunity */
+SELECT Id
+    ,Converted_Lead__c
+    ,Converted_Lead__r.Name
+    ,Pricebook2Id
+    ,(SELECT Id FROM Pricebook2.PricebookEntries)
+FROM Opportunity
+WHERE Converted_Lead__c != NULL
+LIMIT 200

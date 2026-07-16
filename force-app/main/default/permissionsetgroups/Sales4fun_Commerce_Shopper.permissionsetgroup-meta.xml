@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Sales4fun_Commerce_Shopper</label>
+    <permissionSets>force__AuthenticatedPayer</permissionSets>
+    <permissionSets>force__CommerceUser</permissionSets>
+    <permissionSets>force__Commerce_Shopper</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>
