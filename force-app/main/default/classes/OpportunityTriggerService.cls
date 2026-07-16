@@ -100,4 +100,30 @@ public with sharing class OpportunityTriggerService {
       }
     }
   }
+
+  public static Contract[] createContracts(Map<Id, SObject> oldOpportunitiesMap, Map<Id, SObject> newOpportunitiesMap) {
+    if (newOpportunitiesMap==null) return null;
+    if (newOpportunitiesMap.isEmpty()) return null;
+
+    Contract[] contractsToInsert = new List<Contract>();
+
+    for (Id opportunityId: newOpportunitiesMap.keySet()) {
+      Opportunity oldOpportunity = (Opportunity) oldOpportunitiesMap.get(opportunityId);
+      Opportunity newOpportunity = (Opportunity) newOpportunitiesMap.get(opportunityId);
+      if (!oldOpportunity.IsWon && newOpportunity.IsWon) {
+        Contract contract = new Contract(
+          AccountId = newOpportunity.AccountId,
+          Pricebook2Id = newOpportunity.Pricebook2Id
+        );
+        contractsToInsert.add(contract);
+      }
+    }
+
+    if (!contractsToInsert.isEmpty()) {
+      insert contractsToInsert;
+    }
+    // TODO: insert contract line items from opportunity products
+
+    return contractsToInsert;
+  }
 }

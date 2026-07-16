@@ -59,7 +59,9 @@ global with sharing class OpportunityTriggerAction extends mtf.TriggerAction {
    *
    * @description Placeholder for after update logic. Currently empty but available for future enhancements.
    */
-  public override void afterUpdate(Map<Id, SObject> oldRecordsMap, Map<Id, SObject> newRecordsMap) { }
+  public override void afterUpdate(Map<Id, SObject> oldRecordsMap, Map<Id, SObject> newRecordsMap) {
+    Contract[] contracts = OpportunityTriggerService.createContracts(oldRecordsMap, newRecordsMap);
+  }
 
   /**
    * Handles after delete trigger events for Opportunity records.
