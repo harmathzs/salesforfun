@@ -145,3 +145,11 @@ Quote-to-Order functionality
 - Controller features: header validation (status, syncing, expiration), QuoteLineItem -> OrderItem copy, pricebook resolution, and idempotent duplicate prevention checks.
 - Included Apex tests cover success and failure scenarios (no line items, expired, not approved, duplicate requests). LWC displays quote summary, validation badges, line items, creation flow with spinner/toasts, and success state.
 - Notes: current idempotency uses OrderNumber lookup; recommend using Order.QuoteId or a custom Quote__c field for robust duplicate detection.
+
+Opportunity-to-Contract (Implemented)
+- Triggered on Opportunity stage transition to Closed Won via OpportunityTriggerAction.afterUpdate → OpportunityTriggerService.createContracts.
+- Creates Contract records linked to the Opportunity (Contract.Opportunity__c) and populates Contract fields (AccountId, StartDate, ContractTerm, Status).
+- Copies OpportunityLineItem records into Contract Line Items (Contract_Line_Item__c) including Product lookup, Quantity, UnitPrice, Subtotal and SourceOpportunity__c for traceability.
+- Bulk-safe and idempotent: checks existing Contract.Opportunity__c before creating to avoid duplicates.
+- Tests: OpportunityTriggerTest includes tests for single creation, bulk creation, and idempotency. TestFactory helper creates OpportunityLineItems for test scenarios.
+- Next: PDF generation (Visualforce) and storage as ContentVersion for archiving and retrieval.

@@ -397,12 +397,19 @@ public static void setPricebook(List<Opportunity> newOpportunities) {
 
 2. Quote-to-Order
    - Auto-copy Quote Line Items to Order Products
-3. Opportunity-to-Contract
-   - Closed Won Opportunity creates Contract with custom PDF
+
+3. Opportunity-to-Contract (Implemented)
+  - Closed Won Opportunity creates Contract records linked via Contract.Opportunity__c
+  - Creates Contract Line Items (Contract_Line_Item__c) from OpportunityLineItem with product, quantity, unit price, subtotal, and SourceOpportunity__c
+  - Bulk-safe implementation via OpportunityTriggerAction.afterUpdate calling OpportunityTriggerService.createContracts
+  - Idempotency: existing Contracts are checked by Opportunity__c to avoid duplicates
+  - Tests: OpportunityTriggerTest covers single, bulk, and idempotency scenarios. TestFactory includes createTestOpportunityProducts to provision OpportunityLineItems for tests.
+  - Next: Contract PDF generation, storage, and REST endpoints for generation/retrieval
+
 4. Quote PDF custom Visualforce
 5. Invoice-Payment-Shipment ERP integration
 6. Order-to-Assets
-   - Ordered products become Assets
+  - Ordered products become Assets
 7. Renewal, Amendment, Termination options
 
 ### Agentforce AI Backlog (Zero-Cost Implementation)
