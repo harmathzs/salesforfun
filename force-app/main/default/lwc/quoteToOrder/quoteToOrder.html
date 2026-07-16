@@ -1,0 +1,191 @@
+<!-- Quote to Order -->
+<template>
+  <lightning-card title="Quote to Order" icon-name="standard:quote">
+    <!-- Loading Spinner -->
+    <template if:true={loadingSpinnerVisible}>
+      <div class="slds-p-around_medium slds-align_absolute-center">
+        <lightning-spinner variant="brand" alternative-text="Loading"></lightning-spinner>
+      </div>
+    </template>
+
+    <!-- Error Message -->
+    <template if:true={error}>
+      <div class="slds-p-around_medium">
+        <div class="slds-alert slds-alert_error" role="alert">
+          <div class="slds-alert__heading">
+            <h2 class="slds-text-heading_small">Error</h2>
+          </div>
+          <p>{error}</p>
+        </div>
+      </div>
+    </template>
+
+    <!-- Quote Summary Section -->
+    <template if:false={loadingSpinnerVisible}>
+      <template if:false={error}>
+        <template if:false={orderCreated}>
+          <div class="slds-p-around_medium">
+            <!-- Quote Details -->
+            <template if:true={quote}>
+              <div class="slds-grid slds-wrap slds-gutters_medium">
+                <div class="slds-col slds-size_1-of-2">
+                  <lightning-layout-item>
+                    <dl class="slds-dl_horizontal">
+                      <dt class="slds-dl_horizontal__label">
+                        <span class="slds-truncate" title="Quote">Quote</span>
+                      </dt>
+                      <dd class="slds-dl_horizontal__detail">
+                        <span class="slds-truncate" title={quote.QuoteNumber}>{quote.QuoteNumber}</span>
+                      </dd>
+                      <dt class="slds-dl_horizontal__label">
+                        <span class="slds-truncate" title="Name">Name</span>
+                      </dt>
+                      <dd class="slds-dl_horizontal__detail">
+                        <span class="slds-truncate" title={quote.Name}>{quote.Name}</span>
+                      </dd>
+                      <dt class="slds-dl_horizontal__label">
+                        <span class="slds-truncate" title="Account">Account</span>
+                      </dt>
+                      <dd class="slds-dl_horizontal__detail">
+                        <span class="slds-truncate" title={accountName}>{accountName}</span>
+                      </dd>
+                    </dl>
+                  </lightning-layout-item>
+                </div>
+                <div class="slds-col slds-size_1-of-2">
+                  <lightning-layout-item>
+                    <dl class="slds-dl_horizontal">
+                      <dt class="slds-dl_horizontal__label">
+                        <span class="slds-truncate" title="Status">Status</span>
+                      </dt>
+                      <dd class="slds-dl_horizontal__detail">
+                        <lightning-badge label={quote.Status}></lightning-badge>
+                      </dd>
+                      <dt class="slds-dl_horizontal__label">
+                        <span class="slds-truncate" title="Total">Total</span>
+                      </dt>
+                      <dd class="slds-dl_horizontal__detail">
+                        <span class="slds-truncate" title={quote.GrandTotal}>${quote.GrandTotal}</span>
+                      </dd>
+                      <dt class="slds-dl_horizontal__label">
+                        <span class="slds-truncate" title="Expiration">Expiration</span>
+                      </dt>
+                      <dd class="slds-dl_horizontal__detail">
+                        <span class="slds-truncate" title={quote.ExpirationDate}>{quote.ExpirationDate}</span>
+                      </dd>
+                    </dl>
+                  </lightning-layout-item>
+                </div>
+              </div>
+
+              <!-- Quote Status Badges -->
+              <div class="slds-p-top_medium slds-border_top">
+                <p class="slds-p-bottom_small">
+                  <strong>Validation:</strong>
+                </p>
+                <div class="slds-grid slds-wrap slds-gutters_small">
+                  <div class="slds-col">
+                    <template if:true={quote.IsApproved}>
+                      <lightning-badge label="Approved" icon-name="utility:check" class="slds-m-right_small"></lightning-badge>
+                    </template>
+                    <template if:false={quote.IsApproved}>
+                      <lightning-badge label="Not Approved" icon-name="utility-close" class="slds-m-right_small"></lightning-badge>
+                    </template>
+                  </div>
+                  <div class="slds-col">
+                    <template if:true={quote.IsSyncing}>
+                      <lightning-badge label="Syncing" icon-name="utility:check"></lightning-badge>
+                    </template>
+                    <template if:false={quote.IsSyncing}>
+                      <lightning-badge label="Not Syncing" icon-name="utility:close"></lightning-badge>
+                    </template>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Line Items Table -->
+              <div class="slds-p-top_medium slds-border_top">
+                <p class="slds-p-bottom_small">
+                  <strong>Line Items ({lineItems.length})</strong>
+                </p>
+                <template if:true={lineItems.length}>
+                  <table class="slds-table slds-table_striped">
+                    <thead>
+                      <tr class="slds-line-height_reset">
+                        <th scope="col">Product</th>
+                        <th scope="col" style="text-align: right;">Quantity</th>
+                        <th scope="col" style="text-align: right;">Unit Price</th>
+                        <th scope="col" style="text-align: right;">Subtotal</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <template for:each={lineItems} for:item="item">
+                        <tr key={item.Id}>
+                          <td>{item.Product2.Name}</td>
+                          <td style="text-align: right;">{item.Quantity}</td>
+                          <td style="text-align: right;">${item.UnitPrice}</td>
+                          <td style="text-align: right;">${item.Subtotal}</td>
+                        </tr>
+                      </template>
+                    </tbody>
+                  </table>
+                </template>
+                <template if:false={lineItems.length}>
+                  <p class="slds-text-align_center slds-p-vertical_medium slds-text-color_weak">
+                    No line items
+                  </p>
+                </template>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="slds-p-top_medium">
+                <button
+                  class="slds-button slds-button_brand"
+                  onclick={handleCreateOrder}
+                  disabled={isCreateButtonDisabled}
+                  aria-label="Create Order"
+                >
+                  <template if:false={isCreatingOrder}>
+                    Create Order
+                  </template>
+                  <template if:true={isCreatingOrder}>
+                    <lightning-spinner
+                      alternative-text="Creating"
+                      variant="brand"
+                      size="small"
+                      class="slds-m-right_small"
+                    ></lightning-spinner>
+                    Creating...
+                  </template>
+                </button>
+              </div>
+            </template>
+          </div>
+        </template>
+
+        <!-- Order Created Success State -->
+        <template if:true={orderCreated}>
+          <div class="slds-p-around_medium">
+            <div class="slds-alert slds-alert_success" role="status">
+              <div class="slds-alert__heading">
+                <h2 class="slds-text-heading_small">Order Created Successfully</h2>
+              </div>
+              <p>
+                Order <strong>{createdOrderId}</strong> has been created from quote {quote.QuoteNumber}.
+              </p>
+            </div>
+            <div class="slds-p-top_medium">
+              <button
+                class="slds-button slds-button_brand"
+                onclick={handleReset}
+                aria-label="View Another Quote"
+              >
+                Load Another Quote
+              </button>
+            </div>
+          </div>
+        </template>
+      </template>
+    </template>
+  </lightning-card>
+</template>

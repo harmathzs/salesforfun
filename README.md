@@ -139,3 +139,9 @@ public static void setPricebook(List<Opportunity> newOpportunities) {
 - Ensure zero-cost implementation for all users
 - Follow Salesforce security best practices
 - Maintain API documentation and endpoint references
+
+Quote-to-Order functionality
+- Provides a Lightning Web Component (quoteToOrder) that calls the Apex QuoteToOrderController to convert an approved, syncing Quote into an Order with OrderItems.
+- Controller features: header validation (status, syncing, expiration), QuoteLineItem -> OrderItem copy, pricebook resolution, and idempotent duplicate prevention checks.
+- Included Apex tests cover success and failure scenarios (no line items, expired, not approved, duplicate requests). LWC displays quote summary, validation badges, line items, creation flow with spinner/toasts, and success state.
+- Notes: current idempotency uses OrderNumber lookup; recommend using Order.QuoteId or a custom Quote__c field for robust duplicate detection.

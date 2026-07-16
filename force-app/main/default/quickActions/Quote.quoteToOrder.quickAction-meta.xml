@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionSubtype>ScreenAction</actionSubtype>
+    <component>quoteToOrderQuickAction</component>
+    <description>Create an Order from an approved and synced Quote</description>
+    <invokeMethod>SCREEN_FLOW</invokeMethod>
+    <label>Create Order from Quote</label>
+    <lightningComponent>quoteToOrder</lightningComponent>
+    <targetObject>Quote</targetObject>
+    <type>LightningComponent</type>
+</QuickAction>
