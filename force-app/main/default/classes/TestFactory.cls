@@ -454,4 +454,45 @@ public with sharing class TestFactory {
 
     return testData;
   }
+
+  /**
+   * createTestOpportunityProducts
+   * Creates products, pricebook entries and OpportunityLineItem records for a given Opportunity.
+   *
+   * @param oppId Id of the Opportunity to attach line items to
+   * @param productCount Number of product lines to create
+   * @param baseUnitPrice Base unit price for the first product (subsequent products increment)
+   * @return List<OpportunityLineItem> Created OpportunityLineItem records
+   *
+   * @description Convenience method used by tests that need Opportunities pre-populated with
+   *              OpportunityLineItems. Ensures PricebookEntry records exist in the standard pricebook.
+   */
+  public static OpportunityLineItem[] createTestOpportunityProducts(Id oppId, Integer productCount, Decimal baseUnitPrice) {
+    if (oppId == null) return new OpportunityLineItem[0];
+    if (productCount == null || productCount <= 0) productCount = 1;
+    if (baseUnitPrice == null) baseUnitPrice = 100.00;
+
+    // Create products
+    Product2[] products = createTestProducts(productCount);
+
+    // Create pricebook entries in the standard pricebook
+    List<Id> productIds = new List<Id>();
+    for (Product2 p : products) productIds.add(p.Id);
+    PricebookEntry[] pbes = createTestPricebookEntries(productIds, baseUnitPrice);
+
+    // Create OpportunityLineItems
+    OpportunityLineItem[] olis = new List<OpportunityLineItem>();
+    for (Integer i = 0; i < products.size(); i++) {
+      OpportunityLineItem oli = new OpportunityLineItem(
+        OpportunityId = oppId,
+        PricebookEntryId = pbes[i].Id,
+        Quantity = 1 + i,
+        UnitPrice = pbes[i].UnitPrice
+      );
+      olis.add(oli);
+    }
+
+
+    return olis;
+  }
 }
