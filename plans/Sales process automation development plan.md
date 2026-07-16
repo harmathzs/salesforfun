@@ -100,6 +100,10 @@ Implement an end-to-end Salesforce sales process from Lead to Renewal with clear
    - Header validation (Account, dates, status, approved quote)
    - Quote Line Items to Order Products copy
    - Prevent duplicate order creation
+   - UI: Lightning Web Component (quoteToOrder) present. The LWC loads quote (by Quote or Opportunity context), shows approval/syncing badges, lists Quote Line Items, and provides a Create Order action with loading state and success toast.
+   - Apex: QuoteToOrderController implements AuraEnabled methods used by the LWC: getQuoteFromContext, getQuoteLineItems, createOrderFromQuote. It validates quote header (status Approved/Accepted, IsSyncing, ExpirationDate), resolves a pricebook (from Opportunity or standard), creates Order and OrderItem records, and performs an idempotency check to avoid duplicate orders.
+   - Tests: comprehensive Apex tests cover success paths and failure scenarios (no line items, expired, not approved, duplicate order). Note: tests currently skip some IsSyncing checks due to the system-controlled IsSyncing field; consider test utilities or DI for full coverage.
+   - Known gap: current idempotency checks use OrderNumber tied to QuoteId; recommended fix is to set Order.QuoteId (or a custom Quote__c) when creating orders and use that field for duplicate detection.
 
 ### Phase 3: Contracting and Documents (Medium Priority)
 
