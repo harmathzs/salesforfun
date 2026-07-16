@@ -1,0 +1,10 @@
+<apex:page id="ContractPDF" renderAs="pdf" standardController="Contract" extensions="ContractPDFcontroller">
+  <apex:pageBlock>
+    <apex:pageBlockSection>
+      <apex:outputText value="{!recordId}" />
+    </apex:pageBlockSection>
+    <apex:pageBlockSection>
+      <apex:outputText value="{!contract.ContractNumber}" />
+    </apex:pageBlockSection>
+  </apex:pageBlock>
+</apex:page>
