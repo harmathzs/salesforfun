@@ -4,4 +4,18 @@
   <description>Contract PDF Creator</description>
   <isExposed>true</isExposed>
   <masterLabel>Contract PDF Creator</masterLabel>
+
+  <targets>
+    <target>lightning__FlowScreen</target>
+    <target>lightning__AppPage</target>
+    <target>lightning__RecordPage</target>
+    <target>lightning__RecordAction</target>
+    <target>lightning__HomePage</target>
+  </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__RecordPage,lightning__FlowScreen">
+      <property name="recordId" type="String" label="Record ID" />
+    </targetConfig>
+
+  </targetConfigs>
 </LightningComponentBundle>
