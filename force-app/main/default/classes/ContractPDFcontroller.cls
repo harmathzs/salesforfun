@@ -31,7 +31,35 @@ public with sharing class ContractPDFcontroller {
 
     return [
       SELECT Id
-
+        ,ContractNumber
+        ,AccountId
+        ,Account.Name
+        ,CompanySignedId
+        ,CompanySigned.Name
+        ,CompanySignedDate
+        ,CustomerSignedId
+        ,CustomerSigned.Name
+        ,CustomerSignedDate
+        ,StartDate
+        ,EndDate
+        ,ContractTerm
+        ,Description
+        ,Opportunity__c
+        ,Opportunity__r.Name
+        ,Pricebook2Id
+        ,SpecialTerms
+        ,Status
+        ,Total_Price__c
+        ,(SELECT Id
+          ,Name
+          ,Description__c
+          ,Opportunity__c
+          ,Product__c
+          ,Product__r.Name
+          ,Quantity__c
+          ,Unit_Price__c
+          ,Subtotal_Price__c
+        FROM Contract_Line_Items__r)
       FROM Contract
       WHERE Id = :contractId
       LIMIT 1
