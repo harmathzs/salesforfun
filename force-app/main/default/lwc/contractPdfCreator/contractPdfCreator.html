@@ -1,8 +1,20 @@
 <!-- Contract PDF Creator -->
 <template>
-  <lightning-card>
+  <lightning-card title="Create Contract PDF">
     <section if:true={contract} class="slds-p-around_medium">
+      <!-- TODO show contract details -->
       <p>Contract ID: {contract.Id}</p>
+
+    </section>
+    <section if:true={contract} class="slds-p-around_medium">
+      <!-- TODO show PDF preview like in an inner iframe Visualforce PDF page, for example https://salesforfun-dev-ed--c.develop.vf.force.com/apex/ContractPDF?id=800dM00003aftAQQAY -->
+    </section>
+    <section if:true={contract} class="slds-p-around_medium">
+      <!-- TODO buttons -->
+      <lightning-button-icon icon-name="action:download" value="Download PDF">Download PDF</lightning-button-icon>
+      <lightning-button-icon icon-name="utility:save" value="Save PDF"></lightning-button-icon>
+      <lightning-button-icon icon-name="action:email" value="Email PDF"></lightning-button-icon>
+      <lightning-button-icon icon-name="standard:first_non_empty" value="Cancel"></lightning-button-icon>
     </section>
   </lightning-card>
 </template>
