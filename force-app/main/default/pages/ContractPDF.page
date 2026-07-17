@@ -104,7 +104,7 @@
   </div>
 
   <div class="page-break">
-    <h1>Contract</h1>
+    <h1>Contract nr. {!contract.ContractNumber}</h1>
     <h2>Products</h2>
     <table border="1" cellpadding="4" cellspacing="0">
       <thead>
