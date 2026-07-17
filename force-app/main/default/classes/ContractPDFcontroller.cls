@@ -20,11 +20,15 @@ public with sharing class ContractPDFcontroller {
   }
 
   public ContractPDFcontroller() {
-    recordId = ApexPages.currentPage().getParameters().get('id');
-    contract = queryContract(recordId);
+    if (ApexPages.currentPage().getParameters().containsKey('id')) {
+      recordId = ApexPages.currentPage().getParameters().get('id');
+      contract = queryContract(recordId);
+    }
   }
 
   public static Contract queryContract(Id contractId) {
+    if (String.isBlank(contractId)) return null;
+
     return [
       SELECT Id
 
