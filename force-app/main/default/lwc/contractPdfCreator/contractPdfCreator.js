@@ -24,7 +24,7 @@ export default class ContractPdfCreator extends LightningElement {
 
   async loadData() {
     this.contract = await queryContract({contractId: this.contractId});
-    console.log('contract', this.contract);
+    console.log('contract', JSON.stringify(this.contract));
     try{
       this.vfUrl = await getVFUrl({contractId: this.contractId});
     } catch(e){ console.warn('getVFUrl failed', e); }
@@ -35,11 +35,12 @@ export default class ContractPdfCreator extends LightningElement {
     window.open(this.vfUrl + '&download=true','_blank');
   }
 
+  contentDocument;
   async handleSave() {
     try {
-      await savePdfToContract({contractId: this.contractId});
+      this.contentDocument = await savePdfToContract({contractId: this.contractId});
       // TODO: show toast on success
-      console.log('Saved PDF to Contract');
+      console.log('Saved PDF to Contract', this.contentDocument);
     } catch (e) { console.warn(e); }
   }
 

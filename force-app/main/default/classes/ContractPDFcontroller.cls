@@ -26,7 +26,7 @@ public with sharing class ContractPDFcontroller {
     }
   }
 
-  @AuraEnabled(cacheable=true)
+  @AuraEnabled(Cacheable=true)
   public static Contract queryContract(Id contractId) {
     if (String.isBlank(contractId)) return null;
 
@@ -70,13 +70,13 @@ public with sharing class ContractPDFcontroller {
   @AuraEnabled
   public static String getVFUrl(Id contractId){
     // build absolute Visualforce page URL
-    String url = URL.getOrgDomainUrl().toExternalForm() + '/apex/ContractPDF?id=' + String.valueOf(contractId);
+    String url = Url.getOrgDomainUrl().toExternalForm() + '/apex/ContractPDF?id=' + String.valueOf(contractId);
     return url;
   }
 
   @AuraEnabled
-  public static void savePdfToContract(Id contractId){
-    if (contractId==null) return;
+  public static String savePdfToContract(Id contractId){
+    if (contractId==null) return 'Contract ID is null!';
     // generate PDF content from VF page
     PageReference pr = Page.ContractPDF;
     pr.getParameters().put('id', String.valueOf(contractId));
@@ -93,6 +93,7 @@ public with sharing class ContractPDFcontroller {
     cv.PathOnClient = title;
     cv.VersionData = pdfBlob;
     insert cv;
+    System.debug('savePdfToContract cv: '+cv);
 
     // link the ContentDocument to the Contract
     ContentDocumentLink link = new ContentDocumentLink();
@@ -101,6 +102,14 @@ public with sharing class ContractPDFcontroller {
     link.ShareType = 'V';
     link.Visibility = 'AllUsers';
     insert link;
+    System.debug('savePdfToContract link: '+link);
+
+    if (String.isNotBlank(link.ContentDocumentId)) {
+      System.debug('savePdfToContract ContentDocumentId: '+link.ContentDocumentId);
+      return link.ContentDocumentId;
+    } else {
+      return 'Content Document ID is blank!';
+    }
   }
 
   @AuraEnabled

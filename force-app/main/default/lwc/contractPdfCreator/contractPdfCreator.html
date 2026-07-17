@@ -11,10 +11,10 @@
     </section>
 
     <section if:true={contract} class="slds-p-around_medium">
-      <lightning-button variant="brand" icon-name="action:download" icon-position="left" label="Download or Open PDF in new tab" onclick={handleDownload} class="slds-m-right_small"></lightning-button>
+      <lightning-button variant="brand-outline" icon-name="action:download" icon-position="left" label="Download or Open PDF in new tab" onclick={handleDownload} class="slds-m-right_small"></lightning-button>
       <lightning-button variant="brand" icon-name="utility:save" icon-position="left" label="Save to Contract" onclick={handleSave} class="slds-m-right_small"></lightning-button>
-      <lightning-button variant="brand" icon-name="action:email" icon-position="left" label="Email PDF" onclick={openEmailModal} class="slds-m-right_small"></lightning-button>
-      <lightning-button variant="destructive-text" icon-name="standard:first_non_empty" icon-position="left" label="Cancel" onclick={handleCancel}></lightning-button>
+      <lightning-button variant="brand-outline" icon-name="action:email" icon-position="left" label="Email PDF" onclick={openEmailModal} class="slds-m-right_small"></lightning-button>
+      <lightning-button variant="destructive-text" icon-name="standard:first_non_empty" icon-position="left" label="Close" onclick={handleCancel}></lightning-button>
     </section>
 
     <!-- Email modal -->
