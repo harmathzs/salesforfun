@@ -1,21 +1,21 @@
 <apex:page id="ContractSignature"
            showHeader="false" applyHtmlTag="false" applyBodyTag="false" standardStylesheets="false">
   <div style="width: 100%;">
-    <table style="display: inline-table;">
+    <table style="display: inline-table; font-family: Courier;">
       <tr>
         <td style="width: 10cm; height: 4cm; font-size: 10pt;">
           <p style="margin: 0.2cm 0;"><strong>Seller:</strong></p>
           <p style="margin: 0.2cm 0;">Company: Sales4fun</p>
-          <p style="margin: 0.2cm 0;">..........................................</p>
+          <p style="margin: 0.2cm 0;">.....................................</p>
           <p style="margin: 0.2cm 0;">Head of Sales Operations</p>
-          <p style="margin: 0.2cm 0;">Date: ....................................</p>
+          <p style="margin: 0.2cm 0;">Date: ...............................</p>
         </td>
         <td style="width: 10cm; height: 4cm; font-size: 10pt;">
           <p style="margin: 0.2cm 0;"><strong>Buyer:</strong></p>
-          <p style="margin: 0.2cm 0;">Company: .................................</p>
-          <p style="margin: 0.2cm 0;">..........................................</p>
-          <p style="margin: 0.2cm 0;">Title: ...................................</p>
-          <p style="margin: 0.2cm 0;">Date: ....................................</p>
+          <p style="margin: 0.2cm 0;">Company: ............................</p>
+          <p style="margin: 0.2cm 0;">.....................................</p>
+          <p style="margin: 0.2cm 0;">Title: ..............................</p>
+          <p style="margin: 0.2cm 0;">Date: ...............................</p>
         </td>
       </tr>
     </table>

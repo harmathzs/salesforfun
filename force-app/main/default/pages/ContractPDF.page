@@ -132,22 +132,8 @@
     <p class="serif-text">23. WAIVER. No delay or failure to exercise any right or remedy shall constitute a waiver thereof, and any waiver must be in writing and signed by the waiving Party.</p>
     <p class="serif-text">24. COUNTERPARTS; ELECTRONIC SIGNATURES. This Agreement may be executed in counterparts, each of which shall be deemed an original and all of which together shall constitute one instrument. Signatures transmitted electronically (including by PDF or e-signature platform) shall be binding.</p>
     <p class="serif-text">IN WITNESS WHEREOF, the Parties have executed this Agreement as of the dates set forth below.</p>
-    <p class="serif-text">SELLER:</p>
-    <p class="serif-text">Company: Sales4fun</p>
-    <p class="serif-text">By: _________________________________</p>
-    <p class="serif-text">Name: _______________________________</p>
-    <p class="serif-text">Title: ______________________________</p>
-    <p class="serif-text">Date: _______________________________</p>
-    <p class="serif-text">BUYER:</p>
-    <p class="serif-text">Company: ____________________________</p>
-    <p class="serif-text">By: _________________________________</p>
-    <p class="serif-text">Name: _______________________________</p>
-    <p class="serif-text">Title: ______________________________</p>
-    <p class="serif-text">Date: _______________________________</p>
-    <p class="serif-text">Address for Notices (Seller): [Seller Address]</p>
-    <p class="serif-text">Address for Notices (Buyer): ___________________________</p>
-    <p class="serif-text">Optional: Attach Exhibit A (Description of Goods and Pricing), Exhibit B (Delivery Schedule) and Exhibit C (Return Policy) as applicable and incorporated herein by reference.</p>
-    <!-- <apex:include pageName="OrderSignature" /> -->
+
+    <apex:include pageName="ContractSignature" />
   </div>
 
   <div class="last-page">
