@@ -86,6 +86,7 @@
   <div class="header">
     <table>
       <tr>
+        <!--
         <td>
           <div style=
                "height: 9mm; width: 20mm; background-color: black; color: white; font-style: italic; font-size: large; padding: 3mm; text-align: right; float: left;"
@@ -93,6 +94,10 @@
           <div style=
                "height: 9mm; width: 20mm; background-color: orange; color: black; font-style: italic; font-size: large; padding: 3mm; text-align: left; float: right;"
           >force</div>
+        </td>
+        -->
+        <td>
+          <img src="{!URLFOR($Resource.Sales4funBranding600logo)}" alt="Sales4fun" style="height: 18mm; width: 40mm;" />
         </td>
       </tr>
     </table>
