@@ -109,8 +109,8 @@
     <table border="1" cellpadding="4" cellspacing="0">
       <thead>
       <tr>
-        <th width="10%" class="formatted-text">#</th>
-        <th width="40%" class="formatted-text">Name</th>
+        <th width="5%" class="formatted-text">#</th>
+        <th width="45%" class="formatted-text">Name</th>
         <th class="formatted-text">Quantity</th>
         <th class="formatted-text">Unit Price</th>
         <th class="formatted-text">Subtotal</th>
@@ -122,14 +122,14 @@
           <td class="formatted-text"  align="right">1</td>
           <td class="unicode-text">{!crli.Product__r.Name}</td>
           <td class="formatted-text" align="right">{!crli.Quantity__c}</td>
-          <td class="formatted-text" align="right">{!crli.Unit_Price__c}</td>
-          <td class="formatted-text" align="right">{!crli.Subtotal_Price__c}</td>
+          <td class="formatted-text" align="right"><apex:outputField value="{!crli.Unit_Price__c}" /></td>
+          <td class="formatted-text" align="right"><apex:outputField value="{!crli.Subtotal_Price__c}" /></td>
         </tr>
       </apex:repeat>
 
       <tr>
         <td colspan="4" class="formatted-text"><strong>Total Price:</strong></td>
-        <td class="formatted-text" align="right">1$</td>
+        <td class="formatted-text" align="right"><apex:outputField value="{!contract.Total_Price__c}" /></td>
       </tr>
       </tbody>
     </table>
