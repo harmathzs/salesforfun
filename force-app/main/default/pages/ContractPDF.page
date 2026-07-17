@@ -120,7 +120,7 @@
       <apex:variable var="idx" value="{!1}" />
       <apex:repeat value="{!contract.Contract_Line_Items__r}" var="crli">
         <tr>
-          <td class="formatted-text"  align="right">{!idx}</td>
+          <td class="formatted-text" align="right">{!idx}</td>
           <td class="unicode-text">{!crli.Product__r.Name}</td>
           <td class="formatted-text" align="right">{!crli.Quantity__c}</td>
           <td class="formatted-text" align="right"><apex:outputField value="{!crli.Unit_Price__c}" /></td>
@@ -166,28 +166,29 @@
 
     <apex:include pageName="ContractSignature" />
   </div>
+  <!--
+<div class="last-page">
 
-  <div class="last-page">
-    <!--
-    <h2>Order data table</h2>
-    <table border="1" cellpadding="4" cellspacing="0">
-      <thead>
-      <tr>
-        <th width="30%" class="formatted-text">Unicode</th>
-        <th width="20%" class="formatted-text">Formatted</th>
-        <th class="formatted-text">Monospace</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-        <td class="unicode-text">Árvíztűrő tükörfúrógép</td>
-        <td class="formatted-text"><strong>one</strong> <i>two</i> <u>three</u><sup>2</sup></td>
-        <td class="monospaced-text">print Hello;</td>
-      </tr>
-      </tbody>
-    </table>
-    -->
+  <h2>Order data table</h2>
+  <table border="1" cellpadding="4" cellspacing="0">
+    <thead>
+    <tr>
+      <th width="30%" class="formatted-text">Unicode</th>
+      <th width="20%" class="formatted-text">Formatted</th>
+      <th class="formatted-text">Monospace</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td class="unicode-text">Árvíztűrő tükörfúrógép</td>
+      <td class="formatted-text"><strong>one</strong> <i>two</i> <u>three</u><sup>2</sup></td>
+      <td class="monospaced-text">print Hello;</td>
+    </tr>
+    </tbody>
+  </table>
+
   </div>
+-->
   </body>
   </html>
 </apex:page>
