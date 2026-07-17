@@ -105,6 +105,28 @@
 
   <div class="page-break">
     <h1>Contract</h1>
+    <h2>Products</h2>
+    <table border="1" cellpadding="4" cellspacing="0">
+      <thead>
+      <tr>
+        <th width="30%" class="formatted-text">#</th>
+        <th width="20%" class="formatted-text">Name</th>
+        <th class="formatted-text">Quantity</th>
+        <th>Unit Price</th>
+        <th>Subtotal Price</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td class="unicode-text">1</td>
+        <td class="formatted-text">Labubu Plush</td>
+        <td class="monospaced-text">1</td>
+        <td>1$</td>
+        <td>1$</td>
+      </tr>
+      </tbody>
+    </table>
+
     <p class="serif-text">RETAIL SALES PURCHASE AGREEMENT</p>
     <p class="serif-text">This Retail Sales Purchase Agreement ("Agreement") is entered into as of the Effective Date set forth below by and between Sales4fun, a company organized and existing under the laws of [Seller Jurisdiction], with its principal place of business at [Seller Address] ("Seller"), and the purchaser identified below, a business organized and existing under the laws of [Buyer Jurisdiction], with its principal place of business at the address set forth below ("Buyer"). Seller and Buyer may each be referred to herein as a "Party" and together as the "Parties."</p>
     <p class="serif-text">1. DEFINITIONS. In this Agreement, unless the context otherwise requires: "Goods" means the products described in one or more Purchase Orders issued under this Agreement; "Purchase Order" or "Order" means a written or electronic order placed by Buyer and accepted by Seller in accordance with this Agreement; "Delivery" means transfer of possession of Goods to Buyer in accordance with the delivery terms in this Agreement.</p>
@@ -137,6 +159,7 @@
   </div>
 
   <div class="last-page">
+    <!--
     <h2>Order data table</h2>
     <table border="1" cellpadding="4" cellspacing="0">
       <thead>
@@ -154,6 +177,7 @@
       </tr>
       </tbody>
     </table>
+    -->
   </div>
   </body>
   </html>
