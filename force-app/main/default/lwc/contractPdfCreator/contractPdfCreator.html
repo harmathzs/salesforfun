@@ -2,19 +2,40 @@
 <template>
   <lightning-card title="Create Contract PDF">
     <section if:true={contract} class="slds-p-around_medium">
-      <!-- TODO show contract details -->
-      <p>Contract ID: {contract.Id}</p>
+      <p>Contract: {contract.ContractNumber} — Account: {contract.Account.Name}</p>
+    </section>
 
+    <section if:true={contract} class="slds-p-around_medium" style="height:480px">
+      <!-- Preview iframe -->
+      <iframe src={vfUrl} style="width:100%;height:100%;border:1px solid #ddd" title="Contract PDF preview"></iframe>
     </section>
+
     <section if:true={contract} class="slds-p-around_medium">
-      <!-- TODO show PDF preview like in an inner iframe Visualforce PDF page, for example https://salesforfun-dev-ed--c.develop.vf.force.com/apex/ContractPDF?id=800dM00003aftAQQAY -->
+      <lightning-button variant="brand" label="Download PDF" onclick={handleDownload} class="slds-m-right_small"></lightning-button>
+      <lightning-button variant="neutral" label="Save to Contract" onclick={handleSave} class="slds-m-right_small"></lightning-button>
+      <lightning-button variant="neutral" label="Email PDF" onclick={openEmailModal} class="slds-m-right_small"></lightning-button>
+      <lightning-button variant="neutral" label="Cancel" onclick={handleCancel}></lightning-button>
     </section>
-    <section if:true={contract} class="slds-p-around_medium">
-      <!-- TODO buttons -->
-      <lightning-button-icon icon-name="action:download" value="Download PDF">Download PDF</lightning-button-icon>
-      <lightning-button-icon icon-name="utility:save" value="Save PDF"></lightning-button-icon>
-      <lightning-button-icon icon-name="action:email" value="Email PDF"></lightning-button-icon>
-      <lightning-button-icon icon-name="standard:first_non_empty" value="Cancel"></lightning-button-icon>
-    </section>
+
+    <!-- Email modal -->
+    <template if:true={showEmailModal}>
+      <section class="slds-modal slds-fade-in-open" role="dialog">
+        <div class="slds-modal__container">
+          <header class="slds-modal__header">
+            <h2 class="slds-text-heading_medium">Email Contract PDF</h2>
+          </header>
+          <div class="slds-modal__content slds-p-around_medium">
+            <lightning-input label="To" value={emailTo} onchange={onEmailToChange}></lightning-input>
+            <lightning-input label="Subject" value={emailSubject} onchange={onEmailSubjectChange}></lightning-input>
+            <lightning-textarea label="Body" value={emailBody} onchange={onEmailBodyChange}></lightning-textarea>
+          </div>
+          <footer class="slds-modal__footer slds-grid slds-grid_align-end">
+            <lightning-button variant="neutral" label="Cancel" onclick={closeEmailModal}></lightning-button>
+            <lightning-button variant="brand" label="Send" onclick={handleSendEmail} class="slds-m-left_small"></lightning-button>
+          </footer>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
   </lightning-card>
 </template>
