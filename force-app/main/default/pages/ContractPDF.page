@@ -1,10 +1,167 @@
-<apex:page id="ContractPDF" renderAs="pdf" standardController="Contract" extensions="ContractPDFcontroller">
-  <apex:pageBlock>
-    <apex:pageBlockSection>
-      <apex:outputText value="{!recordId}" />
-    </apex:pageBlockSection>
-    <apex:pageBlockSection>
-      <apex:outputText value="{!contract.ContractNumber}" />
-    </apex:pageBlockSection>
-  </apex:pageBlock>
+<apex:page id="ContractPDF" renderAs="pdf" standardController="Contract" extensions="ContractPDFcontroller"
+           showHeader="false" applyHtmlTag="false" applyBodyTag="false" standardStylesheets="false">
+  <html lang="en">
+  <head>
+    <style>
+      body {
+        font-family: "Arial Unicode MS";
+      }
+
+      /* Force a new page */
+      .page-break {
+        page-break-after: always;
+      }
+      .last-page {
+        page-break-after: avoid;
+      }
+
+      /* Prevent row splits in tables */
+      table, tr, td {
+        page-break-inside: avoid;
+      }
+
+
+      .unicode-text {
+        font-family: "Arial Unicode MS";
+      }
+
+      .formatted-text {
+        font-family: SansSerif;
+      }
+
+      .serif-text {
+        font-family: Times-Roman;
+      }
+
+      .monospaced-text {
+        font-family: Courier;
+      }
+
+      p {
+        text-align: justify;
+        text-indent: 18pt;
+      }
+
+      @page {
+        size: A4;
+        margin: 35mm 1cm 20mm;
+      }
+
+      /* Define different headers/footers for pages */
+
+      @page {
+        @top-center { content: element(header); }
+        @bottom-right { content: "Page " counter(page); }
+      }
+      @page:first {
+        @top-center { content: "First Page Header"; }
+      }
+
+      div.header {
+        position: running(header);
+      }
+
+      /* Watermark container - full page fixed position */
+      .watermark {
+        position: fixed;
+        top: 35%;
+        left: 10%;
+        width: 70%;
+        font-size: 90px;
+        color: #666;
+        opacity: 0.15;
+        transform: rotate(-45deg);
+        white-space: nowrap;
+        z-index: -1;
+        pointer-events: none; /* Prevent interference with selectable text */
+        user-select: none;
+      }
+    </style>
+    <title></title>
+  </head>
+
+  <body>
+  <div class="watermark" style="{!IF(true, '', 'display:none')}">WATERMARK</div>
+
+  <div class="header">
+    <table>
+      <tr>
+        <td>
+          <div style=
+               "height: 9mm; width: 20mm; background-color: black; color: white; font-style: italic; font-size: large; padding: 3mm; text-align: right; float: left;"
+          >Sales</div>
+          <div style=
+               "height: 9mm; width: 20mm; background-color: orange; color: black; font-style: italic; font-size: large; padding: 3mm; text-align: left; float: right;"
+          >force</div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="page-break">
+    <h1>First Page</h1>
+    <p class="serif-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+    <p class="serif-text">Integer nibh arcu, vehicula sed hendrerit ac, fringilla id purus. Mauris at lorem cursus, sodales ex non, congue ligula. Sed ut neque orci. Nam et lacus et nulla aliquet sodales. Integer finibus dictum lectus semper congue. Sed consequat eu turpis vitae malesuada. Nulla purus orci, ultrices sit amet diam ut, placerat finibus est. Cras vitae augue vel elit vestibulum ullamcorper. Aliquam pretium pellentesque lobortis. Cras quis nisl eget metus tempor malesuada. Donec sodales vulputate dui. Integer convallis luctus neque sit amet euismod. Nam odio ipsum, fringilla sed aliquet ut, tempor ac justo.</p>
+
+    <p class="serif-text">Donec et gravida sapien. Ut tincidunt scelerisque consequat. Aenean semper massa dolor, ut finibus diam viverra et. Duis malesuada eleifend magna, eget maximus arcu ornare ac. Quisque eget dui vitae mauris fermentum condimentum. Duis eleifend rutrum tortor, in eleifend mauris egestas at. Fusce feugiat molestie ultrices. Vivamus eleifend sed odio ac porttitor. Morbi in dictum felis. Vivamus mauris mauris, pellentesque et lacus tincidunt, fringilla varius diam. In pretium lacus a nulla pellentesque, et vulputate orci pulvinar.</p>
+
+    <p class="serif-text">Phasellus a arcu erat. Nam porttitor sagittis posuere. Curabitur placerat dui eget turpis volutpat blandit. Vivamus sed ligula nec risus tincidunt volutpat. Nullam placerat sem sed arcu posuere, quis accumsan tortor sagittis. Nam laoreet felis sit amet urna auctor, quis euismod turpis mattis. Nulla facilisi. Vivamus ut leo vel erat convallis egestas. Donec sit amet nisi iaculis, ultrices turpis eget, rutrum elit. Cras vel justo porta, gravida est sit amet, semper magna. Duis egestas ante nunc, quis semper sapien hendrerit ac. Donec et metus nunc. Phasellus iaculis nunc eu gravida porttitor. Aliquam erat volutpat. Nunc congue, orci quis consectetur ornare, arcu orci tincidunt massa, consectetur venenatis velit sem sed urna.</p>
+
+    <p class="serif-text">Nam a tellus a velit placerat lacinia. Donec non molestie lorem, lacinia faucibus nunc. Praesent eu risus dictum nibh cursus pellentesque vel in tortor. Mauris ut nisl metus. Nam suscipit tempor consequat. Praesent bibendum, ligula sed rutrum sodales, mauris dolor placerat sapien, id maximus enim libero sed dui. Cras vitae lobortis lacus. Nulla in feugiat eros. Maecenas gravida, lorem et ultricies egestas, ligula enim pellentesque leo, at porta ligula orci eget turpis. Maecenas cursus sodales volutpat. Proin ullamcorper at quam non porta. Nulla facilisi. Proin placerat risus ac euismod tempor. Suspendisse ac iaculis dui. Maecenas mauris lectus, elementum ac orci quis, consequat elementum turpis. Aliquam vel dictum quam.</p>
+
+    <p class="serif-text">Integer ultricies dictum lorem sit amet pellentesque. Proin consequat felis at nisl feugiat vulputate. Phasellus vehicula elementum sapien id aliquet. Ut fermentum efficitur malesuada. Curabitur in efficitur elit. Sed finibus ac felis sit amet interdum. In eleifend fermentum faucibus. Nam nisi magna, dapibus porttitor elementum mattis, lobortis et est. Nunc lacinia leo vel malesuada pulvinar. Curabitur eros turpis, accumsan eu tempor nec, lobortis non lectus. Integer ut augue feugiat, dignissim elit id, mollis nisi.</p>
+
+    <p class="serif-text">Cras sit amet cursus neque. Nulla imperdiet et felis non hendrerit. Integer pulvinar dictum tempor. Mauris tincidunt ligula nec congue accumsan. In tristique diam et nunc mollis rhoncus. Etiam tristique magna et vulputate interdum. Suspendisse id mauris ornare est porttitor dapibus tempus fermentum leo. Sed volutpat volutpat porta. Morbi suscipit non magna eu blandit. Phasellus gravida, nisl eu cursus dapibus, neque nisl vulputate enim, in sodales lorem lacus nec nunc. Duis et dignissim odio.</p>
+
+    <p class="serif-text">Sed suscipit lorem et aliquet euismod. Etiam id massa rutrum, rhoncus lacus sit amet, cursus erat. Aliquam bibendum et libero at vulputate. Etiam facilisis quam enim, id pulvinar risus eleifend vel. Nunc eu leo eros. Ut in lobortis augue. Proin volutpat pharetra risus non faucibus.</p>
+
+    <p class="serif-text">Praesent sed odio sit amet felis convallis vehicula. Integer et aliquam massa. In hac habitasse platea dictumst. Fusce in magna iaculis, varius orci eget, pellentesque mauris. Fusce sodales a massa vel tempus. In ac euismod nisi. Sed porttitor tortor sed posuere ultricies. Proin tristique porttitor eros eget luctus.</p>
+
+    <p class="serif-text">Sed sollicitudin metus nec ullamcorper luctus. Donec ac hendrerit metus. Duis eget arcu ac nunc blandit varius eu eget nibh. Ut magna mauris, maximus ac aliquet sit amet, finibus ac leo. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Mauris a vulputate dolor, eu consectetur metus. Vestibulum pellentesque orci velit, sed iaculis ligula viverra a. Morbi sit amet condimentum nibh, eget elementum lectus.</p>
+
+    <p class="serif-text">Suspendisse at neque finibus, luctus ante ut, venenatis nisl. Morbi ac libero egestas erat convallis egestas molestie a lacus. Praesent in justo pulvinar, convallis ligula eget, commodo enim. Donec elit nunc, bibendum nec elementum nec, eleifend sit amet libero. Maecenas commodo, metus a condimentum aliquet, eros ante consectetur lectus, et ullamcorper ex dui ac magna. Nunc mattis sodales nunc in molestie. Sed tincidunt vehicula enim, a malesuada orci hendrerit non. Sed tempor fringilla nulla vitae aliquam.</p>
+
+    <p class="serif-text">Sed ultricies egestas tellus, eu ultricies lorem porta vitae. Curabitur at bibendum lorem. Donec vel tempor dolor. Integer at eros ac nunc tristique ultrices. In id sapien nec urna egestas efficitur. Proin sit amet dui vehicula, iaculis diam et, pretium magna. Nunc urna sem, malesuada non malesuada non, dapibus vestibulum tellus. Proin fermentum est quam, nec suscipit felis posuere a. Phasellus ac efficitur dui. Donec sed ultricies enim. Nam et molestie risus, eu mattis sem. Suspendisse eleifend ullamcorper nisi id dapibus.</p>
+
+    <p class="serif-text">Integer arcu erat, consequat ut commodo sit amet, commodo id massa. Nam fringilla, metus ac hendrerit fringilla, mauris neque egestas magna, a feugiat metus erat tempus nisl. Pellentesque id tristique nulla. Cras ullamcorper semper risus eget malesuada. Morbi a orci et enim luctus iaculis quis sit amet dolor. Suspendisse viverra dignissim libero, nec gravida arcu. Ut porttitor tortor a facilisis tempor. Phasellus mattis elit ut odio tristique, sed eleifend diam accumsan.</p>
+
+    <p class="serif-text">Aliquam erat volutpat. Morbi et lacus ultricies, placerat nisi a, congue diam. Ut non justo euismod, porta elit sit amet, fringilla mi. Fusce finibus accumsan dui, quis tristique arcu vehicula eget. Proin eget diam et nibh eleifend venenatis sit amet molestie dolor. Aenean tincidunt tortor euismod libero fermentum, ut dignissim magna bibendum. Nam vitae eros eleifend, lacinia ligula in, mollis mauris. Donec vel lacus gravida erat viverra blandit eget sed diam. Nunc tempor, ante eu suscipit porta, sapien magna vestibulum dui, ac malesuada nibh orci vel est. Suspendisse sed porttitor velit. Aliquam diam eros, volutpat non purus eget, aliquet vehicula lorem. Vivamus volutpat sapien blandit, efficitur sem eget, auctor erat. Donec vitae elit a augue molestie congue. Phasellus condimentum sem ac aliquam ultrices. Etiam pretium, justo sit amet efficitur pellentesque, magna massa venenatis sapien, ac laoreet lacus ipsum finibus dolor.</p>
+
+    <p class="serif-text">Donec efficitur iaculis hendrerit. Integer vel pretium lacus. Nunc non eros sed lectus congue laoreet. Ut semper turpis vitae feugiat euismod. Ut tortor odio, aliquam id vulputate eget, posuere ut sapien. Etiam accumsan egestas ex, et gravida elit ultricies vitae. Aliquam vehicula, massa at laoreet rutrum, augue metus scelerisque purus, et scelerisque erat libero quis nibh. Suspendisse hendrerit urna id eros lacinia commodo. Vestibulum ac lectus eu quam malesuada sollicitudin.</p>
+
+    <p class="serif-text">Sed ac magna nec sapien porttitor facilisis. Proin vitae maximus ante, quis vulputate tortor. Vivamus interdum pharetra justo, eget accumsan quam vestibulum vel. Nam porttitor consectetur ante eu rutrum. Mauris risus urna, dapibus non massa quis, fringilla vulputate diam. Vivamus scelerisque faucibus consectetur. Aenean vehicula velit aliquam felis pulvinar consequat. Etiam velit neque, fermentum eu sem a, vulputate pulvinar lorem. Aliquam tempor diam tortor, ac posuere massa dapibus ac.</p>
+
+    <p class="serif-text">Aenean faucibus orci vitae erat fermentum euismod. Phasellus molestie felis venenatis, fringilla libero vel, suscipit urna. Maecenas sollicitudin maximus libero, semper fringilla lacus blandit sit amet. Cras a nulla quis velit blandit placerat. Integer cursus commodo ex. Donec interdum nunc non urna placerat pellentesque. Mauris imperdiet massa tempor molestie accumsan. Aenean dignissim vitae metus ac vehicula. Morbi sollicitudin ornare imperdiet. Donec at magna eget mauris molestie tristique egestas eget nisl.</p>
+
+    <p class="serif-text">Donec a nulla eu ante facilisis malesuada vitae non erat. Nulla sem neque, tincidunt sagittis cursus nec, cursus quis mauris. Quisque elementum sed justo vitae mollis. Duis mattis diam enim, et egestas ante varius id. Ut eu consectetur nunc. Sed non quam dui. Integer venenatis dictum massa, vitae dignissim nisl tincidunt et. Sed auctor neque ac hendrerit malesuada. Aliquam non libero gravida, lacinia mauris id, sagittis magna. Proin sem urna, ullamcorper a odio at, sagittis iaculis ex. Sed condimentum ligula urna, ac euismod lacus consequat ut. Proin a rhoncus justo. Phasellus pharetra enim ac ex feugiat aliquam.</p>
+
+    <p class="serif-text">Suspendisse sed placerat massa. Pellentesque eget neque risus. Integer sodales ante lorem, sed egestas ante tincidunt sit amet. Proin ornare purus ligula, ac convallis nisl tincidunt nec. Nam venenatis magna sed mauris placerat, a placerat felis posuere. Aliquam non augue nec neque viverra faucibus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Ut tempor dignissim nulla non ultrices. Nulla sit amet porta enim, et tincidunt nunc. Vestibulum gravida elit vehicula lectus vestibulum volutpat. Ut pharetra lectus purus, hendrerit ullamcorper est ultrices ut. Sed tristique sagittis nisi, varius malesuada tortor. Nullam fermentum vehicula justo, ut commodo tortor consectetur a. Suspendisse pharetra quis mauris eu viverra.</p>
+
+    <p class="serif-text">Ut hendrerit ante ut mi suscipit dapibus. Phasellus magna libero, porttitor vitae justo vel, egestas facilisis lorem. Vivamus varius in dolor non iaculis. Donec id congue magna. Etiam et tincidunt odio, a aliquam sapien. Integer bibendum quis est nec eleifend. Suspendisse porttitor ultrices gravida. Etiam porta arcu id turpis mollis, vel rutrum risus sollicitudin. Duis eget ornare purus, sed fringilla ex.</p>
+
+    <!-- <apex:include pageName="OrderSignature" /> -->
+  </div>
+
+  <div class="last-page">
+    <h2>Order data table</h2>
+    <table border="1" cellpadding="4" cellspacing="0">
+      <thead>
+      <tr>
+        <th width="30%" class="formatted-text">Unicode</th>
+        <th width="20%" class="formatted-text">Formatted</th>
+        <th class="formatted-text">Monospace</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td class="unicode-text">Árvíztűrő tükörfúrógép</td>
+        <td class="formatted-text"><strong>one</strong> <i>two</i> <u>three</u><sup>2</sup></td>
+        <td class="monospaced-text">print Hello;</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  </body>
+  </html>
 </apex:page>
