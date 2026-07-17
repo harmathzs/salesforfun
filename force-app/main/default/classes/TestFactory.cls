@@ -495,4 +495,24 @@ public with sharing class TestFactory {
 
     return olis;
   }
+
+  public static Contract[] createTestContracts(Integer count) {
+    Account[] accounts = createTestAccounts(1);
+    insert accounts;
+    Account acc = accounts.get(0);
+
+    Contract[] contracts = new List<Contract>();
+    for (Integer i=0; i<count; i++) {
+      Contract contract = new Contract(
+        AccountId = acc.Id,
+        Status = 'Draft',
+        StartDate = Date.today(),
+        ContractTerm = 12
+      );
+      contracts.add(contract);
+    }
+
+    return contracts;
+  }
+
 }
