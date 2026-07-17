@@ -1,3 +1,8 @@
 <!-- Contract PDF Creator -->
 <template>
+  <lightning-card>
+    <section if:true={contract} class="slds-p-around_medium">
+      <p>Contract ID: {contract.Id}</p>
+    </section>
+  </lightning-card>
 </template>
