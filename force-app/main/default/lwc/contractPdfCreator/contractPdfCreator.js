@@ -1,5 +1,7 @@
 import { LightningElement, api, track } from 'lwc';
 
+import { CloseActionScreenEvent } from 'lightning/actions';
+
 import queryContract from '@salesforce/apex/ContractPDFcontroller.queryContract';
 import getVFUrl from '@salesforce/apex/ContractPDFcontroller.getVFUrl';
 import savePdfToContract from '@salesforce/apex/ContractPDFcontroller.savePdfToContract';
@@ -56,6 +58,7 @@ export default class ContractPdfCreator extends LightningElement {
   }
 
   handleCancel(){
-    this.dispatchEvent(new CustomEvent('cancel'));
+    // this.dispatchEvent(new CustomEvent('cancel'));
+    this.dispatchEvent(new CloseActionScreenEvent());
   }
 }
