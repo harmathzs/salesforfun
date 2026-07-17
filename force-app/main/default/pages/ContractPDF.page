@@ -117,13 +117,15 @@
       </tr>
       </thead>
       <tbody>
-      <tr>
-        <td class="formatted-text"  align="right">1</td>
-        <td class="unicode-text">Labubu Plush</td>
-        <td class="formatted-text" align="right">1</td>
-        <td class="formatted-text" align="right">1$</td>
-        <td class="formatted-text" align="right">1$</td>
-      </tr>
+      <apex:repeat value="{!contract.Contract_Line_Items__r}" var="crli">
+        <tr>
+          <td class="formatted-text"  align="right">1</td>
+          <td class="unicode-text">{!crli.Product__r.Name}</td>
+          <td class="formatted-text" align="right">{!crli.Quantity__c}</td>
+          <td class="formatted-text" align="right">{!crli.Unit_Price__c}</td>
+          <td class="formatted-text" align="right">{!crli.Subtotal_Price__c}</td>
+        </tr>
+      </apex:repeat>
 
       <tr>
         <td colspan="4" class="formatted-text"><strong>Total Price:</strong></td>
