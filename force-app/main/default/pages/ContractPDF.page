@@ -109,20 +109,25 @@
     <table border="1" cellpadding="4" cellspacing="0">
       <thead>
       <tr>
-        <th width="30%" class="formatted-text">#</th>
-        <th width="20%" class="formatted-text">Name</th>
+        <th width="10%" class="formatted-text">#</th>
+        <th width="40%" class="formatted-text">Name</th>
         <th class="formatted-text">Quantity</th>
-        <th>Unit Price</th>
-        <th>Subtotal Price</th>
+        <th class="formatted-text">Unit Price</th>
+        <th class="formatted-text">Subtotal</th>
       </tr>
       </thead>
       <tbody>
       <tr>
-        <td class="unicode-text">1</td>
-        <td class="formatted-text">Labubu Plush</td>
-        <td class="monospaced-text">1</td>
-        <td>1$</td>
-        <td>1$</td>
+        <td class="formatted-text"  align="right">1</td>
+        <td class="unicode-text">Labubu Plush</td>
+        <td class="formatted-text" align="right">1</td>
+        <td class="formatted-text" align="right">1$</td>
+        <td class="formatted-text" align="right">1$</td>
+      </tr>
+
+      <tr>
+        <td colspan="4" class="formatted-text"><strong>Total Price:</strong></td>
+        <td class="formatted-text" align="right">1$</td>
       </tr>
       </tbody>
     </table>
