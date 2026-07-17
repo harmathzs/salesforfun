@@ -26,6 +26,7 @@ public with sharing class ContractPDFcontroller {
     }
   }
 
+  @AuraEnabled
   public static Contract queryContract(Id contractId) {
     if (String.isBlank(contractId)) return null;
 
