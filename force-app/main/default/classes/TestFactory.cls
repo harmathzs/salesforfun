@@ -495,4 +495,42 @@ public with sharing class TestFactory {
 
     return olis;
   }
+
+  public static Contract[] createTestContracts(Integer count) {
+    Account[] accounts = createTestAccounts(1);
+    insert accounts;
+    Account acc = accounts.get(0);
+
+    Contract[] contracts = new List<Contract>();
+    for (Integer i=0; i<count; i++) {
+      Contract contract = new Contract(
+        AccountId = acc.Id,
+        Status = 'Draft',
+        StartDate = Date.today(),
+        ContractTerm = 12
+      );
+      contracts.add(contract);
+    }
+
+    return contracts;
+  }
+
+  public static Contract_Line_Item__c[] createTestContractLineItems(Contract[] contracts, PricebookEntry pbe) {
+    Contract_Line_Item__c[] crlis = new List<Contract_Line_Item__c>();
+    for (Contract contract: contracts) {
+      if (String.isNotBlank(contract.Id)) {
+        Contract_Line_Item__c crli = new Contract_Line_Item__c(
+          Contract__c = contract.Id,
+          Description__c = pbe.Product2.Description,
+          Opportunity__c = contract.Opportunity__c,
+          Product__c = pbe.Product2Id,
+          Quantity__c = 1,
+          Unit_Price__c = pbe.UnitPrice
+        );
+        crlis.add(crli);
+      }
+    }
+    return crlis;
+  }
+
 }

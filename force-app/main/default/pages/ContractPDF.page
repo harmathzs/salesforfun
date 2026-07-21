@@ -1,0 +1,194 @@
+<apex:page id="ContractPDF" renderAs="pdf" standardController="Contract" extensions="ContractPDFcontroller"
+           showHeader="false" applyHtmlTag="false" applyBodyTag="false" standardStylesheets="false">
+  <html lang="en">
+  <head>
+    <style>
+      body {
+        font-family: "Arial Unicode MS";
+      }
+
+      /* Force a new page */
+      .page-break {
+        page-break-after: always;
+      }
+      .last-page {
+        page-break-after: avoid;
+      }
+
+      /* Prevent row splits in tables */
+      table, tr, td {
+        page-break-inside: avoid;
+      }
+
+
+      .unicode-text {
+        font-family: "Arial Unicode MS";
+      }
+
+      .formatted-text {
+        font-family: SansSerif;
+      }
+
+      .serif-text {
+        font-family: Times-Roman;
+      }
+
+      .monospaced-text {
+        font-family: Courier;
+      }
+
+      p {
+        text-align: justify;
+        text-indent: 18pt;
+      }
+
+      @page {
+        size: A4;
+        margin: 35mm 1cm 20mm;
+      }
+
+      /* Define different headers/footers for pages */
+
+      @page {
+        @top-center { content: element(header); }
+        @bottom-right { content: "Page " counter(page); }
+      }
+      @page:first {
+        @top-center { content: "Contract Agreement"; }
+      }
+
+      div.header {
+        position: running(header);
+      }
+
+      /* Watermark container - full page fixed position */
+      .watermark {
+        position: fixed;
+        top: 35%;
+        left: 10%;
+        width: 70%;
+        font-size: 90px;
+        color: #666;
+        opacity: 0.15;
+        transform: rotate(-45deg);
+        white-space: nowrap;
+        z-index: -1;
+        pointer-events: none; /* Prevent interference with selectable text */
+        user-select: none;
+      }
+    </style>
+    <title></title>
+  </head>
+
+  <body>
+  <div class="watermark" style="{!IF(contract.Status=='Draft', '', 'display:none')}">DRAFT</div>
+
+  <div class="header">
+    <table>
+      <tr>
+        <!--
+        <td>
+          <div style=
+               "height: 9mm; width: 20mm; background-color: black; color: white; font-style: italic; font-size: large; padding: 3mm; text-align: right; float: left;"
+          >Sales</div>
+          <div style=
+               "height: 9mm; width: 20mm; background-color: orange; color: black; font-style: italic; font-size: large; padding: 3mm; text-align: left; float: right;"
+          >force</div>
+        </td>
+        -->
+        <td>
+          <img src="{!URLFOR($Resource.Sales4funBranding600logo)}" alt="Sales4fun" style="height: 18mm; width: 40mm;" />
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="page-break">
+    <h1>Contract nr. {!contract.ContractNumber}</h1>
+    <h2>Products</h2>
+    <table border="1" cellpadding="4" cellspacing="0">
+      <thead>
+      <tr>
+        <th width="5%" class="formatted-text">#</th>
+        <th width="45%" class="formatted-text">Name</th>
+        <th class="formatted-text">Quantity</th>
+        <th class="formatted-text">Unit Price</th>
+        <th class="formatted-text">Subtotal</th>
+      </tr>
+      </thead>
+      <tbody>
+      <apex:variable var="idx" value="{!1}" />
+      <apex:repeat value="{!contract.Contract_Line_Items__r}" var="crli">
+        <tr>
+          <td class="formatted-text" align="right">{!idx}</td>
+          <td class="unicode-text">{!crli.Product__r.Name}</td>
+          <td class="formatted-text" align="right">{!crli.Quantity__c}</td>
+          <td class="formatted-text" align="right"><apex:outputField value="{!crli.Unit_Price__c}" /></td>
+          <td class="formatted-text" align="right"><apex:outputField value="{!crli.Subtotal_Price__c}" /></td>
+        </tr>
+        <apex:variable var="idx" value="{!idx+1}" />
+      </apex:repeat>
+
+      <tr>
+        <td colspan="4" class="formatted-text"><strong>Total Price:</strong></td>
+        <td class="formatted-text" align="right"><apex:outputField value="{!contract.Total_Price__c}" /></td>
+      </tr>
+      </tbody>
+    </table>
+
+    <p class="serif-text">RETAIL SALES PURCHASE AGREEMENT</p>
+    <p class="serif-text">This Retail Sales Purchase Agreement ("Agreement") is entered into as of the Effective Date set forth below by and between Sales4fun, a company organized and existing under the laws of Seller Jurisdiction, with its principal place of business at Seller Address ("Seller"), and the purchaser identified below, a business organized and existing under the laws of Buyer Jurisdiction, with its principal place of business at the address set forth below ("Buyer"). Seller and Buyer may each be referred to herein as a "Party" and together as the "Parties."</p>
+    <p class="serif-text">1. DEFINITIONS. In this Agreement, unless the context otherwise requires: "Goods" means the products described in one or more Purchase Orders issued under this Agreement; "Purchase Order" or "Order" means a written or electronic order placed by Buyer and accepted by Seller in accordance with this Agreement; "Delivery" means transfer of possession of Goods to Buyer in accordance with the delivery terms in this Agreement.</p>
+    <p class="serif-text">2. SALE OF GOODS. Seller agrees to sell and Buyer agrees to purchase the Goods described in accepted Purchase Orders, subject to the terms and conditions of this Agreement. Each Purchase Order shall identify the Goods, quantities, prices, delivery dates and shipping instructions.</p>
+    <p class="serif-text">3. ORDERS AND ACCEPTANCE. All Purchase Orders are subject to acceptance by Seller. Seller may accept or reject any Purchase Order in its sole discretion; acceptance is effective when Seller issues a written or electronic confirmation. Any additional or different terms proposed by Buyer in a Purchase Order or other document are expressly rejected by Seller, and the Parties agree that this Agreement controls.</p>
+    <p class="serif-text">4. PRICE; PAYMENT. Prices for Goods are the prices set forth in Seller’s accepted Purchase Order. Unless otherwise agreed in writing, prices are exclusive of taxes, duties, shipping, handling and insurance, which are the responsibility of Buyer. Buyer shall pay all invoices in full within thirty (30) days from invoice date, unless otherwise agreed in writing. Late payments shall accrue interest at the lesser of 1.5% per month or the maximum rate permitted by law. Buyer shall not withhold or set off any amounts due to Seller for any reason, except as expressly agreed in writing.</p>
+    <p class="serif-text">5. DELIVERY; RISK OF LOSS. Delivery terms are ex works (EXW) Seller’s designated facility unless otherwise agreed in writing. Title and risk of loss or damage to the Goods shall pass to Buyer upon Seller’s delivery to the carrier, unless otherwise specified in an accepted Purchase Order. Delivery dates are estimates only; Seller shall not be liable for delays due to causes beyond its reasonable control.</p>
+    <p class="serif-text">6. INSPECTION; ACCEPTANCE; RETURNS. Buyer shall inspect the Goods promptly upon receipt. Buyer must notify Seller in writing of any nonconformity, shortage or defect within ten (10) days after receipt of the Goods, specifying the basis for rejection. If Buyer fails to provide timely notice, the Goods shall be deemed accepted. Return, replacement or remedy for nonconforming Goods shall be governed by Seller’s return policy or as otherwise agreed in writing.</p>
+    <p class="serif-text">7. WARRANTIES. Seller warrants that, at the time of delivery, the Goods will conform to Seller’s published specifications and be free from defects in material and workmanship under normal use for a period of ninety (90) days unless a longer warranty period is specified for particular Goods. THE FOREGOING IS THE SOLE AND EXCLUSIVE WARRANTY PROVIDED BY SELLER; SELLER EXPRESSLY DISCLAIMS ALL OTHER WARRANTIES, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.</p>
+    <p class="serif-text">8. LIMITATION OF LIABILITY. EXCEPT FOR A PARTY’S FRAUD, WILLFUL MISCONDUCT, OR GROSS NEGLIGENCE, NEITHER PARTY SHALL BE LIABLE TO THE OTHER FOR ANY INDIRECT, INCIDENTAL, CONSEQUENTIAL, SPECIAL OR PUNITIVE DAMAGES, INCLUDING LOSS OF PROFITS OR REVENUE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. SELLER’S AGGREGATE LIABILITY ARISING OUT OF OR RELATING TO THIS AGREEMENT OR THE GOODS SHALL NOT EXCEED THE AMOUNTS PAID BY BUYER FOR THE SPECIFIC GOODS GIVING RISE TO THE CLAIM DURING THE TWELVE (12) MONTHS PRECEDING THE CLAIM.</p>
+    <p class="serif-text">9. COMPLIANCE WITH LAWS. Each Party shall comply with all applicable laws, rules and regulations in performing its obligations under this Agreement, including export control laws and sanctions. Buyer shall not resell Goods in violation of applicable law and shall obtain, at its expense, any import permits, licenses or approvals required for the importation, sale or distribution of the Goods.</p>
+    <p class="serif-text">10. CONFIDENTIALITY. Each Party agrees to maintain the confidentiality of non-public information disclosed by the other Party that is designated as confidential or that reasonably should be understood to be confidential. Confidential information shall not include information that (a) is or becomes publicly known through no breach by the receiving Party, (b) is lawfully received from a third party without restriction, or (c) is independently developed without use of Confidential Information.</p>
+    <p class="serif-text">11. INTELLECTUAL PROPERTY. Seller retains all right, title and interest in and to Seller’s trademarks, trade names, designs, specifications and any intellectual property embodied in or relating to the Goods. Buyer shall not remove, alter or obscure any trademark, serial number or other proprietary notice affixed to the Goods.</p>
+    <p class="serif-text">12. FORCE MAJEURE. Neither Party shall be liable for delay or failure to perform any obligation (except payment obligations) if such delay or failure is caused by events beyond its reasonable control, including acts of God, fire, flood, epidemic, war, terrorism, civil unrest, strikes, government actions, shortages of materials or transportation delays. The affected Party shall promptly notify the other and make reasonable efforts to resume performance.</p>
+    <p class="serif-text">13. TERMINATION. Either Party may terminate this Agreement for material breach by the other Party if the breaching Party fails to cure such breach within thirty (30) days after receiving written notice. Seller may suspend performance or cancel Orders if Buyer fails to pay when due or becomes insolvent. Termination shall not relieve Buyer of its obligation to pay for Goods already delivered.</p>
+    <p class="serif-text">14. INDEMNIFICATION. Buyer shall indemnify, defend and hold harmless Seller and its officers, directors, employees and agents from and against any third-party claims, liabilities, losses, damages, costs and expenses (including reasonable attorneys’ fees) arising out of Buyer’s negligence, willful misconduct, breach of this Agreement, or the resale, distribution or misuse of the Goods by Buyer or its customers.</p>
+    <p class="serif-text">15. DATA PROTECTION. To the extent the Parties exchange personal data, each Party shall comply with applicable data protection laws and process personal data only for the purposes set forth in this Agreement or as otherwise authorized in writing.</p>
+    <p class="serif-text">16. ASSIGNMENT. Neither Party may assign or transfer this Agreement or any rights or obligations hereunder without the other Party’s prior written consent, except that Seller may assign to an affiliate or to a purchaser of substantially all of Seller’s assets. Any purported assignment in violation of this provision shall be void.</p>
+    <p class="serif-text">17. NOTICES. All notices and communications under this Agreement shall be in writing and delivered to the addresses set forth in the Purchase Order or such other address as a Party may designate by notice. Notices may be delivered by hand, courier, certified mail or electronic transmission (provided receipt is confirmed).</p>
+    <p class="serif-text">18. SEVERABILITY. If any provision of this Agreement is held invalid or unenforceable, the remaining provisions shall remain in full force and effect and the invalid or unenforceable provision shall be replaced by a valid provision that most closely approximates the Parties’ intent.</p>
+    <p class="serif-text">19. GOVERNING LAW; DISPUTE RESOLUTION. This Agreement shall be governed by and construed in accordance with the laws of Governing Law Jurisdiction, without regard to its conflict of laws rules. Any dispute arising out of or in connection with this Agreement shall be resolved by the courts located in Venue, or by arbitration if the Parties agree in writing to arbitrate; venue and procedure shall be as set forth in the applicable Purchase Order or a separate written agreement.</p>
+    <p class="serif-text">20. ENTIRE AGREEMENT. This Agreement, together with accepted Purchase Orders and any documents expressly incorporated herein, constitutes the entire agreement between the Parties concerning its subject matter and supersedes all prior and contemporaneous agreements, proposals, negotiations and communications, whether written or oral.</p>
+    <p class="serif-text">21. AMENDMENT. No amendment or modification of this Agreement shall be binding unless executed in writing by authorized representatives of both Parties.</p>
+    <p class="serif-text">22. INDEPENDENT CONTRACTORS. The Parties are independent contractors. Nothing in this Agreement creates an agency, partnership, joint venture or employment relationship between the Parties.</p>
+    <p class="serif-text">23. WAIVER. No delay or failure to exercise any right or remedy shall constitute a waiver thereof, and any waiver must be in writing and signed by the waiving Party.</p>
+    <p class="serif-text">24. COUNTERPARTS; ELECTRONIC SIGNATURES. This Agreement may be executed in counterparts, each of which shall be deemed an original and all of which together shall constitute one instrument. Signatures transmitted electronically (including by PDF or e-signature platform) shall be binding.</p>
+    <p class="serif-text">IN WITNESS WHEREOF, the Parties have executed this Agreement as of the dates set forth below.</p>
+
+    <apex:include pageName="ContractSignature" />
+  </div>
+  <!--
+<div class="last-page">
+
+  <h2>Order data table</h2>
+  <table border="1" cellpadding="4" cellspacing="0">
+    <thead>
+    <tr>
+      <th width="30%" class="formatted-text">Unicode</th>
+      <th width="20%" class="formatted-text">Formatted</th>
+      <th class="formatted-text">Monospace</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td class="unicode-text">Árvíztűrő tükörfúrógép</td>
+      <td class="formatted-text"><strong>one</strong> <i>two</i> <u>three</u><sup>2</sup></td>
+      <td class="monospaced-text">print Hello;</td>
+    </tr>
+    </tbody>
+  </table>
+
+  </div>
+-->
+  </body>
+  </html>
+</apex:page>
